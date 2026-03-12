@@ -1638,7 +1638,7 @@ function openWorkspaceModal(){
         <div class="ws-icon">🏢</div>
         <div class="ws-info">
           <div class="ws-name">${w.name}</div>
-          <div class="ws-role">${isOwner?'Propriétaire · Code: <span class="ws-code" onclick="copyCode(event,''+w.invite_code+'')">'+w.invite_code+'</span>':'Membre'}</div>
+          <div class="ws-role">${isOwner?`Propriétaire &middot; Code: <span class="ws-code" onclick="copyCode(event,'${w.invite_code}')">${w.invite_code}</span>`:'Membre'}</div>
         </div>
         ${active?'<span style="color:var(--accent)">✓</span>':''}
       </div>`;
