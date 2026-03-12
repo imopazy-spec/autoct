@@ -747,7 +747,7 @@ function renderHome(){
         <span class="status-pill ${st.cls}">${st.label}</span>
       </div>
       <div class="vehicle-actions">
-        <button class="icon-btn del" onclick="askDeleteVehicle(${v.id})" title="Supprimer">🗑</button>
+        <button class="icon-btn del" onclick="askDeleteVehicle('${v.id}')" title="Supprimer">🗑</button>
       </div>
     </div>`;
   }).join('');
@@ -784,8 +784,8 @@ function renderHistoryList(){
       </div>
       <div class="history-footer">
         <div class="history-btns">
-          <button class="mini-btn" onclick="openEditHistoryModal(${h.id})">✏️ Modifier</button>
-          <button class="mini-btn del-btn" onclick="askDeleteHistory(${h.id})">🗑 Supprimer</button>
+          <button class="mini-btn" onclick="openEditHistoryModal('${h.id}')">✏️ Modifier</button>
+          <button class="mini-btn del-btn" onclick="askDeleteHistory('${h.id}')">🗑 Supprimer</button>
         </div>
         <span class="chip chip-${h.result==='Favorable'?'ok':h.result==='Défavorable'?'urgent':'warn'}">${h.result}</span>
       </div>
