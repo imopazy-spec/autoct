@@ -1699,7 +1699,7 @@ function openJoinWorkspace(){
 async function joinWorkspace(){
   const code=document.getElementById('wsCodeInput').value.trim().toUpperCase();
   const err=document.getElementById('wsJoinErr');
-  if(!code){err.textContent='Entrez un code d'invitation.';return;}
+  if(!code){err.textContent='Entrez un code invitation.';return;}
   try{
     // Trouver l'espace avec ce code
     const data=await _rest('GET','workspaces',null,{'invite_code':'eq.'+code,'select':'*'});
