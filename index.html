@@ -1350,10 +1350,8 @@ function switchAuthTab(tab){
 
 async function doLoginGoogle(){
   try{
-    // Ouvrir popup Google OAuth via Supabase
-    const redirectTo = location.href.split('?')[0];
+    const redirectTo = 'https://autoct.vercel.app';
     const url = SUPA_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(redirectTo);
-    // Dans un fichier local, on ouvre dans la même fenêtre
     window.location.href = url;
   }catch(e){
     console.error('Google login error:',e);
