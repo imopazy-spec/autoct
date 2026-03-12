@@ -1404,14 +1404,16 @@ async function onLogin(user){
   document.getElementById('authScreen').style.display='none';
   const chip=document.getElementById('userChip');
   chip.style.display='flex';
-  chip.textContent='👤 '+user.email.split('@')[0];
-  // Charger depuis Supabase (ou cache local si déjà chargé)
-  vehicles=[];history=[];
+  // Afficher le vrai nom Google si dispo
+  const displayName = user.user_metadata&&user.user_metadata.full_name ? user.user_metadata.full_name : user.email.split('@')[0];
+  chip.textContent='👤 '+displayName;
+  // Afficher le cache local immédiatement
+  render();
+  // Charger depuis Supabase en arrière-plan
   await loadFromSupabase();
-  // Sauvegarder en cache local pour le F5
   save();
   render();
-  toast('Bienvenue '+(user.email.split('@')[0])+' !','success');
+  toast('Bienvenue '+displayName+' !','success');
 }
 
 function showUserMenu(){
