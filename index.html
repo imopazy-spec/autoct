@@ -1455,12 +1455,9 @@ async function doLogout(){
   try{await fetch(SUPA_URL+'/auth/v1/logout',{method:'POST',headers:_headers()});}catch(e){}
   currentUser=null;_accessToken=null;_refreshToken=null;
   localStorage.removeItem('ct_session');
-  document.getElementById('userChip').style.display='none';
-  vehicles=[];history=[];
-  localStorage.removeItem('ct_v');localStorage.removeItem('ct_h');
-  render();
-  document.getElementById('authScreen').style.display='flex';
-  toast('Deconnecte.','');
+  localStorage.removeItem('ct_v');
+  localStorage.removeItem('ct_h');
+  location.reload();
 }
 
 async function loadFromSupabase(){
