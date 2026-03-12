@@ -1522,7 +1522,6 @@ async function doLogout(){
 async function loadFromSupabase(){
   if(!currentUser)return;
   try{
-    const vFilter=currentWorkspace?{'workspace_id':'eq.'+currentWorkspace.id,'order':'created_at.asc','select':'*'}:{'user_id':'eq.'+currentUser.id,'is.null':'workspace_id','order':'created_at.asc','select':'*'};
     const [vData,hData]=await Promise.all([
       _rest('GET','vehicles',null,currentWorkspace?{'workspace_id':'eq.'+currentWorkspace.id,'order':'created_at.asc','select':'*'}:{'user_id':'eq.'+currentUser.id,'order':'created_at.asc','select':'*'}),
       _rest('GET','history',null,{'user_id':'eq.'+currentUser.id,'order':'date.desc','select':'*'})
@@ -1607,6 +1606,7 @@ async function loadWorkspaces(){
 
 function renderWorkspacePicker(){
   const picker=document.getElementById('workspacePicker');
+  if(!picker)return;
   if(!currentUser){picker.style.display='none';return;}
   picker.style.display='flex';
   if(currentWorkspace){
