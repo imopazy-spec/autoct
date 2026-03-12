@@ -178,6 +178,15 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 .auth-btn:hover{opacity:.85}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-err{font-size:.8rem;color:var(--urgent);margin-top:10px;text-align:center;min-height:18px}
+/* WORKSPACE */
+.ws-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s}
+.ws-item:hover{background:var(--surface2)}
+.ws-item.active{background:var(--accent-dim);border:1px solid rgba(0,229,160,0.2)}
+.ws-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--surface2)}
+.ws-info{flex:1}
+.ws-name{font-weight:600;font-size:.9rem}
+.ws-role{font-size:.75rem;color:var(--ink3)}
+.ws-code{font-family:monospace;font-size:.85rem;background:var(--surface2);padding:6px 12px;border-radius:6px;color:var(--accent);letter-spacing:2px;cursor:pointer;display:inline-block}
 .google-btn{width:100%;padding:12px;background:#fff;color:#1f1f1f;font-family:var(--font-body);font-size:.9rem;font-weight:600;border:1px solid #ddd;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px;transition:background .2s}
 .google-btn:hover{background:#f5f5f5}
 .auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink3);font-size:.78rem}
@@ -316,6 +325,11 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 <!-- TOP NAV -->
 <nav class="top-nav">
   <div class="logo"><div class="logo-dot"></div>AutoCT</div>
+  <div id="workspacePicker" style="display:none;align-items:center;gap:6px;cursor:pointer;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:5px 12px;font-size:.8rem;color:var(--ink2)" onclick="openWorkspaceModal()">
+    <span id="workspaceIcon">👤</span>
+    <span id="workspaceName">Personnel</span>
+    <span style="color:var(--ink3)">▾</span>
+  </div>
   <div class="nav-actions">
     <button class="nav-btn" onclick="openEmailModal()">✉ Rappels</button>
     <button class="nav-btn primary" onclick="openAddModal()">+ Véhicule</button>
@@ -422,6 +436,51 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
     <button class="btn" style="flex:1;justify-content:center;background:var(--surface2);color:var(--ink2);border:1px solid var(--border2)" onclick="resetData()">🗑 Effacer données</button>
   </div>
 </main></div>
+
+<!-- ══ MODAL WORKSPACE ══ -->
+<div class="modal-overlay" id="workspaceModal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">Espaces de travail</div>
+      <button class="modal-close" onclick="closeModal('workspaceModal')">✕</button>
+    </div>
+    <div id="workspaceList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
+    <div style="border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openCreateWorkspace()">+ Créer un espace pro</button>
+      <button class="btn" style="width:100%;justify-content:center;background:var(--surface2)" onclick="openJoinWorkspace()">🔑 Rejoindre avec un code</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL CRÉER WORKSPACE ══ -->
+<div class="modal-overlay" id="createWorkspaceModal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title">Créer un espace pro</div>
+      <button class="modal-close" onclick="closeModal('createWorkspaceModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-field"><label>Nom de l'espace</label><input type="text" id="wsNameInput" placeholder="Ex: Garage Martin, Mon Entreprise..."></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px" onclick="createWorkspace()">Créer</button>
+      <div class="auth-err" id="wsCreateErr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL REJOINDRE WORKSPACE ══ -->
+<div class="modal-overlay" id="joinWorkspaceModal">
+  <div class="modal" style="max-width:380px">
+    <div class="modal-header">
+      <div class="modal-title">Rejoindre un espace</div>
+      <button class="modal-close" onclick="closeModal('joinWorkspaceModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="auth-field"><label>Code d'invitation</label><input type="text" id="wsCodeInput" placeholder="Ex: GARAGE-X7K2" style="text-transform:uppercase;letter-spacing:2px"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px" onclick="joinWorkspace()">Rejoindre</button>
+      <div class="auth-err" id="wsJoinErr"></div>
+    </div>
+  </div>
+</div>
 
 <!-- ══ BOTTOM NAV ══ -->
 <nav class="bottom-nav">
@@ -1463,8 +1522,9 @@ async function doLogout(){
 async function loadFromSupabase(){
   if(!currentUser)return;
   try{
+    const vFilter=currentWorkspace?{'workspace_id':'eq.'+currentWorkspace.id,'order':'created_at.asc','select':'*'}:{'user_id':'eq.'+currentUser.id,'is.null':'workspace_id','order':'created_at.asc','select':'*'};
     const [vData,hData]=await Promise.all([
-      _rest('GET','vehicles',null,{'user_id':'eq.'+currentUser.id,'order':'created_at.asc','select':'*'}),
+      _rest('GET','vehicles',null,currentWorkspace?{'workspace_id':'eq.'+currentWorkspace.id,'order':'created_at.asc','select':'*'}:{'user_id':'eq.'+currentUser.id,'order':'created_at.asc','select':'*'}),
       _rest('GET','history',null,{'user_id':'eq.'+currentUser.id,'order':'date.desc','select':'*'})
     ]);
     if(vData){
@@ -1523,6 +1583,138 @@ async function saveHistoryToSupabase(h){
 async function deleteHistoryFromSupabase(id){
   if(!currentUser||typeof id!=='string')return;
   try{await _rest('DELETE','history?id=eq.'+id);}catch(e){}
+}
+
+// ════════════════════════════════════════
+// WORKSPACES
+// ════════════════════════════════════════
+let workspaces=[], currentWorkspace=null;
+
+async function loadWorkspaces(){
+  if(!currentUser)return;
+  try{
+    // Espaces dont je suis propriétaire
+    const owned=await _rest('GET','workspaces',null,{'owner_id':'eq.'+currentUser.id,'select':'*'});
+    // Espaces dont je suis membre
+    const memberships=await _rest('GET','workspace_members',null,{'user_id':'eq.'+currentUser.id,'select':'*,workspaces(*)'});
+    const memberSpaces=(memberships||[]).map(m=>m.workspaces).filter(Boolean);
+    workspaces=[...(owned||[]),...memberSpaces];
+    // Dédupliquer
+    workspaces=workspaces.filter((w,i,a)=>a.findIndex(x=>x.id===w.id)===i);
+  }catch(e){console.error('loadWorkspaces:',e);workspaces=[];}
+  renderWorkspacePicker();
+}
+
+function renderWorkspacePicker(){
+  const picker=document.getElementById('workspacePicker');
+  if(!currentUser){picker.style.display='none';return;}
+  picker.style.display='flex';
+  if(currentWorkspace){
+    document.getElementById('workspaceIcon').textContent='🏢';
+    document.getElementById('workspaceName').textContent=currentWorkspace.name;
+  }else{
+    document.getElementById('workspaceIcon').textContent='👤';
+    document.getElementById('workspaceName').textContent='Personnel';
+  }
+}
+
+function openWorkspaceModal(){
+  const list=document.getElementById('workspaceList');
+  // Espace personnel
+  const isPersonal=!currentWorkspace;
+  list.innerHTML=`
+    <div class="ws-item ${isPersonal?'active':''}" onclick="switchWorkspace(null)">
+      <div class="ws-icon">👤</div>
+      <div class="ws-info">
+        <div class="ws-name">Personnel</div>
+        <div class="ws-role">Mes véhicules personnels</div>
+      </div>
+      ${isPersonal?'<span style="color:var(--accent)">✓</span>':''}
+    </div>
+    ${workspaces.map(w=>{
+      const active=currentWorkspace&&currentWorkspace.id===w.id;
+      const isOwner=w.owner_id===currentUser.id;
+      return `<div class="ws-item ${active?'active':''}" onclick="switchWorkspace('${w.id}')">
+        <div class="ws-icon">🏢</div>
+        <div class="ws-info">
+          <div class="ws-name">${w.name}</div>
+          <div class="ws-role">${isOwner?'Propriétaire · Code: <span class="ws-code" onclick="copyCode(event,''+w.invite_code+'')">'+w.invite_code+'</span>':'Membre'}</div>
+        </div>
+        ${active?'<span style="color:var(--accent)">✓</span>':''}
+      </div>`;
+    }).join('')}`;
+  document.getElementById('workspaceModal').classList.add('open');
+}
+
+function copyCode(e, code){
+  e.stopPropagation();
+  navigator.clipboard.writeText(code).then(()=>toast('Code copié !','success'));
+}
+
+async function switchWorkspace(wsId){
+  closeModal('workspaceModal');
+  if(!wsId){
+    currentWorkspace=null;
+  }else{
+    currentWorkspace=workspaces.find(w=>w.id===wsId)||null;
+  }
+  // Recharger les véhicules de cet espace
+  vehicles=[];history=[];
+  await loadFromSupabase();
+  save();render();
+  renderWorkspacePicker();
+  toast(currentWorkspace?'Espace: '+currentWorkspace.name:'Espace personnel','success');
+}
+
+function openCreateWorkspace(){
+  closeModal('workspaceModal');
+  document.getElementById('wsNameInput').value='';
+  document.getElementById('wsCreateErr').textContent='';
+  document.getElementById('createWorkspaceModal').classList.add('open');
+}
+
+async function createWorkspace(){
+  const name=document.getElementById('wsNameInput').value.trim();
+  const err=document.getElementById('wsCreateErr');
+  if(!name){err.textContent='Donnez un nom à votre espace.';return;}
+  try{
+    const data=await _rest('POST','workspaces',{name,owner_id:currentUser.id});
+    const ws=data&&data[0];
+    if(ws){
+      workspaces.push(ws);
+      closeModal('createWorkspaceModal');
+      toast('Espace "'+name+'" créé ! Code: '+ws.invite_code,'success');
+      renderWorkspacePicker();
+    }
+  }catch(e){err.textContent='Erreur: '+e.message;}
+}
+
+function openJoinWorkspace(){
+  closeModal('workspaceModal');
+  document.getElementById('wsCodeInput').value='';
+  document.getElementById('wsJoinErr').textContent='';
+  document.getElementById('joinWorkspaceModal').classList.add('open');
+}
+
+async function joinWorkspace(){
+  const code=document.getElementById('wsCodeInput').value.trim().toUpperCase();
+  const err=document.getElementById('wsJoinErr');
+  if(!code){err.textContent='Entrez un code d'invitation.';return;}
+  try{
+    // Trouver l'espace avec ce code
+    const data=await _rest('GET','workspaces',null,{'invite_code':'eq.'+code,'select':'*'});
+    if(!data||!data[0]){err.textContent='Code invalide.';return;}
+    const ws=data[0];
+    // Rejoindre
+    await _rest('POST','workspace_members',{workspace_id:ws.id,user_id:currentUser.id,role:'member'});
+    workspaces.push(ws);
+    closeModal('joinWorkspaceModal');
+    toast('Vous avez rejoint "'+ws.name+'" !','success');
+    renderWorkspacePicker();
+  }catch(e){
+    if(e.message.includes('duplicate'))err.textContent='Vous êtes déjà membre de cet espace.';
+    else err.textContent='Erreur: '+e.message;
+  }
 }
 
 // ════════════════════════════════════════
