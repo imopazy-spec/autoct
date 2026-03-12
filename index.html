@@ -1749,6 +1749,7 @@ async function startApp(){
     if(authEl)authEl.style.display='none';
     render();
     loadFromSupabase().then(()=>{save();render();});
+    loadWorkspaces();
   }else{
     vehicles=[];history=[];
     const authEl=document.getElementById('authScreen');
