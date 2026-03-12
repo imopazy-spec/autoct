@@ -417,7 +417,10 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
       <input type="email" id="settingsEmail" placeholder="votre@email.com" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none" onfocus="this.style.borderColor='rgba(0,229,160,0.4)'" onblur="this.style.borderColor='var(--border2)';saveSettings()">
     </div>
   </div>
-  <button class="btn btn-danger" style="width:100%;justify-content:center" onclick="resetData()">🗑 Effacer toutes les données</button>
+  <div style="display:flex;gap:10px;margin-top:4px">
+    <button class="btn btn-danger" style="flex:1;justify-content:center" onclick="confirmLogout()">🚪 Se déconnecter</button>
+    <button class="btn" style="flex:1;justify-content:center;background:var(--surface2);color:var(--ink2);border:1px solid var(--border2)" onclick="resetData()">🗑 Effacer données</button>
+  </div>
 </main></div>
 
 <!-- ══ BOTTOM NAV ══ -->
@@ -674,6 +677,25 @@ function render(){
   const h=new Date().getHours();
   document.getElementById('heroGreet').textContent=h<12?'Bonjour 👋':h<18?'Bon après-midi 👋':'Bonsoir 👋';
   document.getElementById('heroDate').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+function checkNotifications(){
+  // Vérifier si le navigateur supporte les notifications
+  if(!('Notification' in window))return;
+  const expired = vehicles.filter(v=>daysUntil(v.dateCT)<0);
+  const soon = vehicles.filter(v=>{const d=daysUntil(v.dateCT);return d>=0&&d<=settings.alertDays;});
+  if(expired.length===0&&soon.length===0)return;
+  if(Notification.permission==='granted'){
+    expired.forEach(v=>{
+      new Notification('CT Expiré !', {body:`${v.marque} ${v.modele} (${v.plaque}) - CT expiré !`, icon:'/favicon.ico'});
+    });
+    soon.forEach(v=>{
+      const d=daysUntil(v.dateCT);
+      new Notification('CT à renouveler', {body:`${v.marque} ${v.modele} (${v.plaque}) - expire dans ${d}j`, icon:'/favicon.ico'});
+    });
+  }else if(Notification.permission==='default'){
+    Notification.requestPermission().then(p=>{if(p==='granted')checkNotifications();});
+  }
 }
 
 function renderHome(){
@@ -1167,7 +1189,14 @@ function sendEmails(){
 // ════════════════════════════════════════
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
-function resetData(){if(!confirm('Effacer toutes les données ?'))return;localStorage.clear();location.reload();}
+function resetData(){
+  if(!confirm('Effacer toutes les données locales ?'))return;
+  localStorage.removeItem('ct_v');
+  localStorage.removeItem('ct_h');
+  vehicles=[];history=[];
+  save();render();
+  toast('Données effacées','');
+}
 function toast(msg,type=''){
   const c=document.getElementById('toastContainer'),el=document.createElement('div');
   el.className=`toast ${type}`;el.textContent=msg;c.appendChild(el);setTimeout(()=>el.remove(),3000);
@@ -1418,7 +1447,7 @@ async function onLogin(user){
 
 function showUserMenu(){
   if(!currentUser)return;
-  const ok=confirm('Se deconnecter de AutoCT ?');
+  const ok=confirm('Se déconnecter de AutoCT ?');
   if(ok)doLogout();
 }
 
