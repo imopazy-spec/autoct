@@ -1525,17 +1525,16 @@ async function startApp(){
   const user=await _getSession();
   if(user){
     currentUser=user;
-    // Afficher le cache local immédiatement (pas de flash vide au F5)
     const chip=document.getElementById('userChip');
-    chip.style.display='flex';
-    chip.textContent='👤 '+(user.email||'').split('@')[0];
-    document.getElementById('authScreen').style.display='none';
+    const authEl=document.getElementById('authScreen');
+    if(chip){chip.style.display='flex';chip.textContent='👤 '+(user.email||'').split('@')[0];}
+    if(authEl)authEl.style.display='none';
     render();
-    // Puis sync Supabase en arrière-plan
     loadFromSupabase().then(()=>{save();render();});
   }else{
     vehicles=[];history=[];
-    document.getElementById('authScreen').style.display='flex';
+    const authEl=document.getElementById('authScreen');
+    if(authEl)authEl.style.display='flex';
   }
 }
 
