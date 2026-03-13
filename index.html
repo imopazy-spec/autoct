@@ -210,6 +210,31 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 .auth-btn:hover{opacity:.85}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-err{font-size:.8rem;color:var(--urgent);margin-top:10px;text-align:center;min-height:18px}
+/* ONBOARDING */
+#onboardingScreen{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;align-items:center;justify-content:center;padding:24px}
+#onboardingScreen.open{display:flex}
+.onb-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto}
+.onb-logo{font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.onb-logo-dot{width:8px;height:8px;border-radius:2px;background:var(--accent)}
+.onb-title{font-family:var(--font-display);font-size:2rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--ink);margin-bottom:8px}
+.onb-sub{font-size:.88rem;color:var(--ink2);margin-bottom:32px;line-height:1.6}
+.onb-types{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.onb-type{background:var(--bg);border:2px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .2s;text-align:center}
+.onb-type:hover{border-color:var(--border2)}
+.onb-type.selected{border-color:var(--accent);background:var(--accent-dim)}
+.onb-type-icon{font-size:2rem;margin-bottom:8px}
+.onb-type-name{font-family:var(--font-display);font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink)}
+.onb-type-desc{font-size:.75rem;color:var(--ink2);margin-top:4px}
+.onb-form{display:none}
+.onb-form.visible{display:block}
+.onb-form-title{font-family:var(--font-display);font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink);margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.onb-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.onb-grid .full{grid-column:span 2}
+.onb-field{display:flex;flex-direction:column;gap:6px;margin-bottom:0}
+.onb-label{font-size:.75rem;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.08em}
+.onb-input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--ink);font-size:.9rem;font-family:var(--font-body);transition:border .2s;width:100%}
+.onb-input:focus{outline:none;border-color:var(--accent)}
+.onb-actions{display:flex;gap:12px;margin-top:28px}
 /* PLANS */
 .plan-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
 .plan-card.featured{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
@@ -1987,6 +2012,8 @@ async function onLogin(user){
   save();
   render();
   renderWorkspacePicker();
+  // Vérifier si onboarding nécessaire
+  await checkOnboarding();
   toast('Bienvenue '+displayName+' !','success');
 }
 
@@ -2069,6 +2096,79 @@ async function saveHistoryToSupabase(h){
 async function deleteHistoryFromSupabase(id){
   if(!currentUser||typeof id!=='string')return;
   try{await _rest('DELETE','history?id=eq.'+id);}catch(e){}
+}
+
+// ════════════════════════════════════════
+// ONBOARDING
+// ════════════════════════════════════════
+let _onbType = 'particulier';
+
+function selectOnbType(type){
+  _onbType = type;
+  document.getElementById('onbTypeParticulier').classList.toggle('selected', type==='particulier');
+  document.getElementById('onbTypePro').classList.toggle('selected', type==='pro');
+  const form = document.getElementById('onbProForm');
+  form.classList.toggle('visible', type==='pro');
+}
+
+async function checkOnboarding(){
+  if(!currentUser) return;
+  try{
+    const data = await _rest('GET','profiles',null,{'id':'eq.'+currentUser.id,'select':'id,type'});
+    if(!data || data.length === 0){
+      // Nouveau user — afficher onboarding
+      document.getElementById('onboardingScreen').classList.add('open');
+    } else {
+      // Profil existe — stocker le type
+      currentUser._profileType = data[0].type;
+    }
+  }catch(e){
+    console.error('checkOnboarding:',e);
+  }
+}
+
+async function submitOnboarding(){
+  const errEl = document.getElementById('onbErr');
+  errEl.style.display='none';
+
+  const type = _onbType;
+  let profileData = { id: currentUser.id, type };
+
+  if(type === 'pro'){
+    const company = document.getElementById('onbCompany').value.trim();
+    const siret = document.getElementById('onbSiret').value.trim();
+    const address = document.getElementById('onbAddress').value.trim();
+    const postal = document.getElementById('onbPostal').value.trim();
+    const city = document.getElementById('onbCity').value.trim();
+
+    if(!company || !siret || !address || !postal || !city){
+      errEl.textContent = 'Veuillez remplir tous les champs obligatoires (*)';
+      errEl.style.display='block';
+      return;
+    }
+
+    profileData = {
+      ...profileData,
+      company_name: company,
+      siret: siret,
+      tva: document.getElementById('onbTva').value.trim(),
+      address: address,
+      postal_code: postal,
+      city: city,
+      phone: document.getElementById('onbPhone').value.trim(),
+      billing_email: document.getElementById('onbBillingEmail').value.trim() || currentUser.email
+    };
+  }
+
+  try{
+    await _rest('POST','profiles',profileData);
+    currentUser._profileType = type;
+    document.getElementById('onboardingScreen').classList.remove('open');
+    toast('Profil créé ! Bienvenue sur AutoCT 🎉','success');
+  }catch(e){
+    errEl.textContent = 'Erreur lors de la sauvegarde. Réessayez.';
+    errEl.style.display='block';
+  }
 }
 
 // ════════════════════════════════════════
