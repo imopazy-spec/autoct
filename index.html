@@ -2089,14 +2089,15 @@ async function switchWorkspace(wsId){
   }else{
     currentWorkspace=workspaces.find(w=>w.id===wsId)||null;
   }
-  // Recharger les données de cet espace
+  // Recharger toutes les données du nouvel espace
   vehicles=[];history=[];employees=[];entretiens=[];
+  render(); // Afficher vide immédiatement
   await loadFromSupabase();
   await loadEmployees();
   await loadEntretiens();
   save();render();
   renderWorkspacePicker();
-  updateEditButtons();
+  updateEntretienFilter();
   toast(currentWorkspace?'Espace: '+currentWorkspace.name:'Espace personnel','success');
 }
 
