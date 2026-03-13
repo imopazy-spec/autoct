@@ -2093,8 +2093,7 @@ async function subscribePlan(plan){
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization':'Bearer '+SUPA_KEY,
-        'x-user-token':_accessToken||''
+        'Authorization':'Bearer '+SUPA_KEY
       },
       body:JSON.stringify({
         priceId,
