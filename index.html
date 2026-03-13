@@ -178,6 +178,18 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 .auth-btn:hover{opacity:.85}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-err{font-size:.8rem;color:var(--urgent);margin-top:10px;text-align:center;min-height:18px}
+/* DASHBOARD */
+.dash-section{margin-bottom:20px}
+.dash-section-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:10px}
+.dash-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.dash-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;position:relative;overflow:hidden}
+.dash-kpi-icon{font-size:1.5rem;margin-bottom:6px}
+.dash-kpi-val{font-size:1.5rem;font-weight:800;font-family:var(--font-display);line-height:1}
+.dash-kpi-label{font-size:.72rem;color:var(--ink3);margin-top:4px}
+.dash-kpi-accent{position:absolute;top:0;right:0;width:60px;height:60px;border-radius:50%;opacity:.06;transform:translate(20px,-20px)}
+.dash-alert-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}
+.dash-entretien-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}
+.dash-empty{text-align:center;padding:16px;color:var(--ink3);font-size:.85rem;background:var(--surface);border-radius:var(--radius-sm)}
 /* FINANCES */
 .fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
 .fin-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
@@ -513,6 +525,15 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   </div>
 </div>
 
+<!-- ══ PAGE DASHBOARD ══ -->
+<div class="page" id="page-dashboard"><main>
+  <div class="page-hero" style="margin-top:8px">
+    <div class="page-hero-label">Vue d'ensemble</div>
+    <h1>Tableau de bord</h1>
+  </div>
+  <div id="dashContent"></div>
+</main></div>
+
 <!-- ══ PAGE EMPLOYÉS ══ -->
 <div class="page" id="page-employees"><main>
   <div class="page-hero" style="margin-top:8px">
@@ -572,7 +593,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 <nav class="bottom-nav">
   <button class="nav-tab active" onclick="switchTab('home',this)"><span class="tab-icon">🏠</span>Accueil</button>
   <button class="nav-tab" onclick="switchTab('entretiens',this)"><span class="tab-icon">🔧</span>Entretiens</button>
-  <button class="nav-tab" onclick="switchTab('finances',this)"><span class="tab-icon">💰</span>Finances</button>
+  <button class="nav-tab" onclick="switchTab('dashboard',this)"><span class="tab-icon">📊</span>Tableau</button>
   <button class="nav-tab" onclick="switchTab('employees',this)"><span class="tab-icon">👷</span>Employés</button>
   <button class="nav-tab" onclick="switchTab('settings',this)"><span class="tab-icon">⚙️</span>Réglages</button>
 </nav>
@@ -1845,6 +1866,127 @@ async function saveHistoryToSupabase(h){
 async function deleteHistoryFromSupabase(id){
   if(!currentUser||typeof id!=='string')return;
   try{await _rest('DELETE','history?id=eq.'+id);}catch(e){}
+}
+
+// ════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════
+function renderDashboard(){
+  const el=document.getElementById('dashContent');
+  if(!el)return;
+
+  // ── KPI globaux
+  const totalVeh=vehicles.length;
+  const ctExpired=vehicles.filter(v=>daysUntil(v.dateCT)<0).length;
+  const ctSoon=vehicles.filter(v=>{const d=daysUntil(v.dateCT);return d>=0&&d<=settings.alertDays;}).length;
+  const totalEmp=employees.length;
+  const totalRev=finances.filter(f=>f.type==='revenu').reduce((s,f)=>s+parseFloat(f.montant||0),0);
+  const totalDep=finances.filter(f=>f.type==='depense').reduce((s,f)=>s+parseFloat(f.montant||0),0);
+  const rentab=totalRev-totalDep;
+  const prochainsEntr=entretiens.filter(e=>e.prochaine_date&&daysUntil(e.prochaine_date)<=30).length;
+
+  // ── Alertes critiques toutes catégories
+  const alerts=[];
+  vehicles.forEach(v=>{const d=daysUntil(v.dateCT);if(d<=settings.alertDays)alerts.push({icon:'🚗',label:v.marque+' '+v.modele+' · '+v.plaque,sub:'Contrôle technique',days:d,urgent:d<0});});
+  employees.forEach(emp=>{
+    const name=(emp.prenom||'')+' '+(emp.nom||'');
+    if(emp.permis_expiration){const d=daysUntil(emp.permis_expiration);if(d<=settings.alertDays)alerts.push({icon:'👷',label:name,sub:'Permis de conduire',days:d,urgent:d<0});}
+    if(emp.carte_expiration){const d=daysUntil(emp.carte_expiration);if(d<=settings.alertDays)alerts.push({icon:'📇',label:name,sub:'Carte conducteur',days:d,urgent:d<0});}
+    if(emp.fco_date){const d=daysUntil(emp.fco_date);if(d<=settings.alertDays)alerts.push({icon:'🎓',label:name,sub:'FCO',days:d,urgent:d<0});}
+  });
+  entretiens.forEach(e=>{
+    if(e.prochaine_date){const d=daysUntil(e.prochaine_date);if(d<=settings.alertDays){const v=vehicles.find(x=>x.id===e.vehicle_id);alerts.push({icon:'🔧',label:e.type,sub:v?v.marque+' '+v.modele:'',days:d,urgent:d<0});}}
+  });
+  alerts.sort((a,b)=>a.days-b.days);
+
+  // ── Prochains entretiens (7 prochains)
+  const prochains=entretiens.filter(e=>e.prochaine_date).sort((a,b)=>new Date(a.prochaine_date)-new Date(b.prochaine_date)).slice(0,5);
+
+  // ── Top véhicules rentables
+  const vRentab=vehicles.map(v=>{
+    const rev=finances.filter(f=>f.vehicle_id===v.id&&f.type==='revenu').reduce((s,f)=>s+parseFloat(f.montant||0),0);
+    const dep=finances.filter(f=>f.vehicle_id===v.id&&f.type==='depense').reduce((s,f)=>s+parseFloat(f.montant||0),0);
+    return{v,net:rev-dep,rev,dep};
+  }).filter(x=>x.rev>0||x.dep>0).sort((a,b)=>b.net-a.net);
+
+  el.innerHTML=`
+    <!-- KPI grid -->
+    <div class="dash-kpi-grid">
+      <div class="dash-kpi">
+        <div class="dash-kpi-accent" style="background:var(--accent)"></div>
+        <div class="dash-kpi-icon">🚗</div>
+        <div class="dash-kpi-val">${totalVeh}</div>
+        <div class="dash-kpi-label">Véhicules</div>
+      </div>
+      <div class="dash-kpi" style="${ctExpired?'border-color:var(--urgent)':''}">
+        <div class="dash-kpi-accent" style="background:${ctExpired?'var(--urgent)':'var(--accent)'}"></div>
+        <div class="dash-kpi-icon">${ctExpired?'🚨':'✅'}</div>
+        <div class="dash-kpi-val" style="color:${ctExpired?'var(--urgent)':ctSoon?'var(--warn)':'var(--accent)'}">${ctExpired+ctSoon}</div>
+        <div class="dash-kpi-label">Alertes CT</div>
+      </div>
+      <div class="dash-kpi">
+        <div class="dash-kpi-accent" style="background:#4F8EF7"></div>
+        <div class="dash-kpi-icon">👷</div>
+        <div class="dash-kpi-val" style="color:#4F8EF7">${totalEmp}</div>
+        <div class="dash-kpi-label">Employés</div>
+      </div>
+      <div class="dash-kpi">
+        <div class="dash-kpi-accent" style="background:${rentab>=0?'var(--accent)':'var(--urgent)'}"></div>
+        <div class="dash-kpi-icon">💰</div>
+        <div class="dash-kpi-val" style="color:${rentab>=0?'var(--accent)':'var(--urgent)'}">${rentab>=0?'+':''}${rentab.toFixed(0)}€</div>
+        <div class="dash-kpi-label">Rentabilité</div>
+      </div>
+    </div>
+
+    <!-- Alertes critiques -->
+    <div class="dash-section">
+      <div class="dash-section-title">⚠️ Alertes critiques (${alerts.length})</div>
+      ${alerts.length?alerts.slice(0,6).map(a=>`
+        <div class="dash-alert-row">
+          <span style="font-size:1.2rem">${a.icon}</span>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:.85rem">${a.label}</div>
+            <div style="font-size:.75rem;color:var(--ink3)">${a.sub}</div>
+          </div>
+          <span class="chip ${a.urgent?'chip-urgent':'chip-warn'}">${a.urgent?'EXPIRÉ':a.days+'j'}</span>
+        </div>`).join('')
+        :`<div class="dash-empty">✅ Aucune alerte — tout est en ordre !</div>`}
+    </div>
+
+    <!-- Prochains entretiens -->
+    <div class="dash-section">
+      <div class="dash-section-title">🔧 Prochains entretiens</div>
+      ${prochains.length?prochains.map(e=>{
+        const v=vehicles.find(x=>x.id===e.vehicle_id);
+        const d=daysUntil(e.prochaine_date);
+        return`<div class="dash-entretien-row">
+          <span style="font-size:1.1rem">${entretienIcons[e.type]||'🔩'}</span>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:.85rem">${e.type}</div>
+            <div style="font-size:.75rem;color:var(--ink3)">${v?v.marque+' '+v.modele+' · '+v.plaque:''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:.8rem;font-weight:600;color:${d<0?'var(--urgent)':d<=7?'var(--warn)':'var(--ink2)'}">${fmtDate(e.prochaine_date)}</div>
+            <div style="font-size:.72rem;color:var(--ink3)">${d<0?'Retard '+Math.abs(d)+'j':d+'j'}</div>
+          </div>
+        </div>`;
+      }).join(''):`<div class="dash-empty">Aucun entretien planifié</div>`}
+    </div>
+
+    <!-- Rentabilité par véhicule -->
+    ${vRentab.length?`<div class="dash-section">
+      <div class="dash-section-title">📈 Rentabilité par véhicule</div>
+      ${vRentab.map(x=>`
+        <div class="dash-entretien-row">
+          <span style="font-size:1.1rem">${vehicleIcon(x.v.marque)}</span>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:.85rem">${x.v.marque} ${x.v.modele}</div>
+            <div style="font-size:.75rem;color:var(--ink3)">${x.v.plaque} · Rev: ${x.rev.toFixed(0)}€ / Dép: ${x.dep.toFixed(0)}€</div>
+          </div>
+          <div style="font-weight:700;font-size:.95rem;color:${x.net>=0?'var(--accent)':'var(--urgent)'}">${x.net>=0?'+':''}${x.net.toFixed(0)}€</div>
+        </div>`).join('')}
+    </div>`:''}
+  `;
 }
 
 // ════════════════════════════════════════
