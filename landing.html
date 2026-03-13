@@ -2,3105 +2,427 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="AutoCT">
-<meta name="theme-color" content="#1A1C1E">
-<title>AutoCT</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AutoCT — La plateforme de gestion de flotte pour les professionnels du transport. CT, entretiens, employés, finances. Tout en un.">
+<title>AutoCT — Gestion de flotte intelligente</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#1A1C1E;
-  --bg2:#222527;
-  --surface:#252829;
-  --surface2:#2E3133;
-  --surface3:#363A3C;
+  --bg:#141618;
+  --bg2:#1C1F21;
+  --surface:#222527;
+  --surface2:#2A2E31;
   --border:rgba(255,255,255,0.06);
   --border2:rgba(255,255,255,0.1);
-  --ink:#ECEEF0;
-  --ink2:#8E9399;
-  --ink3:#555C62;
-  --accent:#F97316;
-  --accent-dim:rgba(249,115,22,0.12);
-  --accent-glow:rgba(249,115,22,0.3);
-  --warn:#FBBF24;
-  --warn-dim:rgba(251,191,36,0.12);
-  --urgent:#F43F5E;
-  --urgent-dim:rgba(244,63,94,0.12);
-  --ok:#22C55E;
-  --ok-dim:rgba(34,197,94,0.1);
+  --ink:#F0F2F4;
+  --ink2:#8A9099;
+  --ink3:#4A5260;
+  --orange:#F97316;
+  --orange-dim:rgba(249,115,22,0.15);
+  --orange-glow:rgba(249,115,22,0.4);
+  --green:#22C55E;
+  --red:#F43F5E;
   --blue:#3B82F6;
-  --blue-dim:rgba(59,130,246,0.12);
-  --radius:12px;
-  --radius-sm:7px;
-  --shadow:0 2px 16px rgba(0,0,0,0.35);
-  --shadow-lg:0 8px 40px rgba(0,0,0,0.5);
-  --nav-h:60px;
-  --bottom-h:0px;
   --font-display:'Barlow Condensed',sans-serif;
   --font-body:'DM Sans',sans-serif;
   --font-mono:'DM Mono',monospace;
 }
-html{scroll-behavior:smooth;height:100%}
-body{font-family:var(--font-body);background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:var(--bottom-h);padding-top:var(--nav-h);-webkit-font-smoothing:antialiased;}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-/* ── SCROLLBAR ── */
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
+/* ── NOISE TEXTURE ── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:.4}
 
-/* ── TOP NAV ── */
-.top-nav{height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:fixed;top:0;left:0;right:0;z-index:200;background:var(--bg2);border-bottom:1px solid var(--border)}
-.logo{font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--ink);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:10px}
-.logo-dot{width:8px;height:8px;border-radius:2px;background:var(--accent)}
-.nav-actions{display:flex;gap:8px}
-.nav-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--ink2);padding:8px 16px;border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
-.nav-btn:hover{background:var(--surface3);color:var(--ink)}
-.nav-btn.primary{background:var(--accent);color:#fff;border-color:transparent;font-weight:600}
-.nav-btn.primary:hover{opacity:.9}
-
-/* ── HAMBURGER ── */
-.hamburger{width:36px;height:36px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;border:none;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border2);transition:all .2s;flex-shrink:0}
-.hamburger:hover{background:var(--surface3)}
-.hamburger span{display:block;width:16px;height:2px;background:var(--ink2);border-radius:1px;transition:all .25s}
-.hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
-.hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-
-/* ── DRAWER ── */
-.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:150;opacity:0;pointer-events:none;transition:opacity .25s}
-.drawer-overlay.open{opacity:1;pointer-events:all}
-.drawer{position:fixed;top:0;left:0;bottom:0;width:260px;background:var(--bg2);border-right:1px solid var(--border);z-index:160;transform:translateX(-100%);transition:transform .28s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;padding:0}
-.drawer.open{transform:translateX(0)}
-.drawer-head{height:var(--nav-h);display:flex;align-items:center;padding:0 20px;border-bottom:1px solid var(--border);gap:10px}
-.drawer-logo{font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--ink)}
-.drawer-logo-dot{width:7px;height:7px;border-radius:2px;background:var(--accent)}
-.drawer-ws{margin:12px;border-radius:var(--radius-sm);background:var(--surface);border:1px solid var(--border2);padding:12px;cursor:pointer;transition:all .2s}
-.drawer-ws:hover{background:var(--surface2)}
-.drawer-ws-label{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:4px}
-.drawer-ws-name{font-size:.9rem;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:6px}
-.drawer-nav{flex:1;overflow-y:auto;padding:8px}
-.drawer-nav-item{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:var(--radius-sm);cursor:pointer;transition:all .18s;color:var(--ink2);font-size:.9rem;font-weight:500;border:none;background:none;width:100%;text-align:left;margin-bottom:2px}
-.drawer-nav-item:hover{background:var(--surface2);color:var(--ink)}
-.drawer-nav-item.active{background:var(--accent-dim);color:var(--accent);font-weight:600}
-.drawer-nav-item .nav-icon{width:32px;height:32px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-.drawer-nav-item.active .nav-icon{background:var(--accent-dim)}
-.drawer-sep{height:1px;background:var(--border);margin:8px 12px}
-.drawer-footer{padding:12px;border-top:1px solid var(--border)}
-.drawer-footer-btn{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-sm);cursor:pointer;color:var(--ink3);font-size:.85rem;font-weight:500;border:none;background:none;width:100%;transition:all .2s}
-.drawer-footer-btn:hover{background:var(--surface2);color:var(--ink)}
-
-/* ── BOTTOM NAV ── */
-.bottom-nav{display:none}
-.nav-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border:none;background:none;cursor:pointer;font-family:var(--font-body);font-size:.6rem;font-weight:500;color:var(--ink3);transition:all .2s;padding:6px 2px;position:relative}
-.nav-tab.active{color:var(--accent)}
-.tab-icon{font-size:1.2rem;transition:transform .2s}
-.nav-tab.active .tab-icon{transform:translateY(-2px)}
-.nav-tab.active::after{content:'';position:absolute;bottom:6px;left:50%;transform:translateX(-50%);width:20px;height:2px;border-radius:1px;background:var(--accent);box-shadow:0 0 8px var(--accent)}
-
-/* ── PAGES ── */
-.page{display:none;animation:fadeUp .3s ease}.page.active{display:block}
-main{max-width:700px;margin:0 auto;padding:24px 16px}
-@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-
-/* ── SECTION TITLE ── */
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.section-title{font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--ink);text-transform:uppercase;letter-spacing:2px}
-.section-count{font-size:.78rem;color:var(--ink3);font-weight:400}
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(20,22,24,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:10px}
+.nav-logo-dot{width:8px;height:8px;border-radius:2px;background:var(--orange)}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-link{color:var(--ink2);font-size:.88rem;font-weight:500;text-decoration:none;transition:color .2s}
+.nav-link:hover{color:var(--ink)}
+.nav-cta{background:var(--orange);color:#fff;padding:9px 22px;border-radius:6px;font-size:.88rem;font-weight:600;text-decoration:none;transition:all .2s;letter-spacing:.02em}
+.nav-cta:hover{opacity:.9;box-shadow:0 4px 20px var(--orange-glow)}
 
 /* ── HERO ── */
-.page-hero{margin-bottom:28px}
-.page-hero-label{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--accent);margin-bottom:6px}
-.page-hero h1{font-family:var(--font-display);font-size:2.2rem;font-weight:800;color:var(--ink);letter-spacing:2px;text-transform:uppercase;line-height:1}
-.page-hero p{font-size:.88rem;color:var(--ink2);margin-top:8px}
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(249,115,22,0.08),transparent 70%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;mask-image:radial-gradient(ellipse 80% 80% at 50% 0%,black,transparent)}
+.hero-label{font-family:var(--font-mono);font-size:.72rem;font-weight:500;color:var(--orange);letter-spacing:.2em;text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fadeUp .6s .2s forwards}
+.hero-title{font-family:var(--font-display);font-size:clamp(4rem,12vw,9rem);font-weight:900;line-height:.92;letter-spacing:-1px;text-transform:uppercase;color:var(--ink);margin-bottom:8px;opacity:0;animation:fadeUp .6s .3s forwards}
+.hero-title span{color:var(--orange);font-style:italic}
+.hero-sub{font-size:clamp(1rem,2.5vw,1.25rem);color:var(--ink2);max-width:560px;line-height:1.6;margin:28px auto 48px;font-weight:300;opacity:0;animation:fadeUp .6s .5s forwards}
+.hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp .6s .65s forwards}
+.btn-primary{background:var(--orange);color:#fff;padding:14px 32px;border-radius:8px;font-size:1rem;font-weight:600;text-decoration:none;transition:all .2s;letter-spacing:.02em}
+.btn-primary:hover{opacity:.9;box-shadow:0 8px 30px var(--orange-glow);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--ink);padding:14px 32px;border-radius:8px;font-size:1rem;font-weight:500;text-decoration:none;border:1px solid var(--border2);transition:all .2s}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.25);background:var(--surface)}
+.hero-stats{display:flex;gap:48px;justify-content:center;margin-top:72px;opacity:0;animation:fadeUp .6s .8s forwards;flex-wrap:wrap}
+.hero-stat-val{font-family:var(--font-display);font-size:2.5rem;font-weight:800;color:var(--ink);letter-spacing:1px}
+.hero-stat-label{font-size:.78rem;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.1em}
 
-/* ── STATS CARDS ── */
-.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:24px}
-@media(min-width:500px){.stats-row{grid-template-columns:repeat(4,1fr)}}
-.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;position:relative;overflow:hidden;transition:all .2s}
-.stat-card:hover{transform:translateY(-2px)}
-.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0;transition:opacity .2s}
-.stat-card:hover::before{opacity:1}
-.stat-card.urgent{border-color:rgba(255,69,103,0.2);background:linear-gradient(135deg,var(--surface),rgba(255,69,103,0.05))}
-.stat-card.urgent::before{background:var(--urgent);opacity:1}
-.stat-card.warn{border-color:rgba(255,140,66,0.2);background:linear-gradient(135deg,var(--surface),rgba(255,140,66,0.05))}
-.stat-card.warn::before{background:var(--warn);opacity:1}
-.stat-label{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:10px}
-.stat-value{font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--ink);line-height:1}
-.stat-card.urgent .stat-value{color:var(--urgent)}
-.stat-card.warn .stat-value{color:var(--warn)}
+/* ── MARQUEE ── */
+.marquee-wrap{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);padding:16px 0;overflow:hidden;white-space:nowrap}
+.marquee-track{display:inline-flex;animation:marquee 20s linear infinite;gap:0}
+.marquee-item{font-family:var(--font-display);font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--ink3);padding:0 32px}
+.marquee-item span{color:var(--orange);margin-right:32px}
 
-/* ── ALERT ITEMS ── */
-.alerts-wrap{margin-bottom:24px}
-.alert-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--radius);margin-bottom:8px;border:1px solid;backdrop-filter:blur(10px);animation:fadeUp .3s ease}
-.alert-item.urgent{background:linear-gradient(135deg,rgba(255,69,103,0.08),rgba(255,69,103,0.04));border-color:rgba(255,69,103,0.2)}
-.alert-item.warning{background:linear-gradient(135deg,rgba(255,140,66,0.08),rgba(255,140,66,0.04));border-color:rgba(255,140,66,0.2)}
-.alert-pulse{width:10px;height:10px;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
-.alert-pulse.urgent{background:var(--urgent);box-shadow:0 0 0 0 rgba(255,69,103,0.4)}
-.alert-pulse.warning{background:var(--warn);box-shadow:0 0 0 0 rgba(255,140,66,0.4)}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,69,103,0.4)}50%{box-shadow:0 0 0 6px rgba(255,69,103,0)}}
-.alert-text{flex:1}
-.alert-text strong{font-size:.88rem;font-weight:600;display:block}
-.alert-text span{font-size:.76rem;color:var(--ink2);margin-top:2px;display:block}
-.chip{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;letter-spacing:.04em;white-space:nowrap}
-.chip-urgent{background:var(--urgent-dim);color:var(--urgent);border:1px solid rgba(255,69,103,0.3)}
-.chip-warn{background:var(--warn-dim);color:var(--warn);border:1px solid rgba(255,140,66,0.3)}
-.chip-ok{background:var(--ok-dim);color:var(--ok);border:1px solid rgba(0,229,160,0.3)}
+/* ── FEATURES ── */
+.section{padding:100px 40px;max-width:1200px;margin:0 auto}
+.section-eyebrow{font-family:var(--font-mono);font-size:.7rem;color:var(--orange);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.section-title{font-family:var(--font-display);font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;text-transform:uppercase;letter-spacing:1px;line-height:.95;color:var(--ink);margin-bottom:20px}
+.section-sub{font-size:1rem;color:var(--ink2);max-width:480px;line-height:1.7;font-weight:300}
 
-/* ── VEHICLE LIST ── */
-.vehicle-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
-.vehicle-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;display:flex;align-items:center;gap:14px;transition:all .2s;cursor:default}
-.vehicle-card:hover{background:var(--surface2);border-color:var(--border2);transform:translateX(2px)}
-.vehicle-avatar{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;background:var(--surface2)}
-.vehicle-info{flex:1;min-width:0}
-.vehicle-name{font-family:var(--font-display);font-size:.95rem;font-weight:700;color:var(--ink)}
-.vehicle-plate{display:inline-block;background:var(--surface3);border:1px solid var(--border2);border-radius:5px;padding:2px 8px;font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--ink2);margin-top:3px}
-.vehicle-owner{font-size:.76rem;color:var(--ink3);margin-top:2px}
-.vehicle-meta{text-align:right;flex-shrink:0}
-.vehicle-date{font-size:.76rem;color:var(--ink2);margin-bottom:5px}
-.status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:.72rem;font-weight:600}
-.status-pill::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.status-pill.urgent{background:var(--urgent-dim);color:var(--urgent)}.status-pill.urgent::before{background:var(--urgent);box-shadow:0 0 6px var(--urgent)}
-.status-pill.warning{background:var(--warn-dim);color:var(--warn)}.status-pill.warning::before{background:var(--warn)}
-.status-pill.ok{background:var(--ok-dim);color:var(--ok)}.status-pill.ok::before{background:var(--ok)}
-.vehicle-actions{display:flex;gap:6px;flex-shrink:0}
-.icon-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.9rem;transition:all .15s;color:var(--ink2)}
-.icon-btn:hover{background:var(--surface3);color:var(--ink)}
-.icon-btn.del:hover{background:var(--urgent-dim);border-color:rgba(255,69,103,0.3);color:var(--urgent)}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2px;margin-top:64px;background:var(--border)}
+.feat-card{background:var(--bg);padding:40px 36px;transition:background .2s;position:relative;overflow:hidden}
+.feat-card:hover{background:var(--bg2)}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.feat-card:hover::before{transform:scaleX(1)}
+.feat-icon{font-size:2rem;margin-bottom:20px;display:block}
+.feat-name{font-family:var(--font-display);font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink);margin-bottom:10px}
+.feat-desc{font-size:.88rem;color:var(--ink2);line-height:1.65;font-weight:300}
 
-/* ── HISTORY ── */
-.history-list{display:flex;flex-direction:column;gap:8px}
-.history-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;transition:all .2s}
-.history-card:hover{background:var(--surface2);border-color:var(--border2)}
-.history-top{display:flex;align-items:flex-start;gap:12px}
-.history-badge{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-.history-badge.ok{background:var(--ok-dim)}.history-badge.fail{background:var(--urgent-dim)}.history-badge.warn{background:var(--warn-dim)}
-.history-body{flex:1;min-width:0}
-.history-vehicle{font-weight:600;font-size:.9rem;color:var(--ink)}
-.history-detail{font-size:.76rem;color:var(--ink2);margin-top:2px}
-.history-right{text-align:right;flex-shrink:0}
-.history-date{font-size:.73rem;color:var(--ink3)}
-.history-cost{font-family:var(--font-display);font-size:.95rem;font-weight:700;color:var(--accent);margin-top:3px}
-.history-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
-.history-btns{display:flex;gap:6px}
-.mini-btn{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;font-family:var(--font-body);font-size:.72rem;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--ink2);transition:all .12s}
-.mini-btn:hover{background:var(--surface3);color:var(--ink)}
-.mini-btn.del-btn:hover{background:var(--urgent-dim);border-color:rgba(255,69,103,0.3);color:var(--urgent)}
-.doc-attachments{display:flex;flex-wrap:wrap;gap:5px}
-.doc-tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:5px;font-size:.7rem;font-weight:500;border:1px solid var(--border);background:var(--surface2);color:var(--ink2);cursor:pointer;transition:all .12s;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.doc-tag:hover{background:var(--accent-dim);border-color:rgba(0,229,160,0.3);color:var(--accent)}
+/* ── BENTO ── */
+.bento-section{padding:0 40px 100px;max-width:1200px;margin:0 auto}
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto;gap:12px}
+.bento-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;overflow:hidden}
+.bento-card.wide{grid-column:span 2}
+.bento-card.tall{grid-row:span 2}
+.bento-card-label{font-family:var(--font-mono);font-size:.65rem;color:var(--orange);letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+.bento-card-title{font-family:var(--font-display);font-size:1.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink);margin-bottom:8px}
+.bento-card-desc{font-size:.83rem;color:var(--ink2);line-height:1.6;font-weight:300}
+.bento-number{font-family:var(--font-display);font-size:5rem;font-weight:900;color:var(--orange);opacity:.15;position:absolute;bottom:-10px;right:16px;line-height:1;letter-spacing:-2px}
 
+/* ── PRICING ── */
+.pricing-section{padding:100px 40px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.pricing-inner{max-width:1000px;margin:0 auto}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:64px}
+.price-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:36px;position:relative;transition:all .25s}
+.price-card:hover{border-color:var(--border2);transform:translateY(-4px)}
+.price-card.featured{border-color:var(--orange);background:linear-gradient(135deg,rgba(249,115,22,0.05),transparent)}
+.price-name{font-family:var(--font-display);font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--ink2);margin-bottom:16px}
+.price-amount{font-family:var(--font-display);font-size:3.5rem;font-weight:900;color:var(--ink);line-height:1}
+.price-period{font-size:.85rem;color:var(--ink3);font-weight:400;font-family:var(--font-body)}
+.price-divider{height:1px;background:var(--border);margin:24px 0}
+.price-feature{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--ink2);margin-bottom:10px}
+.price-feature.ok{color:var(--ink)}
+.price-dot{width:6px;height:6px;border-radius:50%;background:var(--ink3);flex-shrink:0}
+.price-dot.ok{background:var(--green)}
+.price-btn{display:block;width:100%;padding:13px;border-radius:8px;font-size:.9rem;font-weight:600;text-align:center;text-decoration:none;margin-top:28px;transition:all .2s;border:none;cursor:pointer;font-family:var(--font-body)}
+.price-btn.primary{background:var(--orange);color:#fff}
+.price-btn.primary:hover{opacity:.9;box-shadow:0 6px 24px var(--orange-glow)}
+.price-btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--border2)}
+.price-btn.ghost:hover{background:var(--surface2)}
 
-/* ── AUTH SCREEN ── */
-#authScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px}
-.auth-box{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px 28px}
-.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;justify-content:center}
-.auth-logo-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent-glow)}
-.auth-logo-text{font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:-.02em}
-.auth-tabs{display:flex;background:var(--surface2);border-radius:10px;padding:3px;margin-bottom:24px;gap:3px}
-.auth-tab{flex:1;padding:9px;text-align:center;font-size:.82rem;font-weight:600;border-radius:8px;cursor:pointer;color:var(--ink3);transition:all .2s}
-.auth-tab.active{background:var(--surface3);color:var(--ink)}
-.auth-title{font-family:var(--font-display);font-size:1.3rem;font-weight:800;margin-bottom:6px}
-.auth-sub{font-size:.82rem;color:var(--ink3);margin-bottom:22px}
-.auth-field{margin-bottom:14px}
-.auth-field label{display:block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:6px}
-.auth-field input{width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none;transition:border .2s}
-.auth-field input:focus{border-color:var(--accent)}
-.auth-btn{width:100%;padding:13px;background:var(--accent);color:#000;font-family:var(--font-display);font-size:.95rem;font-weight:700;border:none;border-radius:var(--radius-sm);cursor:pointer;margin-top:6px;transition:opacity .2s}
-.auth-btn:hover{opacity:.85}
-.auth-btn:disabled{opacity:.5;cursor:not-allowed}
-.auth-err{font-size:.8rem;color:var(--urgent);margin-top:10px;text-align:center;min-height:18px}
-/* PLANS */
-.plan-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
-.plan-card.featured{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.plan-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
-.plan-name{font-family:var(--font-display);font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--ink)}
-.plan-price{font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--ink);margin-top:4px}
-.plan-period{font-size:.85rem;font-weight:400;color:var(--ink3)}
-.plan-badge{padding:4px 10px;border-radius:6px;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-.plan-features{display:flex;flex-direction:column;gap:8px}
-.plan-feat{font-size:.85rem;color:var(--ink)}
-.plan-feat.muted{color:var(--ink3)}
-/* DASHBOARD */
-.dash-section{margin-bottom:20px}
-.dash-section-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:10px}
-.dash-kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
-.dash-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;position:relative;overflow:hidden}
-.dash-kpi-icon{font-size:1.5rem;margin-bottom:6px}
-.dash-kpi-val{font-size:1.5rem;font-weight:800;font-family:var(--font-display);line-height:1}
-.dash-kpi-label{font-size:.72rem;color:var(--ink3);margin-top:4px}
-.dash-kpi-accent{position:absolute;top:0;right:0;width:60px;height:60px;border-radius:50%;opacity:.06;transform:translate(20px,-20px)}
-.dash-alert-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}
-.dash-entretien-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px}
-.dash-empty{text-align:center;padding:16px;color:var(--ink3);font-size:.85rem;background:var(--surface);border-radius:var(--radius-sm)}
-/* FINANCES */
-.fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
-.fin-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.fin-info{flex:1}
-.fin-label{font-weight:600;font-size:.9rem}
-.fin-meta{font-size:.78rem;color:var(--ink3);margin-top:2px}
-.fin-amount{font-weight:700;font-size:1rem}
-.fin-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
-.fin-kpi-val{font-size:1.3rem;font-weight:800;font-family:var(--font-display);margin-top:4px}
-.fin-kpi-label{font-size:.7rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em}
-/* ENTRETIENS */
-.entr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-.entr-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
-.entr-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--surface2);flex-shrink:0}
-.entr-type{font-weight:700;font-size:.95rem}
-.entr-vehicle{font-size:.8rem;color:var(--ink3);margin-top:2px}
-.entr-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.entr-tag{font-size:.75rem;padding:4px 10px;border-radius:6px;background:var(--surface2);color:var(--ink2)}
-.entr-next{margin-top:10px;padding:8px 12px;background:var(--accent-dim);border-radius:8px;font-size:.8rem;color:var(--accent);display:flex;align-items:center;gap:6px}
-/* EMPLOYÉS */
-.emp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
-.emp-header{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-.emp-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;border:2px solid var(--border2)}
-.emp-name{font-weight:700;font-size:1rem}
-.emp-contact{font-size:.8rem;color:var(--ink3)}
-.emp-badges{display:flex;flex-wrap:wrap;gap:8px}
-.emp-badge{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;font-size:.75rem;font-weight:600}
-.emp-badge.ok{background:var(--ok-dim);color:var(--ok)}
-.emp-badge.warn{background:var(--warn-dim);color:var(--warn)}
-.emp-badge.urgent{background:var(--urgent-dim);color:var(--urgent)}
-.emp-badge.neutral{background:var(--surface2);color:var(--ink2)}
-/* WORKSPACE */
-.ws-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s}
-.ws-item:hover{background:var(--surface2)}
-.ws-item.active{background:var(--accent-dim);border:1px solid rgba(0,229,160,0.2)}
-.ws-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--surface2)}
-.ws-info{flex:1}
-.ws-name{font-weight:600;font-size:.9rem}
-.ws-role{font-size:.75rem;color:var(--ink3)}
-.ws-code{font-family:monospace;font-size:.85rem;background:var(--surface2);padding:6px 12px;border-radius:6px;color:var(--accent);letter-spacing:2px;cursor:pointer;display:inline-block}
-.google-btn{width:100%;padding:12px;background:#fff;color:#1f1f1f;font-family:var(--font-body);font-size:.9rem;font-weight:600;border:1px solid #ddd;border-radius:var(--radius-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:4px;transition:background .2s}
-.google-btn:hover{background:#f5f5f5}
-.auth-divider{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--ink3);font-size:.78rem}
-.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border2)}
-.auth-user-chip{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--surface2);border-radius:20px;font-size:.78rem;color:var(--ink2);cursor:pointer;border:1px solid var(--border)}
-.auth-user-chip:hover{border-color:var(--border2)}
+/* ── TESTIMONIALS ── */
+.testi-section{padding:100px 40px;max-width:1200px;margin:0 auto}
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:64px}
+.testi-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px}
+.testi-quote{font-size:.95rem;color:var(--ink);line-height:1.7;margin-bottom:24px;font-style:italic;font-weight:300}
+.testi-author{display:flex;align-items:center;gap:12px}
+.testi-avatar{width:40px;height:40px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.testi-name{font-weight:600;font-size:.88rem;color:var(--ink)}
+.testi-role{font-size:.75rem;color:var(--ink3)}
 
-/* ── STATS PAGE ── */
-.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
-.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center}
-.kpi-label{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:8px}
-.kpi-value{font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--accent)}
-.kpi-sub{font-size:.72rem;color:var(--ink3);margin-top:3px}
-.year-filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px}
-.year-pill{padding:6px 14px;border-radius:20px;font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--ink2);transition:all .15s}
-.year-pill.active{background:var(--accent);color:#000;border-color:transparent;box-shadow:0 0 12px var(--accent-glow)}
-.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px}
-.chart-label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--ink3);margin-bottom:16px}
-.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.bar-name{font-size:.78rem;color:var(--ink2);width:100px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bar-track{flex:1;height:6px;background:var(--surface3);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;transition:width .8s cubic-bezier(.16,1,.3,1)}
-.bar-val{font-size:.75rem;font-weight:700;color:var(--ink);width:44px;text-align:right;flex-shrink:0}
-.donut-wrap{display:flex;align-items:center;gap:20px}
-.donut-legend{display:flex;flex-direction:column;gap:8px;flex:1}
-.legend-item{display:flex;align-items:center;gap:8px;font-size:.8rem}
-.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* ── CTA FINAL ── */
+.cta-section{padding:120px 40px;text-align:center;position:relative;overflow:hidden}
+.cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(249,115,22,0.07),transparent);pointer-events:none}
+.cta-title{font-family:var(--font-display);font-size:clamp(3rem,8vw,6rem);font-weight:900;text-transform:uppercase;letter-spacing:1px;line-height:.95;color:var(--ink);margin-bottom:24px}
+.cta-title span{color:var(--orange)}
+.cta-sub{font-size:1.05rem;color:var(--ink2);margin-bottom:48px;font-weight:300}
 
-/* ── MAP PAGE ── */
-.search-bar{display:flex;gap:10px;margin-bottom:16px}
-.search-input-wrap{position:relative;flex:1}
-.search-input-wrap input{width:100%;padding:12px 14px 12px 40px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none;transition:all .2s}
-.search-input-wrap input::placeholder{color:var(--ink3)}
-.search-input-wrap input:focus{border-color:rgba(0,229,160,0.4);box-shadow:0 0 0 3px rgba(0,229,160,0.08)}
-.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.95rem;pointer-events:none}
-.autocomplete-box{position:absolute;top:calc(100%+6px);left:0;right:0;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);z-index:300;display:none;max-height:220px;overflow-y:auto}
-.autocomplete-item{padding:11px 14px;cursor:pointer;font-size:.86rem;border-bottom:1px solid var(--border);transition:background .1s}
-.autocomplete-item:last-child{border-bottom:none}
-.autocomplete-item:hover{background:var(--surface3)}
-.autocomplete-item strong{color:var(--ink)}
-.autocomplete-item small{color:var(--ink3);font-size:.76rem}
-#mapContainer{width:100%;height:260px;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);margin-bottom:14px;display:none}
-.map-empty{text-align:center;padding:48px 20px;color:var(--ink3)}
-.map-empty-icon{font-size:2.5rem;margin-bottom:12px;opacity:.6}
-.ct-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;transition:all .2s}
-.ct-card:hover{background:var(--surface2);border-color:var(--border2)}
-.ct-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
-.ct-name{font-family:var(--font-display);font-size:.95rem;font-weight:700;color:var(--ink)}
-.ct-brand{font-size:.73rem;color:var(--accent);font-weight:500;margin-top:2px}
-.ct-addr{font-size:.75rem;color:var(--ink3);margin-top:3px}
-.ct-dist{font-family:var(--font-display);font-size:1rem;font-weight:800;color:var(--accent);white-space:nowrap}
-.ct-dist small{font-family:var(--font-body);font-size:.68rem;color:var(--ink3);display:block;text-align:right}
-.ct-actions{display:flex;gap:7px;flex-wrap:wrap}
-.ct-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:6px;font-family:var(--font-body);font-size:.76rem;font-weight:500;text-decoration:none;border:1px solid var(--border2);background:var(--surface2);color:var(--ink2);cursor:pointer;transition:all .15s}
-.ct-btn:hover{background:var(--surface3);color:var(--ink);border-color:var(--border2)}
-.ct-btn.call{background:var(--accent-dim);border-color:rgba(0,229,160,0.25);color:var(--accent)}
-.ct-btn.call:hover{background:rgba(0,229,160,0.2);box-shadow:0 0 12px var(--accent-glow)}
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:var(--font-display);font-size:1.1rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px}
+.footer-logo-dot{width:6px;height:6px;border-radius:2px;background:var(--orange)}
+.footer-links{display:flex;gap:24px}
+.footer-link{color:var(--ink3);font-size:.82rem;text-decoration:none;transition:color .2s}
+.footer-link:hover{color:var(--ink)}
+.footer-copy{color:var(--ink3);font-size:.78rem}
 
-/* ── SETTINGS ── */
-.settings-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:14px}
-.settings-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid var(--border)}
-.settings-row:last-child{border-bottom:none}
-.settings-label{font-size:.88rem;font-weight:600;color:var(--ink)}
-.settings-sub{font-size:.74rem;color:var(--ink3);margin-top:2px}
-.range-val{font-family:var(--font-display);font-size:.95rem;font-weight:800;color:var(--accent);min-width:36px;text-align:right}
-input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
+.reveal.visible{opacity:1;transform:translateY(0)}
 
-/* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity .25s}
-@media(min-width:600px){.modal-overlay{align-items:center}}
-.modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-height:92vh;overflow-y:auto;transform:translateY(40px);transition:transform .3s cubic-bezier(.16,1,.3,1)}
-@media(min-width:600px){.modal{border-radius:20px;max-width:520px;padding:32px}}
-.modal-overlay.open .modal{transform:translateY(0)}
-.modal-handle{display:block;width:32px;height:3px;border-radius:2px;background:var(--surface3);margin:0 auto 22px}
-.modal-title{font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--ink);margin-bottom:5px}
-.modal-sub{font-size:.84rem;color:var(--ink2);margin-bottom:22px}
-.modal-actions{display:flex;gap:10px;margin-top:22px;justify-content:flex-end}
-.form-group{margin-bottom:14px}
-.form-group label{display:block;font-size:.72rem;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
-.form-group input,.form-group select{width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none;transition:all .2s}
-.form-group input::placeholder{color:var(--ink3)}
-.form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2355556A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
-.form-group input:focus,.form-group select:focus{border-color:rgba(249,115,22,0.5);box-shadow:0 0 0 3px rgba(249,115,22,0.08)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--radius-sm);border:none;font-family:var(--font-body);font-size:.875rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none}
-.btn-primary{background:var(--accent);color:#fff;letter-spacing:.02em}.btn-primary:hover{opacity:.9;box-shadow:0 4px 16px var(--accent-glow)}
-.btn-ghost{background:var(--surface2);color:var(--ink2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--surface3);color:var(--ink)}
-.btn-danger{background:var(--urgent-dim);color:var(--urgent);border:1px solid rgba(255,69,103,0.25)}.btn-danger:hover{background:rgba(255,69,103,0.2)}
-.btn-sm{padding:7px 14px;font-size:.8rem}
-
-/* ── DROP ZONE ── */
-.drop-zone{border:1.5px dashed var(--border2);border-radius:var(--radius-sm);padding:24px 16px;text-align:center;background:var(--surface2);transition:all .2s;cursor:default}
-.drop-zone.drag-over{border-color:var(--accent);background:var(--accent-dim);box-shadow:0 0 0 3px rgba(0,229,160,0.08)}
-.drop-icon{font-size:1.8rem;margin-bottom:6px;opacity:.7}
-.drop-label{font-size:.84rem;font-weight:500;color:var(--ink2);margin-bottom:3px}
-.drop-sub{font-size:.74rem;color:var(--ink3);margin-bottom:12px}
-.file-btn,.url-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:6px;font-family:var(--font-body);font-size:.78rem;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid var(--border2);background:var(--surface);color:var(--ink2)}
-.file-btn:hover,.url-btn:hover{background:var(--accent-dim);border-color:rgba(0,229,160,0.3);color:var(--accent)}
-.doc-chip{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface);font-size:.82rem;animation:fadeUp .2s ease}
-.doc-chip-name{flex:1;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
-.doc-chip-type{font-size:.65rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0}
-.doc-chip-del{width:20px;height:20px;border-radius:50%;border:none;background:var(--surface2);color:var(--ink3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.7rem;flex-shrink:0;transition:all .12s}
-.doc-chip-del:hover{background:var(--urgent-dim);color:var(--urgent)}
-
-/* ── VIEWER ── */
-.viewer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:2000;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .2s}
-.viewer-overlay.open{opacity:1;pointer-events:all}
-.viewer-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
-.viewer-title{color:var(--ink);font-size:.88rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80%}
-.viewer-close{background:var(--surface2);border:1px solid var(--border2);color:var(--ink2);width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
-.viewer-close:hover{background:var(--urgent-dim);color:var(--urgent)}
-.viewer-body{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:16px}
-
-/* ── CONFIRM MODAL ── */
-.confirm-icon{font-size:3rem;margin-bottom:16px;display:block;text-align:center}
-.confirm-name{color:var(--ink2);font-size:.9rem;margin:8px 0 6px;font-weight:500;text-align:center}
-.confirm-sub{color:var(--ink3);font-size:.78rem;margin-bottom:22px;text-align:center}
-
-/* ── TOAST ── */
-.toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;gap:7px;z-index:3000;width:calc(100% - 32px);max-width:340px;pointer-events:none;align-items:center}
-.toast{background:var(--surface2);color:var(--ink);border:1px solid var(--border2);padding:11px 18px;border-radius:10px;font-size:.84rem;font-weight:500;box-shadow:var(--shadow-lg);animation:fadeUp .3s ease;text-align:center;backdrop-filter:blur(20px)}
-.toast.success{background:var(--accent-dim);color:var(--accent);border-color:rgba(0,229,160,0.3)}
-.toast.error{background:var(--urgent-dim);color:var(--urgent);border-color:rgba(255,69,103,0.3)}
-
-/* ── EMPTY ── */
-.empty-state{text-align:center;padding:48px 20px;color:var(--ink3)}
-.empty-icon{font-size:2.8rem;margin-bottom:14px;opacity:.4}
-.empty-state p{font-size:.86rem;margin-bottom:18px;line-height:1.5}
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .section,.bento-section,.testi-section,.cta-section{padding-left:20px;padding-right:20px}
+  .bento-grid{grid-template-columns:1fr}
+  .bento-card.wide,.bento-card.tall{grid-column:span 1;grid-row:span 1}
+  .hero-stats{gap:28px}
+  footer{flex-direction:column;align-items:flex-start;padding:32px 20px}
+}
 </style>
 </head>
 <body>
 
-<!-- TOP NAV -->
-<!-- ══ PAGE ABONNEMENT ══ -->
-<div class="page" id="page-plans" style="padding-top:0"><main>
-  <div class="page-hero" style="margin-top:8px">
-    <div class="page-hero-label">Abonnement</div>
-    <h1>Nos offres</h1>
-  </div>
-  <div id="currentPlanBanner" style="display:none;margin-bottom:20px"></div>
-  <div style="display:flex;flex-direction:column;gap:16px" id="plansList">
-
-    <!-- Gratuit -->
-    <div class="plan-card">
-      <div class="plan-header">
-        <div>
-          <div class="plan-name">Gratuit</div>
-          <div class="plan-price">0€<span class="plan-period">/mois</span></div>
-        </div>
-        <div class="plan-badge" style="background:var(--surface2);color:var(--ink2)">Actuel</div>
-      </div>
-      <div class="plan-features">
-        <div class="plan-feat">✅ 2 véhicules maximum</div>
-        <div class="plan-feat">✅ Historique CT</div>
-        <div class="plan-feat muted">❌ Rappels email</div>
-        <div class="plan-feat muted">❌ Espaces de travail</div>
-        <div class="plan-feat muted">❌ Gestion employés</div>
-        <div class="plan-feat muted">❌ Module finances</div>
-      </div>
-    </div>
-
-    <!-- Pro -->
-    <div class="plan-card featured">
-      <div class="plan-header">
-        <div>
-          <div class="plan-name">Pro</div>
-          <div class="plan-price">4,99€<span class="plan-period">/mois</span></div>
-        </div>
-        <div class="plan-badge" style="background:var(--accent);color:#fff">Populaire</div>
-      </div>
-      <div class="plan-features">
-        <div class="plan-feat">✅ Véhicules illimités</div>
-        <div class="plan-feat">✅ Historique CT</div>
-        <div class="plan-feat">✅ Rappels email automatiques</div>
-        <div class="plan-feat muted">❌ Espaces de travail</div>
-        <div class="plan-feat muted">❌ Gestion employés</div>
-        <div class="plan-feat muted">❌ Module finances</div>
-      </div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:16px" onclick="subscribePlan('pro')">
-        Choisir Pro →
-      </button>
-    </div>
-
-    <!-- Entreprise -->
-    <div class="plan-card">
-      <div class="plan-header">
-        <div>
-          <div class="plan-name">Entreprise</div>
-          <div class="plan-price">200€<span class="plan-period">/mois</span></div>
-        </div>
-        <div class="plan-badge" style="background:var(--blue-dim);color:var(--blue)">Flotte</div>
-      </div>
-      <div class="plan-features">
-        <div class="plan-feat">✅ Véhicules illimités</div>
-        <div class="plan-feat">✅ Rappels email automatiques</div>
-        <div class="plan-feat">✅ Espaces de travail multi-users</div>
-        <div class="plan-feat">✅ Gestion employés (permis, FCO...)</div>
-        <div class="plan-feat">✅ Module finances & rentabilité</div>
-        <div class="plan-feat">✅ Tableau de bord entreprise</div>
-      </div>
-      <button class="btn" style="width:100%;justify-content:center;margin-top:16px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,0.3)" onclick="subscribePlan('entreprise')">
-        Choisir Entreprise →
-      </button>
-    </div>
-
-  </div>
-</main></div>
-
-<!-- DRAWER OVERLAY -->
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-
-<!-- DRAWER -->
-<nav class="drawer" id="mainDrawer">
-  <div class="drawer-head">
-    <div class="drawer-logo-dot"></div>
-    <div class="drawer-logo">AutoCT</div>
-  </div>
-  <div class="drawer-ws" id="drawerWsPicker" onclick="openWorkspaceModal()" style="display:none">
-    <div class="drawer-ws-label">Espace actif</div>
-    <div class="drawer-ws-name"><span id="drawerWsIcon">👤</span><span id="drawerWsName">Personnel</span><span style="margin-left:auto;color:var(--ink3);font-size:.8rem">▾</span></div>
-  </div>
-  <div class="drawer-nav">
-    <button class="drawer-nav-item active" id="dnav-home" onclick="switchTab('home',this);closeDrawer()"><span class="nav-icon">🏠</span>Accueil</button>
-    <button class="drawer-nav-item" id="dnav-dashboard" onclick="switchTab('dashboard',this);closeDrawer()"><span class="nav-icon">📊</span>Tableau de bord</button>
-    <div class="drawer-sep"></div>
-    <button class="drawer-nav-item" id="dnav-entretiens" onclick="switchTab('entretiens',this);closeDrawer()"><span class="nav-icon">🔧</span>Entretiens</button>
-    <button class="drawer-nav-item" id="dnav-finances" onclick="switchTab('finances',this);closeDrawer()"><span class="nav-icon">💰</span>Finances</button>
-    <button class="drawer-nav-item" id="dnav-employees" onclick="switchTab('employees',this);closeDrawer()"><span class="nav-icon">👷</span>Employés</button>
-    <div class="drawer-sep"></div>
-    <button class="drawer-nav-item" id="dnav-plans" onclick="switchTab('plans',this);closeDrawer()"><span class="nav-icon">💳</span>Abonnement</button>
-    <div class="drawer-sep"></div>
-    <button class="drawer-nav-item" id="dnav-history" onclick="switchTab('history',this);closeDrawer()"><span class="nav-icon">📋</span>Historique CT</button>
-    <button class="drawer-nav-item" id="dnav-stats" onclick="switchTab('stats',this);closeDrawer()"><span class="nav-icon">📈</span>Statistiques</button>
-    <button class="drawer-nav-item" id="dnav-map" onclick="switchTab('map',this);closeDrawer()"><span class="nav-icon">📍</span>Centres CT</button>
-  </div>
-  <div class="drawer-footer">
-    <button class="drawer-footer-btn" onclick="openEmailModal();closeDrawer()">✉️ Rappels email</button>
-    <button class="drawer-footer-btn" onclick="switchTab('settings',document.getElementById('dnav-settings'));closeDrawer()" id="dnav-settings">⚙️ Réglages</button>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><div class="nav-logo-dot"></div>AutoCT</div>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Fonctionnalités</a>
+    <a href="#pricing" class="nav-link">Tarifs</a>
+    <a href="#testimonials" class="nav-link">Avis</a>
+    <a href="https://autoct.vercel.app/app" class="nav-cta">Commencer gratuitement</a>
   </div>
 </nav>
 
-<!-- TOP NAV -->
-<nav class="top-nav">
-  <button class="hamburger" id="hamburgerBtn" onclick="toggleDrawer()">
-    <span></span><span></span><span></span>
-  </button>
-  <div style="display:flex;align-items:center;gap:8px;">
-    <div class="logo-dot"></div>
-    <span class="logo" style="font-size:1.1rem">AutoCT</span>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-label">Gestion de flotte professionnelle</div>
+  <h1 class="hero-title">Votre flotte.<br><span>Sous contrôle.</span></h1>
+  <p class="hero-sub">AutoCT centralise la gestion de vos véhicules, employés et finances. Plus jamais de CT expiré, plus jamais de permis oublié.</p>
+  <div class="hero-actions">
+    <a href="https://autoct.vercel.app" class="btn-primary">Essayer gratuitement →</a>
+    <a href="#features" class="btn-ghost">Voir les fonctionnalités</a>
   </div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <button class="nav-btn primary btn-sm" id="btnAddVehicle" onclick="openAddModal()">+ Véhicule</button>
-  </div>
-</nav>
-
-<!-- garde workspacePicker caché pour compatibilité JS -->
-<div id="workspacePicker" style="display:none"><span id="workspaceIcon">👤</span><span id="workspaceName">Personnel</span></div>
-
-<!-- ══ ACCUEIL ══ -->
-<div class="page active" id="page-home"><main>
-  <div class="page-hero">
-    <div class="page-hero-label">Tableau de bord</div>
-    <h1 id="heroGreet">Bonjour 👋</h1>
-    <p id="heroDate" style="color:var(--ink3)"></p>
-  </div>
-  <div class="stats-row" id="statsBar"></div>
-  <div class="alerts-wrap" id="alertsSection"></div>
-  <div class="section-header">
-    <span class="section-title">Véhicules</span>
-    <span class="section-count" id="vehicleCount"></span>
-  </div>
-  <div class="vehicle-list" id="vehicleList"></div>
-</main></div>
-
-<!-- ══ HISTORIQUE ══ -->
-<div class="page" id="page-history"><main>
-  <div class="section-header" style="margin-top:8px">
-    <span class="section-title">Historique des CT</span>
-    <button class="btn btn-primary btn-sm" id="btnAddHistory" onclick="openHistoryModal()">+ Ajouter</button>
-  </div>
-  <div class="history-list" id="historyList"></div>
-</main></div>
-
-<!-- ══ STATS ══ -->
-<div class="page" id="page-stats"><main>
-  <div class="page-hero" style="margin-top:8px">
-    <div class="page-hero-label">Analyses</div>
-    <h1>Statistiques</h1>
-  </div>
-  <div class="year-filter" id="yearFilter"></div>
-  <div class="kpi-row" id="kpiRow"></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
-    <div class="chart-card" style="margin-bottom:0">
-      <div class="chart-label">Resultats</div>
-      <div style="position:relative;height:180px"><canvas id="chartDoughnut"></canvas></div>
-      <div id="chartDoughnutLegend" style="margin-top:12px"></div>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-val">100%</div>
+      <div class="hero-stat-label">Alertes automatiques</div>
     </div>
-    <div class="chart-card" style="margin-bottom:0">
-      <div class="chart-label">Par vehicule</div>
-      <div style="position:relative;height:180px"><canvas id="chartBarH"></canvas></div>
+    <div>
+      <div class="hero-stat-val">0€</div>
+      <div class="hero-stat-label">Pour commencer</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">24/7</div>
+      <div class="hero-stat-label">Surveillance active</div>
     </div>
   </div>
-  <div class="chart-card">
-    <div class="chart-label">Depenses dans le temps</div>
-    <div style="position:relative;height:200px"><canvas id="chartLine"></canvas></div>
-  </div>
-  <div class="chart-card">
-    <div class="chart-label">Detail par vehicule</div>
-    <div id="statsTable"></div>
-  </div>
-</main></div>
+</section>
 
-<!-- ══ CENTRES CT ══ -->
-<div class="page" id="page-map"><main>
-  <div class="page-hero" style="margin-top:8px">
-    <div class="page-hero-label">Recherche</div>
-    <h1>Centres CT</h1>
-    <p>Trouvez un centre agréé près de chez vous</p>
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item"><span>✦</span> Contrôle Technique</span>
+    <span class="marquee-item"><span>✦</span> Gestion Employés</span>
+    <span class="marquee-item"><span>✦</span> Rappels Email</span>
+    <span class="marquee-item"><span>✦</span> Module Finances</span>
+    <span class="marquee-item"><span>✦</span> Tableau de Bord</span>
+    <span class="marquee-item"><span>✦</span> Multi-Utilisateurs</span>
+    <span class="marquee-item"><span>✦</span> Transport Routier</span>
+    <span class="marquee-item"><span>✦</span> Contrôle Technique</span>
+    <span class="marquee-item"><span>✦</span> Gestion Employés</span>
+    <span class="marquee-item"><span>✦</span> Rappels Email</span>
+    <span class="marquee-item"><span>✦</span> Module Finances</span>
+    <span class="marquee-item"><span>✦</span> Tableau de Bord</span>
+    <span class="marquee-item"><span>✦</span> Multi-Utilisateurs</span>
+    <span class="marquee-item"><span>✦</span> Transport Routier</span>
   </div>
-  <div class="search-bar">
-    <div class="search-input-wrap">
-      <span class="search-icon">📍</span>
-      <input id="cityInput" type="text" placeholder="Votre ville (ex: Bordeaux, Lyon...)"
-        onkeydown="if(event.key==='Enter')searchCTCenters()"
-        oninput="onCityInput(this.value)">
-      <div class="autocomplete-box" id="autocompleteBox"></div>
-    </div>
-    <button class="btn btn-primary" onclick="searchCTCenters()">Chercher</button>
-  </div>
-  <div id="mapContainer"></div>
-  <div class="map-empty" id="mapStatus"><div class="map-empty-icon">🗺️</div><p style="font-size:.86rem">Entrez votre ville pour trouver les centres CT proches dans un rayon de 15 km</p></div>
-  <div id="ctCentersList"></div>
-</main></div>
+</div>
 
-<!-- ══ RÉGLAGES ══ -->
-<div class="page" id="page-settings"><main>
-  <div class="page-hero" style="margin-top:8px">
-    <div class="page-hero-label">Préférences</div>
-    <h1>Réglages</h1>
+<!-- FEATURES -->
+<section id="features">
+  <div class="section reveal">
+    <div class="section-eyebrow">Fonctionnalités</div>
+    <h2 class="section-title">Tout ce dont<br>vous avez besoin</h2>
+    <p class="section-sub">Une plateforme complète pensée pour les professionnels du transport et de la logistique.</p>
   </div>
-  <div class="settings-card">
-    <div class="settings-row">
-      <div><div class="settings-label">Délai d'alerte CT</div><div class="settings-sub">Jours avant expiration pour être alerté</div></div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <input type="range" min="7" max="60" id="alertDaysRange" oninput="document.getElementById('alertDaysVal').textContent=this.value+'j';saveSettings()">
-        <div class="range-val" id="alertDaysVal"></div>
+  <div style="max-width:1200px;margin:0 auto;padding:0 40px">
+    <div class="features-grid reveal">
+      <div class="feat-card">
+        <span class="feat-icon">🚗</span>
+        <div class="feat-name">Contrôle Technique</div>
+        <p class="feat-desc">Suivez les dates de CT de toute votre flotte. Alertes automatiques avant expiration. Historique complet des passages.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">👷</span>
+        <div class="feat-name">Gestion Employés</div>
+        <p class="feat-desc">Permis de conduire, cartes conducteur, FIMO/FCO — toutes les échéances réglementaires sous contrôle.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🔧</span>
+        <div class="feat-name">Entretiens</div>
+        <p class="feat-desc">Planifiez vidanges, révisions et réparations. Suivez les kilométrages et prestataires. Anticipez les coûts.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">💰</span>
+        <div class="feat-name">Finances</div>
+        <p class="feat-desc">Revenus vs dépenses par véhicule. Rentabilité en temps réel. Prenez les bonnes décisions avec les bons chiffres.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📧</span>
+        <div class="feat-name">Rappels Email</div>
+        <p class="feat-desc">Recevez chaque matin un email récapitulatif des CT et documents qui expirent bientôt. Ne ratez plus rien.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">👥</span>
+        <div class="feat-name">Multi-Utilisateurs</div>
+        <p class="feat-desc">Gérez votre équipe avec des rôles précis. Propriétaire, Admin, Membre. Chacun voit ce dont il a besoin.</p>
       </div>
     </div>
-    <div class="settings-row" style="flex-direction:column;align-items:flex-start;gap:10px">
-      <div><div class="settings-label">Email de rappel</div><div class="settings-sub">Pour recevoir les alertes par email</div></div>
-      <input type="email" id="settingsEmail" placeholder="votre@email.com" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none" onfocus="this.style.borderColor='rgba(0,229,160,0.4)'" onblur="this.style.borderColor='var(--border2)';saveSettings()">
+  </div>
+</section>
+
+<!-- BENTO -->
+<div class="bento-section reveal">
+  <div class="bento-grid">
+    <div class="bento-card wide">
+      <div class="bento-card-label">Tableau de bord</div>
+      <div class="bento-card-title">Vue 360°<br>de votre flotte</div>
+      <p class="bento-card-desc">KPI critiques, alertes prioritaires, prochains entretiens et rentabilité par véhicule — tout en un seul coup d'œil.</p>
+      <div class="bento-number">01</div>
+    </div>
+    <div class="bento-card">
+      <div class="bento-card-label">Alertes</div>
+      <div class="bento-card-title">Zéro oubli</div>
+      <p class="bento-card-desc">CT, permis, FCO, entretiens — chaque échéance déclenchée automatiquement.</p>
+      <div class="bento-number">02</div>
+    </div>
+    <div class="bento-card">
+      <div class="bento-card-label">Sécurité</div>
+      <div class="bento-card-title">Données<br>protégées</div>
+      <p class="bento-card-desc">Chiffrement bout en bout. Vos données vous appartiennent.</p>
+      <div class="bento-number">03</div>
+    </div>
+    <div class="bento-card wide">
+      <div class="bento-card-label">Rentabilité</div>
+      <div class="bento-card-title">Sachez exactement ce que rapporte chaque camion</div>
+      <p class="bento-card-desc">Comparez revenus et dépenses par véhicule, identifiez les moins rentables, optimisez votre flotte.</p>
+      <div class="bento-number">04</div>
     </div>
   </div>
-  <!-- Gestion membres espace pro -->
-  <div id="settingsMembersSection" style="display:none;margin-top:16px">
-    <div class="settings-card">
-      <div style="font-weight:700;font-size:.85rem;color:var(--accent);margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em">👥 Membres de l'espace pro</div>
-      <div id="settingsMembersList"></div>
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-        <div style="font-size:.8rem;color:var(--ink3);margin-bottom:8px">Code d'invitation</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div id="settingsInviteCode" style="font-family:var(--font-mono);font-size:1rem;font-weight:700;color:var(--ink);background:var(--surface2);padding:8px 14px;border-radius:var(--radius-sm);letter-spacing:3px;flex:1"></div>
-          <button class="btn btn-primary btn-sm" onclick="copyInviteCode()">Copier</button>
+</div>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing-section">
+  <div class="pricing-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Tarifs</div>
+      <h2 class="section-title">Simple.<br>Transparent.</h2>
+      <p class="section-sub">Commencez gratuitement. Passez à Pro quand vous en avez besoin.</p>
+    </div>
+    <div class="pricing-grid reveal">
+
+      <!-- Gratuit -->
+      <div class="price-card">
+        <div class="price-name">Gratuit</div>
+        <div class="price-amount">0€ <span class="price-period">/mois</span></div>
+        <div class="price-divider"></div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>2 véhicules</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Historique CT</div>
+        <div class="price-feature"><div class="price-dot"></div>Rappels email</div>
+        <div class="price-feature"><div class="price-dot"></div>Espaces de travail</div>
+        <div class="price-feature"><div class="price-dot"></div>Gestion employés</div>
+        <div class="price-feature"><div class="price-dot"></div>Module finances</div>
+        <a href="https://autoct.vercel.app" class="price-btn ghost">Commencer →</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="price-card featured">
+        <div style="position:absolute;top:20px;right:20px;background:var(--orange);color:#fff;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:4px">Populaire</div>
+        <div class="price-name">Pro</div>
+        <div class="price-amount">4,99€ <span class="price-period">/mois</span></div>
+        <div class="price-divider"></div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Véhicules illimités</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Historique CT complet</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Rappels email automatiques</div>
+        <div class="price-feature"><div class="price-dot"></div>Espaces de travail</div>
+        <div class="price-feature"><div class="price-dot"></div>Gestion employés</div>
+        <div class="price-feature"><div class="price-dot"></div>Module finances</div>
+        <a href="https://autoct.vercel.app" class="price-btn primary">Choisir Pro →</a>
+      </div>
+
+      <!-- Entreprise -->
+      <div class="price-card">
+        <div class="price-name">Entreprise</div>
+        <div class="price-amount">200€ <span class="price-period">/mois</span></div>
+        <div class="price-divider"></div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Véhicules illimités</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Rappels email automatiques</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Espaces de travail multi-users</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Gestion employés complète</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Module finances & rentabilité</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Tableau de bord entreprise</div>
+        <a href="https://autoct.vercel.app" class="price-btn ghost">Contacter →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="testi-section">
+  <div class="reveal">
+    <div class="section-eyebrow">Témoignages</div>
+    <h2 class="section-title">Ils nous<br>font confiance</h2>
+  </div>
+  <div class="testi-grid reveal">
+    <div class="testi-card">
+      <p class="testi-quote">"AutoCT nous a évité une amende de 1500€ en nous alertant 14 jours avant l'expiration du CT de notre semi. Indispensable."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">🚛</div>
+        <div>
+          <div class="testi-name">Marc Lefevre</div>
+          <div class="testi-role">Gérant — Transport Lefevre & Fils</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <p class="testi-quote">"La gestion des cartes conducteur et des FCO depuis une seule interface, c'est exactement ce qu'il nous fallait. Simple et efficace."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">🏢</div>
+        <div>
+          <div class="testi-name">Sophie Martin</div>
+          <div class="testi-role">RH — Groupe Martin Logistics</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <p class="testi-quote">"Je sais enfin quels camions me coûtent de l'argent. Le module finances m'a aidé à optimiser ma flotte de 12 véhicules."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">📊</div>
+        <div>
+          <div class="testi-name">Pierre Dubois</div>
+          <div class="testi-role">Directeur — DBL Transport</div>
         </div>
       </div>
     </div>
   </div>
+</section>
 
-  <div style="display:flex;gap:10px;margin-top:16px">
-    <button class="btn btn-danger" style="flex:1;justify-content:center" onclick="showUserMenu()">🚪 Se déconnecter</button>
-    <button class="btn" style="flex:1;justify-content:center;background:var(--surface2);color:var(--ink2);border:1px solid var(--border2)" onclick="resetData()">🗑 Effacer données</button>
+<!-- CTA FINAL -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="reveal">
+    <h2 class="cta-title">Prêt à prendre<br>le <span>contrôle</span> ?</h2>
+    <p class="cta-sub">Rejoignez les professionnels du transport qui font confiance à AutoCT.<br>Gratuit pour commencer, sans carte bancaire.</p>
+    <a href="https://autoct.vercel.app" class="btn-primary" style="font-size:1.1rem;padding:16px 40px">Commencer gratuitement →</a>
   </div>
-</main></div>
+</section>
 
-<!-- ══ MODAL GESTION MEMBRES ══ -->
-<div class="modal-overlay" id="manageMembersModal">
-  <div class="modal" style="max-width:460px">
-    <div class="modal-header">
-      <div class="modal-title">👥 Gérer les membres</div>
-      <button class="modal-close" onclick="closeModal('manageMembersModal')">✕</button>
-    </div>
-    <div id="membersList" style="margin-bottom:16px"></div>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><div class="footer-logo-dot"></div>AutoCT</div>
+  <div class="footer-links">
+    <a href="#features" class="footer-link">Fonctionnalités</a>
+    <a href="#pricing" class="footer-link">Tarifs</a>
+    <a href="https://autoct.vercel.app" class="footer-link">Se connecter</a>
   </div>
-</div>
-
-<!-- ══ MODAL WORKSPACE ══ -->
-<div class="modal-overlay" id="workspaceModal">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-header">
-      <div class="modal-title">Espaces de travail</div>
-      <button class="modal-close" onclick="closeModal('workspaceModal')">✕</button>
-    </div>
-    <div id="workspaceList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
-    <div style="border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:10px">
-      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openCreateWorkspace()">+ Créer un espace pro</button>
-      <button class="btn" style="width:100%;justify-content:center;background:var(--surface2)" onclick="openJoinWorkspace()">🔑 Rejoindre avec un code</button>
-      ${currentWorkspace&&(currentWorkspace._myRole==='owner')?`<button class="btn" style="width:100%;justify-content:center;background:var(--surface2)" onclick="openManageMembers()">👥 Gérer les membres</button>`:''}
-    </div>
-  </div>
-</div>
-
-<!-- ══ MODAL CRÉER WORKSPACE ══ -->
-<div class="modal-overlay" id="createWorkspaceModal">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-header">
-      <div class="modal-title">Créer un espace pro</div>
-      <button class="modal-close" onclick="closeModal('createWorkspaceModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="auth-field"><label>Nom de l'espace</label><input type="text" id="wsNameInput" placeholder="Ex: Garage Martin, Mon Entreprise..."></div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px" onclick="createWorkspace()">Créer</button>
-      <div class="auth-err" id="wsCreateErr"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MODAL REJOINDRE WORKSPACE ══ -->
-<div class="modal-overlay" id="joinWorkspaceModal">
-  <div class="modal" style="max-width:380px">
-    <div class="modal-header">
-      <div class="modal-title">Rejoindre un espace</div>
-      <button class="modal-close" onclick="closeModal('joinWorkspaceModal')">✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="auth-field"><label>Code d'invitation</label><input type="text" id="wsCodeInput" placeholder="Ex: GARAGE-X7K2" style="text-transform:uppercase;letter-spacing:2px"></div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px" onclick="joinWorkspace()">Rejoindre</button>
-      <div class="auth-err" id="wsJoinErr"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ PAGE DASHBOARD ══ -->
-<div class="page" id="page-dashboard"><main>
-  <div class="page-hero" style="margin-top:8px">
-    <div class="page-hero-label">Vue d'ensemble</div>
-    <h1>Tableau de bord</h1>
-  </div>
-  <div id="dashContent"></div>
-</main></div>
-
-<!-- ══ PAGE EMPLOYÉS ══ -->
-<div class="page" id="page-employees"><main>
-  <div class="page-hero" style="margin-top:8px">
-    <div class="page-hero-label">Gestion RH</div>
-    <h1>Employés</h1>
-  </div>
-  <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
-    <button class="btn btn-primary btn-sm" onclick="openEmployeeModal()">+ Ajouter</button>
-  </div>
-  <div id="employeeList"></div>
-</main></div>
-
-<!-- ══ PAGE ENTRETIENS ══ -->
-<div class="page" id="page-entretiens"><main>
-  <div class="page-hero" style="margin-top:8px">
-    <div class="page-hero-label">Maintenance</div>
-    <h1>Entretiens</h1>
-  </div>
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <select id="entretienVehicleFilter" style="padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.85rem;outline:none" onchange="renderEntretiens()">
-      <option value="">Tous les véhicules</option>
-    </select>
-    <button class="btn btn-primary btn-sm" onclick="openEntretienModal()">+ Ajouter</button>
-  </div>
-  <div id="entretienList"></div>
-</main></div>
-
-<!-- ══ PAGE FINANCES ══ -->
-<div class="page" id="page-finances"><main>
-  <div class="page-hero" style="margin-top:8px">
-    <div class="page-hero-label">Gestion financière</div>
-    <h1>Finances</h1>
-  </div>
-  <!-- KPI -->
-  <div id="financeKpi" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px"></div>
-  <!-- Filtre -->
-  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
-    <select id="financeVehicleFilter" style="flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.85rem;outline:none" onchange="renderFinances()">
-      <option value="">Tous les véhicules</option>
-    </select>
-    <select id="financeTypeFilter" style="padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.85rem;outline:none" onchange="renderFinances()">
-      <option value="">Tout</option>
-      <option value="revenu">Revenus</option>
-      <option value="depense">Dépenses</option>
-    </select>
-    <button class="btn btn-primary btn-sm" onclick="openFinanceModal()">+ Ajouter</button>
-  </div>
-  <!-- Graphique rentabilité par véhicule -->
-  <div class="chart-card" id="financeChartCard" style="margin-bottom:16px;display:none">
-    <div class="chart-label">Rentabilité par véhicule</div>
-    <div style="position:relative;height:180px"><canvas id="chartFinance"></canvas></div>
-  </div>
-  <div id="financeList"></div>
-</main></div>
-
-<!-- ══ BOTTOM NAV ══ -->
-<nav class="bottom-nav">
-  <button class="nav-tab active" onclick="switchTab('home',this)"><span class="tab-icon">🏠</span>Accueil</button>
-  <button class="nav-tab" onclick="switchTab('entretiens',this)"><span class="tab-icon">🔧</span>Entretiens</button>
-  <button class="nav-tab" onclick="switchTab('dashboard',this)"><span class="tab-icon">📊</span>Tableau</button>
-  <button class="nav-tab" onclick="switchTab('employees',this)"><span class="tab-icon">👷</span>Employés</button>
-  <button class="nav-tab" onclick="switchTab('settings',this)"><span class="tab-icon">⚙️</span>Réglages</button>
-</nav>
-
-<!-- ══ MODAL FINANCE ══ -->
-<div class="modal-overlay" id="financeModal"><div class="modal" style="max-width:460px">
-  <span class="modal-handle"></span>
-  <h2 class="modal-title" id="financeModalTitle">Nouvelle transaction</h2>
-  <div style="display:flex;gap:8px;margin-bottom:16px">
-    <button id="finTypRevenu" class="btn btn-primary" style="flex:1;justify-content:center" onclick="setFinType('revenu')">📈 Revenu</button>
-    <button id="finTypDepense" class="btn" style="flex:1;justify-content:center;background:var(--surface2)" onclick="setFinType('depense')">📉 Dépense</button>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <div class="form-group"><label>Véhicule</label>
-      <select id="financeVehicle" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.9rem;outline:none"></select>
-    </div>
-    <div class="form-group"><label>Catégorie</label>
-      <select id="financeCategorie" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.9rem;outline:none">
-        <option value="Transport">Transport</option>
-        <option value="Carburant">Carburant</option>
-        <option value="Entretien">Entretien</option>
-        <option value="Assurance">Assurance</option>
-        <option value="Péage">Péage</option>
-        <option value="Amende">Amende</option>
-        <option value="Salaire chauffeur">Salaire chauffeur</option>
-        <option value="Autre">Autre</option>
-      </select>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <div class="form-group"><label>Montant (€)</label><input type="number" id="financeMontant" placeholder="0.00" step="0.01" min="0"></div>
-    <div class="form-group"><label>Date</label><input type="date" id="financeDate"></div>
-  </div>
-  <div class="form-group" style="margin-bottom:16px"><label>Description</label><input type="text" id="financeDesc" placeholder="Ex: Course Lyon-Paris, Vidange camion..."></div>
-  <div style="display:flex;gap:10px">
-    <button class="btn" style="flex:1;background:var(--surface2)" onclick="closeModal('financeModal')">Annuler</button>
-    <button class="btn btn-primary" style="flex:1" id="financeSaveBtn" onclick="saveFinance()">Enregistrer</button>
-  </div>
-</div></div>
-
-<!-- ══ MODAL ENTRETIEN ══ -->
-<div class="modal-overlay" id="entretienModal"><div class="modal" style="max-width:520px">
-  <span class="modal-handle"></span>
-  <h2 class="modal-title" id="entretienModalTitle">Nouvel entretien</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <div class="form-group"><label>Véhicule</label>
-      <select id="entretienVehicle" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.9rem;outline:none"></select>
-    </div>
-    <div class="form-group"><label>Type d'entretien</label>
-      <select id="entretienType" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.9rem;outline:none">
-        <option>Vidange</option>
-        <option>Révision</option>
-        <option>Contrôle technique</option>
-        <option>Pneus</option>
-        <option>Freins</option>
-        <option>Courroie de distribution</option>
-        <option>Filtre à air</option>
-        <option>Filtre à carburant</option>
-        <option>Batterie</option>
-        <option>Climatisation</option>
-        <option>Autre</option>
-      </select>
-    </div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <div class="form-group"><label>Date</label><input type="date" id="entretienDate"></div>
-    <div class="form-group"><label>Kilométrage</label><input type="number" id="entretienKm" placeholder="150000"></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <div class="form-group"><label>Coût (€)</label><input type="number" id="entretienCout" placeholder="0.00" step="0.01"></div>
-    <div class="form-group"><label>Prestataire</label><input type="text" id="entretienPrestataire" placeholder="Garage Martin..."></div>
-  </div>
-  <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
-    <div style="font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:10px">📅 Prochain entretien</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="form-group"><label>Date prévue</label><input type="date" id="entretienProchaineDate"></div>
-      <div class="form-group"><label>Km prévu</label><input type="number" id="entretienProchainKm" placeholder="160000"></div>
-    </div>
-  </div>
-  <div class="form-group" style="margin-bottom:16px"><label>Notes</label><textarea id="entretienNotes" placeholder="Détails de l'intervention..." style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none;resize:vertical;min-height:70px"></textarea></div>
-  <div style="display:flex;gap:10px">
-    <button class="btn" style="flex:1;background:var(--surface2)" onclick="closeModal('entretienModal')">Annuler</button>
-    <button class="btn btn-primary" style="flex:1" id="entretienSaveBtn" onclick="saveEntretien()">Enregistrer</button>
-  </div>
-</div></div>
-
-<!-- ══ MODAL EMPLOYÉ ══ -->
-<div class="modal-overlay" id="employeeModal"><div class="modal" style="max-width:520px">
-  <span class="modal-handle"></span>
-  <h2 class="modal-title" id="empModalTitle">Nouvel employé</h2>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <div class="form-group"><label>Prénom</label><input type="text" id="empPrenom" placeholder="Jean"></div>
-    <div class="form-group"><label>Nom</label><input type="text" id="empNom" placeholder="Dupont"></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <div class="form-group"><label>Email</label><input type="email" id="empEmail" placeholder="jean@entreprise.com"></div>
-    <div class="form-group"><label>Téléphone</label><input type="tel" id="empTel" placeholder="06 12 34 56 78"></div>
-  </div>
-  <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
-    <div style="font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:10px">🪪 Permis de conduire</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="form-group"><label>Catégorie(s)</label><input type="text" id="empPermis" placeholder="B, C, CE..."></div>
-      <div class="form-group"><label>Expiration permis</label><input type="date" id="empPermisExp"></div>
-    </div>
-  </div>
-  <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
-    <div style="font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:10px">📇 Carte conducteur</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="form-group"><label>N° carte</label><input type="text" id="empCarte" placeholder="FR000000000"></div>
-      <div class="form-group"><label>Expiration carte</label><input type="date" id="empCarteExp"></div>
-    </div>
-  </div>
-  <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
-    <div style="font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:10px">🎓 Formations (FIMO/FCO)</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="form-group"><label>Date FIMO</label><input type="date" id="empFimo"></div>
-      <div class="form-group"><label>Date FCO</label><input type="date" id="empFco"></div>
-    </div>
-  </div>
-  <div class="form-group" style="margin-bottom:16px"><label>Notes</label><textarea id="empNotes" placeholder="Informations complémentaires..." style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none;resize:vertical;min-height:70px"></textarea></div>
-  <div style="display:flex;gap:10px">
-    <button class="btn" style="flex:1;background:var(--surface2)" onclick="closeModal('employeeModal')">Annuler</button>
-    <button class="btn btn-primary" style="flex:1" id="empSaveBtn" onclick="saveEmployee()">Enregistrer</button>
-  </div>
-</div></div>
-
-<!-- ══ MODAL VÉHICULE ══ -->
-<div class="modal-overlay" id="addModal"><div class="modal">
-  <span class="modal-handle"></span>
-  <h2 class="modal-title">Nouveau véhicule</h2>
-  <p class="modal-sub">Ajoutez un véhicule à surveiller.</p>
-  <div class="form-row">
-    <div class="form-group"><label>Marque</label><input type="text" id="inputMarque" placeholder="Renault"></div>
-    <div class="form-group"><label>Modèle</label><input type="text" id="inputModele" placeholder="Clio"></div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label>Immatriculation</label><input type="text" id="inputPlaque" placeholder="AB-123-CD" oninput="formatPlaque(this)" maxlength="9" style="text-transform:uppercase;letter-spacing:.06em"></div>
-    <div class="form-group"><label>Propriétaire</label><input type="text" id="inputOwner" placeholder="Prénom Nom"></div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label>Expiration CT</label><input type="date" id="inputDateCT"></div>
-    <div class="form-group"><label>Kilométrage</label><input type="number" id="inputKm" placeholder="85 000"></div>
-  </div>
-  <div class="form-group"><label>Email propriétaire</label><input type="email" id="inputEmail" placeholder="email@exemple.com"></div>
-  <div class="modal-actions">
-    <button class="btn btn-ghost" onclick="closeModal('addModal')">Annuler</button>
-    <button class="btn btn-primary" onclick="saveVehicle()">Enregistrer</button>
-  </div>
-</div></div>
-
-<!-- ══ MODAL HISTORIQUE ══ -->
-<div class="modal-overlay" id="historyModal"><div class="modal">
-  <span class="modal-handle"></span>
-  <h2 class="modal-title" id="histModalTitle">Ajouter un contrôle</h2>
-  <p class="modal-sub">Enregistrez un CT effectué.</p>
-  <div class="form-group"><label>Véhicule</label><select id="histVehicle"></select></div>
-  <div class="form-row">
-    <div class="form-group"><label>Date</label><input type="date" id="histDate"></div>
-    <div class="form-group"><label>Résultat</label>
-      <select id="histResult">
-        <option value="Favorable">✅ Favorable</option>
-        <option value="Défavorable">❌ Défavorable</option>
-        <option value="Contre-visite">⚠️ Contre-visite</option>
-      </select>
-    </div>
-  </div>
-  <div class="form-row">
-    <div class="form-group"><label>Centre</label><input type="text" id="histCenter" placeholder="Autovision, Dekra..."></div>
-    <div class="form-group"><label>Coût (€)</label><input type="number" id="histCost" placeholder="85"></div>
-  </div>
-  <div class="form-group">
-    <label>Documents</label>
-    <div class="drop-zone" id="dropZone"
-      ondragover="event.preventDefault();this.classList.add('drag-over')"
-      ondragleave="this.classList.remove('drag-over')"
-      ondrop="handleDrop(event)">
-      <div class="drop-icon">📎</div>
-      <p class="drop-label">Glissez un PDF ou une image ici</p>
-      <p class="drop-sub">ou choisissez ci-dessous</p>
-      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
-        <label class="file-btn"><input type="file" id="fileInput" accept=".pdf,image/*" style="display:none" onchange="handleFilePick(event)">📂 Fichier</label>
-        <button class="url-btn" onclick="toggleUrlInput()">🔗 Lien URL</button>
-      </div>
-    </div>
-    <div id="urlInputWrap" style="display:none;margin-top:10px">
-      <div style="display:flex;gap:8px">
-        <input type="url" id="urlInput" placeholder="https://..." style="flex:1;padding:10px 13px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.88rem;color:var(--ink);outline:none">
-        <button class="btn btn-primary btn-sm" onclick="addUrl()">Ajouter</button>
-      </div>
-    </div>
-    <div id="docList" style="margin-top:10px;display:flex;flex-direction:column;gap:7px"></div>
-  </div>
-  <div class="modal-actions">
-    <button class="btn btn-ghost" onclick="closeModal('historyModal')">Annuler</button>
-    <button class="btn btn-primary" id="histSaveBtn" onclick="saveHistory()">Enregistrer</button>
-  </div>
-</div></div>
-
-<!-- ══ MODAL EMAIL ══ -->
-<div class="modal-overlay" id="emailModal"><div class="modal">
-  <span class="modal-handle"></span>
-  <h2 class="modal-title">Rappels email</h2>
-  <p class="modal-sub">Simulez l'envoi de rappels aux propriétaires.</p>
-  <div id="emailRecipients" style="margin-bottom:16px"></div>
-  <div class="form-group"><label>Délai (jours)</label><input type="number" id="emailDays" value="14" min="1" max="90"></div>
-  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;font-size:.8rem;color:var(--ink2);line-height:1.6">Bonjour [Prénom], votre <em>[Marque Modèle]</em> immatriculé <em>[Plaque]</em> doit passer son CT avant le <em>[Date]</em>. — AutoCT</div>
-  <div class="modal-actions">
-    <button class="btn btn-ghost" onclick="closeModal('emailModal')">Annuler</button>
-    <button class="btn btn-primary" onclick="sendEmails()">📨 Simuler l'envoi</button>
-  </div>
-</div></div>
-
-<!-- ══ MODAL CONFIRM SUPPRESSION ══ -->
-<div class="modal-overlay" id="confirmModal"><div class="modal" style="text-align:center">
-  <span class="modal-handle"></span>
-  <span class="confirm-icon">🗑️</span>
-  <h2 class="modal-title" style="text-align:center" id="confirmTitle">Supprimer ?</h2>
-  <p class="confirm-name" id="confirmName"></p>
-  <p class="confirm-sub" id="confirmSub">Cette action est irréversible.</p>
-  <div class="modal-actions" style="justify-content:center">
-    <button class="btn btn-ghost" onclick="closeModal('confirmModal')">Annuler</button>
-    <button class="btn btn-danger" id="confirmBtn">Supprimer</button>
-  </div>
-</div></div>
-
-<!-- ══ VIEWER ══ -->
-<div class="viewer-overlay" id="docViewer">
-  <div class="viewer-bar">
-    <span class="viewer-title" id="viewerTitle"></span>
-    <button class="viewer-close" onclick="closeViewer()">✕</button>
-  </div>
-  <div class="viewer-body" id="viewerBody"></div>
-</div>
-
-
-<!-- ══ AUTH SCREEN ══ -->
-<div id="authScreen" style="display:none">
-  <div class="auth-box">
-    <div class="auth-logo">
-      <div class="auth-logo-dot"></div>
-      <div class="auth-logo-text">AutoCT</div>
-    </div>
-    <div class="auth-tabs">
-      <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Connexion</div>
-      <div class="auth-tab" id="tabSignup" onclick="switchAuthTab('signup')">Inscription</div>
-    </div>
-    <!-- Bouton Google -->
-    <button class="google-btn" onclick="doLoginGoogle()">
-      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-      Continuer avec Google
-    </button>
-    <div class="auth-divider"><span>ou</span></div>
-
-    <div id="authLogin">
-      <div class="auth-title">Bon retour !</div>
-      <div class="auth-sub">Connectez-vous pour acceder a vos vehicules.</div>
-      <div class="auth-field"><label>Email</label><input type="email" id="loginEmail" placeholder="vous@email.com"></div>
-      <div class="auth-field"><label>Mot de passe</label><input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-      <button class="auth-btn" id="loginBtn" onclick="doLogin()">Se connecter</button>
-      <div class="auth-err" id="loginErr"></div>
-    </div>
-    <div id="authSignup" style="display:none">
-      <div class="auth-title">Creer un compte</div>
-      <div class="auth-sub">Gratuit, sans engagement.</div>
-      <div class="auth-field"><label>Email</label><input type="email" id="signupEmail" placeholder="vous@email.com"></div>
-      <div class="auth-field"><label>Mot de passe</label><input type="password" id="signupPass" placeholder="Min. 8 caracteres" onkeydown="if(event.key==='Enter')doSignup()"></div>
-      <button class="auth-btn" id="signupBtn" onclick="doSignup()">Creer mon compte</button>
-      <div class="auth-err" id="signupErr"></div>
-    </div>
-  </div>
-</div>
-
-<div class="toast-container" id="toastContainer"></div>
+  <div class="footer-copy">© 2026 AutoCT. Tous droits réservés.</div>
+</footer>
 
 <script>
-// ════════════════════════════════════════
-// SUPABASE REST (sans librairie externe)
-// ════════════════════════════════════════
-const SUPA_URL='https://wihcjzjxeqbspbpaknro.supabase.co';
-const SUPA_KEY='sb_publishable_gtJJ53FE9IxWxG5zTtZlzQ_OHCvYYL4';
-let currentUser=null, _accessToken=null, _refreshToken=null;
-
-// ── Helpers REST ──
-function _headers(extra={}){
-  const h={'Content-Type':'application/json','apikey':SUPA_KEY,'Prefer':'return=representation',...extra};
-  if(_accessToken)h['Authorization']='Bearer '+_accessToken;
-  return h;
-}
-async function _rest(method,path,body=null,params={}){
-  const url=new URL(SUPA_URL+'/rest/v1/'+path);
-  Object.entries(params).forEach(([k,v])=>url.searchParams.set(k,v));
-  const opts={method,headers:_headers()};
-  if(body)opts.body=JSON.stringify(body);
-  const r=await fetch(url.toString(),opts);
-  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||r.statusText);}
-  const txt=await r.text();
-  return txt?JSON.parse(txt):null;
-}
-async function _authPost(endpoint,body){
-  const r=await fetch(SUPA_URL+'/auth/v1/'+endpoint,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_KEY},body:JSON.stringify(body)});
-  const data=await r.json();
-  if(!r.ok)throw new Error(data.error_description||data.msg||data.message||'Erreur');
-  return data;
-}
-async function _getSession(){
-  // Essayer token stocké
-  const stored=localStorage.getItem('ct_session');
-  if(!stored)return null;
-  try{
-    const sess=JSON.parse(stored);
-    // Refresh token si expiré
-    const exp=sess.expires_at*1000;
-    if(Date.now()>exp-60000){
-      const r=await fetch(SUPA_URL+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPA_KEY},body:JSON.stringify({refresh_token:sess.refresh_token})});
-      if(!r.ok){localStorage.removeItem('ct_session');return null;}
-      const data=await r.json();
-      _saveSession(data);
-      return data.user;
-    }
-    _accessToken=sess.access_token;
-    _refreshToken=sess.refresh_token;
-    return sess.user;
-  }catch(e){localStorage.removeItem('ct_session');return null;}
-}
-function _saveSession(data){
-  _accessToken=data.access_token;
-  _refreshToken=data.refresh_token;
-  localStorage.setItem('ct_session',JSON.stringify({access_token:data.access_token,refresh_token:data.refresh_token,expires_at:data.expires_at||Math.floor(Date.now()/1000)+3600,user:data.user}));
-}
-function initSupabase(){return true;}
-// ════════════════════════════════════════
-// DONNÉES
-// ════════════════════════════════════════
-let vehicles = JSON.parse(localStorage.getItem('ct_v') || '[]');
-let history  = JSON.parse(localStorage.getItem('ct_h') || '[]');
-let settings = JSON.parse(localStorage.getItem('ct_s') || '{"alertDays":14,"email":""}');
-let pendingDocs=[], pendingDeleteId=null, pendingDeleteType=null, editingHistId=null;
-
-// Si session Supabase stockée, on part de zéro (pas de demo)
-// Toujours sauvegarder en local comme cache (evite la perte au F5)
-function save(){
-  localStorage.setItem('ct_v',JSON.stringify(vehicles));
-  localStorage.setItem('ct_h',JSON.stringify(history));
-  localStorage.setItem('ct_s',JSON.stringify(settings));
-}
-function saveSettings(){settings.alertDays=parseInt(document.getElementById('alertDaysRange').value);settings.email=document.getElementById('settingsEmail').value;save();}
-
-// ════════════════════════════════════════
-// UTILS
-// ════════════════════════════════════════
-const daysUntil=d=>{const t=new Date();t.setHours(0,0,0,0);const x=new Date(d);x.setHours(0,0,0,0);return Math.round((x-t)/86400000);};
-function getStatus(days){
-  if(days<0)return{label:`Expiré (${Math.abs(days)}j)`,cls:'urgent'};
-  if(days<=7)return{label:`${days}j restants`,cls:'urgent'};
-  if(days<=settings.alertDays)return{label:`${days}j restants`,cls:'warning'};
-  return{label:`${days}j`,cls:'ok'};
-}
-const fmtDate=s=>s?new Date(s).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';
-const vehicleIcon=m=>{const icons={'Renault':'🚗','Peugeot':'🚙','Volkswagen':'🚘','Toyota':'🚕','BMW':'🏎','Mercedes':'🚐','Citroën':'🚌','Ford':'🚗','Opel':'🚗'};return icons[m]||'🚗';};
-
-// ════════════════════════════════════════
-// RENDER GLOBAL
-// ════════════════════════════════════════
-function render(){
-  renderHome(); renderHistoryList();
-  document.getElementById('alertDaysRange').value=settings.alertDays;
-  document.getElementById('alertDaysVal').textContent=settings.alertDays+'j';
-  document.getElementById('settingsEmail').value=settings.email||'';
-  const h=new Date().getHours();
-  document.getElementById('heroGreet').textContent=h<12?'Bonjour 👋':h<18?'Bon après-midi 👋':'Bonsoir 👋';
-  document.getElementById('heroDate').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-}
-
-function checkNotifications(){
-  // Vérifier si le navigateur supporte les notifications
-  if(!('Notification' in window))return;
-  const expired = vehicles.filter(v=>daysUntil(v.dateCT)<0);
-  const soon = vehicles.filter(v=>{const d=daysUntil(v.dateCT);return d>=0&&d<=settings.alertDays;});
-  if(expired.length===0&&soon.length===0)return;
-  if(Notification.permission==='granted'){
-    expired.forEach(v=>{
-      new Notification('CT Expiré !', {body:`${v.marque} ${v.modele} (${v.plaque}) - CT expiré !`, icon:'/favicon.ico'});
-    });
-    soon.forEach(v=>{
-      const d=daysUntil(v.dateCT);
-      new Notification('CT à renouveler', {body:`${v.marque} ${v.modele} (${v.plaque}) - expire dans ${d}j`, icon:'/favicon.ico'});
-    });
-  }else if(Notification.permission==='default'){
-    Notification.requestPermission().then(p=>{if(p==='granted')checkNotifications();});
-  }
-}
-
-function updateEditButtons(){
-  const edit=canEdit();
-  const btnV=document.getElementById('btnAddVehicle');
-  const btnH=document.getElementById('btnAddHistory');
-  if(btnV)btnV.style.display=edit?'':'none';
-  if(btnH)btnH.style.display=edit?'':'none';
-}
-
-function renderHome(){
-  // Stats
-  const expired=vehicles.filter(v=>daysUntil(v.dateCT)<0).length;
-  const soon=vehicles.filter(v=>{const d=daysUntil(v.dateCT);return d>=0&&d<=settings.alertDays;}).length;
-  const ok=vehicles.filter(v=>daysUntil(v.dateCT)>settings.alertDays).length;
-  document.getElementById('statsBar').innerHTML=
-    `<div class="stat-card"><div class="stat-label">Véhicules</div><div class="stat-value">${vehicles.length}</div></div>
-     <div class="stat-card ${expired?'urgent':''}"><div class="stat-label">Expirés</div><div class="stat-value">${expired}</div></div>
-     <div class="stat-card ${soon?'warn':''}"><div class="stat-label">À renouveler</div><div class="stat-value">${soon}</div></div>
-     <div class="stat-card"><div class="stat-label">En règle</div><div class="stat-value">${ok}</div></div>`;
-
-  // Alertes
-  const critical=vehicles.filter(v=>{const d=daysUntil(v.dateCT);return d<0||d<=settings.alertDays;}).sort((a,b)=>daysUntil(a.dateCT)-daysUntil(b.dateCT));
-  const alertsEl=document.getElementById('alertsSection');
-  if(!critical.length){alertsEl.innerHTML='';} else {
-    alertsEl.innerHTML=`<div class="section-header"><span class="section-title">Alertes</span></div>`+
-      critical.map(v=>{
-        const days=daysUntil(v.dateCT),exp=days<0;
-        return `<div class="alert-item ${exp?'urgent':'warning'}">
-          <div class="alert-pulse ${exp?'urgent':'warning'}"></div>
-          <div class="alert-text">
-            <strong>${v.marque} ${v.modele} · ${v.plaque}</strong>
-            <span>${exp?`CT expiré depuis ${Math.abs(days)} jour(s) · ${v.owner}`:`Expire le ${fmtDate(v.dateCT)} · ${v.owner}`}</span>
-          </div>
-          <span class="chip ${exp?'chip-urgent':'chip-warn'}">${exp?'EXPIRÉ':days+'j'}</span>
-        </div>`;
-      }).join('');
-  }
-
-  // Alertes employés
-  const alertDays=settings.alertDays||30;
-  const empAlerts=[];
-  employees.forEach(emp=>{
-    const name=(emp.prenom||'')+' '+(emp.nom||'');
-    if(emp.permis_expiration){const d=daysUntil(emp.permis_expiration);if(d<=alertDays)empAlerts.push({name,label:'Permis',days:d,type:d<0?'urgent':'warning'});}
-    if(emp.carte_expiration){const d=daysUntil(emp.carte_expiration);if(d<=alertDays)empAlerts.push({name,label:'Carte conducteur',days:d,type:d<0?'urgent':'warning'});}
-    if(emp.fco_date){const d=daysUntil(emp.fco_date);if(d<=alertDays)empAlerts.push({name,label:'FCO',days:d,type:d<0?'urgent':'warning'});}
-    if(emp.permis_expiration){const d=daysUntil(emp.permis_expiration);if(d<=alertDays){};}
-  });
-  // Alertes entretiens
-  const entrAlerts=[];
-  entretiens.forEach(e=>{
-    if(e.prochaine_date){
-      const d=daysUntil(e.prochaine_date);
-      if(d<=alertDays){
-        const v=vehicles.find(x=>x.id===e.vehicle_id);
-        entrAlerts.push({label:e.type,vehicle:v?v.marque+' '+v.modele+' · '+v.plaque:'',days:d,type:d<0?'urgent':'warning'});
-      }
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
     }
   });
-
-  if(empAlerts.length||entrAlerts.length){
-    const extra=empAlerts.map(a=>`<div class="alert-item ${a.type}">
-      <div class="alert-pulse ${a.type}"></div>
-      <div class="alert-text">
-        <strong>👷 ${a.name}</strong>
-        <span>${a.label} ${a.days<0?`expiré depuis ${Math.abs(a.days)}j`:`expire dans ${a.days}j`}</span>
-      </div>
-      <span class="chip ${a.days<0?'chip-urgent':'chip-warn'}">${a.days<0?'EXPIRÉ':a.days+'j'}</span>
-    </div>`).join('')+
-    entrAlerts.map(a=>`<div class="alert-item ${a.type}">
-      <div class="alert-pulse ${a.type}"></div>
-      <div class="alert-text">
-        <strong>🔧 ${a.label}</strong>
-        <span>${a.vehicle} · ${a.days<0?`en retard de ${Math.abs(a.days)}j`:`dans ${a.days}j`}</span>
-      </div>
-      <span class="chip ${a.days<0?'chip-urgent':'chip-warn'}">${a.days<0?'RETARD':a.days+'j'}</span>
-    </div>`).join('');
-    if(!critical.length){
-      alertsEl.innerHTML=`<div class="section-header"><span class="section-title">Alertes</span></div>`+extra;
-    } else {
-      alertsEl.innerHTML+=extra;
-    }
-  }
-
-  // Véhicules
-  document.getElementById('vehicleCount').textContent=`${vehicles.length} véhicule${vehicles.length!==1?'s':''}`;
-  const vList=document.getElementById('vehicleList');
-  if(!vehicles.length){
-    vList.innerHTML=`<div class="empty-state"><div class="empty-icon">🚗</div><p>Aucun véhicule enregistré.</p><button class="btn btn-primary" onclick="openAddModal()">+ Ajouter un véhicule</button></div>`;return;
-  }
-  vList.innerHTML=vehicles.map(v=>{
-    const days=daysUntil(v.dateCT),st=getStatus(days);
-    return `<div class="vehicle-card">
-      <div class="vehicle-avatar">${vehicleIcon(v.marque)}</div>
-      <div class="vehicle-info">
-        <div class="vehicle-name">${v.marque} ${v.modele}</div>
-        <div class="vehicle-plate">${v.plaque}</div>
-        <div class="vehicle-owner">${v.owner||''}</div>
-      </div>
-      <div class="vehicle-meta">
-        <div class="vehicle-date">Expire le<br>${fmtDate(v.dateCT)}</div>
-        <span class="status-pill ${st.cls}">${st.label}</span>
-      </div>
-      <div class="vehicle-actions">
-        ${canEdit()?`<button class="icon-btn" onclick="openEditVehicle&&openEditVehicle('${v.id}')" title="Modifier">✏️</button>`:''}
-        ${canDelete()?`<button class="icon-btn del" onclick="askDeleteVehicle('${v.id}')" title="Supprimer">🗑</button>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function renderHistoryList(){
-  const el=document.getElementById('historyList');
-  if(!history.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><p>Aucun contrôle technique enregistré.</p></div>`;return;}
-  const icons={'Favorable':'✅','Défavorable':'❌','Contre-visite':'⚠️'};
-  const badgeCls={'Favorable':'ok','Défavorable':'fail','Contre-visite':'warn'};
-  const docIcons={pdf:'📄',img:'🖼️',url:'🔗'};
-  el.innerHTML=[...history].sort((a,b)=>new Date(b.date)-new Date(a.date)).map(h=>{
-    const v=vehicles.find(x=>x.id===h.vehicleId);
-    const vs=h.vs||{};
-    const vLabel=v?`${v.marque} ${v.modele}`:vs.m?`${vs.m} ${vs.mo}`:'Véhicule inconnu';
-    const plate=v?v.plaque:vs.p||'';
-    const deleted=!v&&vs.m;
-    const docsHtml=(h.docs&&h.docs.length)?`<div class="doc-attachments">`+h.docs.map(d=>{
-      const n=d.type==='url'?d.data.replace(/^https?:\/\//,'').split('/')[0]:d.name;
-      return `<span class="doc-tag" onclick="openDoc(${h.id},${d.id})">${docIcons[d.type]} ${n}</span>`;
-    }).join('')+'</div>':'';
-    return `<div class="history-card">
-      <div class="history-top">
-        <div class="history-badge ${badgeCls[h.result]||'ok'}">${icons[h.result]||'📋'}</div>
-        <div class="history-body">
-          <div class="history-vehicle">${vLabel} ${plate?`<span style="font-size:.72rem;color:var(--ink3);font-weight:400">(${plate})</span>`:''}${deleted?`<span style="font-size:.68rem;color:var(--ink3)"> · supprimé</span>`:''}</div>
-          <div class="history-detail">${h.result}${h.center?' · '+h.center:''}</div>
-          ${docsHtml}
-        </div>
-        <div class="history-right">
-          <div class="history-date">${fmtDate(h.date)}</div>
-          ${h.cost?`<div class="history-cost">${h.cost} €</div>`:''}
-        </div>
-      </div>
-      <div class="history-footer">
-        <div class="history-btns">
-          ${canEdit()?`<button class="mini-btn" onclick="openEditHistoryModal('${h.id}')">✏️ Modifier</button>
-          <button class="mini-btn del-btn" onclick="askDeleteHistory('${h.id}')">🗑 Supprimer</button>`:''}
-        </div>
-        <span class="chip chip-${h.result==='Favorable'?'ok':h.result==='Défavorable'?'urgent':'warn'}">${h.result}</span>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ════════════════════════════════════════
-// STATS — graphiques canvas natifs (sans lib externe)
-// ════════════════════════════════════════
-let selectedYear='all';
-
-function renderStatsPage(){
-  const years=[...new Set(history.map(h=>new Date(h.date).getFullYear()))].sort((a,b)=>b-a);
-  document.getElementById('yearFilter').innerHTML=
-    `<span class="year-pill ${selectedYear==='all'?'active':''}" onclick="selectYear('all')">Tout</span>`+
-    years.map(y=>`<span class="year-pill ${selectedYear==y?'active':''}" onclick="selectYear(${y})">${y}</span>`).join('');
-
-  const filtered=selectedYear==='all'?history:history.filter(h=>new Date(h.date).getFullYear()==selectedYear);
-  const totalCost=filtered.reduce((s,h)=>s+(h.cost||0),0);
-  const withCost=filtered.filter(h=>h.cost).length;
-  const avgCost=withCost?Math.round(totalCost/withCost):0;
-  const favorable=filtered.filter(h=>h.result==='Favorable').length;
-  const pct=filtered.length?Math.round(favorable/filtered.length*100):0;
-  const C=['#00E5A0','#FF4567','#FF8C42','#4D9EFF','#A78BFA','#F472B6'];
-
-  // ── KPI ──
-  document.getElementById('kpiRow').innerHTML=
-    `<div class="kpi-card"><div class="kpi-label">Total</div><div class="kpi-value">${totalCost}€</div><div class="kpi-sub">${filtered.length} CT</div></div>
-     <div class="kpi-card"><div class="kpi-label">Moyenne</div><div class="kpi-value">${avgCost}€</div><div class="kpi-sub">par controle</div></div>
-     <div class="kpi-card"><div class="kpi-label">Reussite</div><div class="kpi-value" style="color:${pct>=80?'#00E5A0':pct>=50?'#FF8C42':'#FF4567'}">${pct}%</div><div class="kpi-sub">${favorable}/${filtered.length}</div></div>`;
-
-  // ── DONUT résultats ──
-  const resData=[
-    {label:'Favorable',val:filtered.filter(h=>h.result==='Favorable').length,color:'#00E5A0'},
-    {label:'Defavorable',val:filtered.filter(h=>h.result==='Défavorable').length,color:'#FF4567'},
-    {label:'Contre-visite',val:filtered.filter(h=>h.result==='Contre-visite').length,color:'#FF8C42'},
-  ];
-  drawDonut('chartDoughnut', resData);
-  document.getElementById('chartDoughnutLegend').innerHTML=resData.map(d=>
-    `<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;font-size:.76rem">
-      <div style="width:8px;height:8px;border-radius:50%;background:${d.color};flex-shrink:0;box-shadow:0 0 6px ${d.color}"></div>
-      <span style="color:var(--ink2);flex:1">${d.label}</span>
-      <span style="font-weight:700;color:var(--ink)">${d.val}</span>
-    </div>`).join('');
-
-  // ── BARRES horizontales coût par véhicule ──
-  const costByV={};
-  filtered.forEach(h=>{
-    const v=vehicles.find(x=>x.id===h.vehicleId),vs=h.vs||{};
-    const n=v?`${v.marque} ${v.modele}`:vs.m?`${vs.m} ${vs.mo}`:'Inconnu';
-    costByV[n]=(costByV[n]||0)+(h.cost||0);
-  });
-  const sortedV=Object.entries(costByV).sort((a,b)=>b[1]-a[1]);
-  drawBarsH('chartBarH', sortedV.map(([n,v],i)=>({label:n.length>13?n.slice(0,13)+'…':n,val:v,color:C[i%C.length]})));
-
-  // ── COURBE dépenses dans le temps ──
-  const byMonth={};
-  filtered.filter(h=>h.cost).forEach(h=>{
-    const d=new Date(h.date);
-    const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    byMonth[k]=(byMonth[k]||0)+h.cost;
-  });
-  const months=Object.keys(byMonth).sort();
-  drawLine('chartLine',
-    months.map(k=>{const[y,m]=k.split('-');return `${m}/${y.slice(2)}`;}),
-    months.map(k=>byMonth[k]),
-    '#00E5A0'
-  );
-
-  // ── TABLE ──
-  const td={};
-  filtered.forEach(h=>{
-    const v=vehicles.find(x=>x.id===h.vehicleId),vs=h.vs||{};
-    const n=v?`${v.marque} ${v.modele}`:vs.m?`${vs.m} ${vs.mo}`:'Inconnu';
-    if(!td[n])td[n]={ct:0,cost:0,last:'',ok:0};
-    td[n].ct++;td[n].cost+=(h.cost||0);
-    if(!td[n].last||h.date>td[n].last)td[n].last=h.date;
-    if(h.result==='Favorable')td[n].ok++;
-  });
-  document.getElementById('statsTable').innerHTML=Object.keys(td).length
-    ?`<table style="width:100%;border-collapse:collapse">
-        <thead><tr>
-          <th style="text-align:left;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);padding:0 0 10px;border-bottom:1px solid var(--border)">Vehicule</th>
-          <th style="text-align:center;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);padding:0 0 10px;border-bottom:1px solid var(--border)">CT</th>
-          <th style="text-align:right;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);padding:0 0 10px;border-bottom:1px solid var(--border)">Total</th>
-          <th style="text-align:right;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);padding:0 0 10px;border-bottom:1px solid var(--border)">Dernier</th>
-        </tr></thead><tbody>`+
-        Object.entries(td).map(([n,d])=>`<tr>
-          <td style="padding:10px 0;border-bottom:1px solid var(--border);font-size:.84rem;font-weight:600;color:var(--ink)">${n}</td>
-          <td style="padding:10px 0;border-bottom:1px solid var(--border);text-align:center;font-size:.82rem;color:var(--ink2)">${d.ct} <span style="font-size:.68rem;color:var(--ink3)">(${d.ok} ok)</span></td>
-          <td style="padding:10px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-display);font-size:.92rem;font-weight:800;color:#00E5A0">${d.cost}€</td>
-          <td style="padding:10px 0;border-bottom:1px solid var(--border);text-align:right;font-size:.76rem;color:var(--ink3)">${fmtDate(d.last)}</td>
-        </tr>`).join('')+`</tbody></table>`
-    :'<p style="font-size:.82rem;color:var(--ink3)">Aucun historique pour cette periode.</p>';
-}
-
-function selectYear(y){selectedYear=y;renderStatsPage();}
-
-// ── Moteur de dessin canvas ──────────────────────
-function getCanvas(id,h){
-  const c=document.getElementById(id);
-  const dpr=window.devicePixelRatio||1;
-  const w=c.parentElement.clientWidth||300;
-  c.width=w*dpr; c.height=h*dpr;
-  c.style.width=w+'px'; c.style.height=h+'px';
-  const ctx=c.getContext('2d'); ctx.scale(dpr,dpr);
-  ctx.clearRect(0,0,w,h);
-  return {ctx,w,h};
-}
-
-function drawDonut(id,data){
-  const {ctx,w,h}=getCanvas(id,170);
-  const total=data.reduce((s,d)=>s+d.val,0);
-  if(!total){ctx.fillStyle='#252533';ctx.beginPath();ctx.arc(w/2,h/2,h/2-10,0,Math.PI*2);ctx.fill();return;}
-  const cx=w/2,cy=h/2,r=h/2-12,ri=r*0.62;
-  let angle=-Math.PI/2;
-  data.forEach(d=>{
-    if(!d.val)return;
-    const sweep=(d.val/total)*Math.PI*2;
-    ctx.beginPath();ctx.moveTo(cx,cy);
-    ctx.arc(cx,cy,r,angle,angle+sweep);
-    ctx.closePath();ctx.fillStyle=d.color;ctx.fill();
-    // glow
-    ctx.shadowColor=d.color;ctx.shadowBlur=8;
-    ctx.beginPath();ctx.arc(cx,cy,r,angle,angle+sweep);
-    ctx.arc(cx,cy,ri,angle+sweep,angle,true);ctx.closePath();
-    ctx.fillStyle=d.color;ctx.fill();
-    ctx.shadowBlur=0;
-    angle+=sweep;
-  });
-  // trou central
-  ctx.beginPath();ctx.arc(cx,cy,ri,0,Math.PI*2);ctx.fillStyle='#16161F';ctx.fill();
-  // texte centre
-  ctx.fillStyle='#F0F0F8';ctx.font=`800 ${Math.round(h*0.18)}px Syne,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.fillText(total+' CT',cx,cy);
-}
-
-function drawBarsH(id,data){
-  const {ctx,w,h}=getCanvas(id,170);
-  if(!data.length){ctx.fillStyle='#55556A';ctx.font='12px Outfit,sans-serif';ctx.fillText('Aucune donnee',w/2,h/2);return;}
-  const maxVal=Math.max(...data.map(d=>d.val),1);
-  const labelW=100,padT=10,barH=Math.min(22,(h-padT*2)/data.length-6),gap=6;
-  const totalH=data.length*(barH+gap)-gap;
-  const startY=(h-totalH)/2;
-  data.forEach((d,i)=>{
-    const y=startY+i*(barH+gap);
-    const barW=(d.val/maxVal)*(w-labelW-16);
-    // label
-    ctx.fillStyle='#9090A8';ctx.font=`500 11px Outfit,sans-serif`;ctx.textAlign='right';ctx.textBaseline='middle';
-    ctx.fillText(d.label,labelW-6,y+barH/2);
-    // track
-    ctx.fillStyle='#252533';roundRect(ctx,labelW,y,w-labelW-16,barH,4);ctx.fill();
-    // bar
-    if(barW>0){
-      const g=ctx.createLinearGradient(labelW,0,labelW+barW,0);
-      g.addColorStop(0,d.color+'99');g.addColorStop(1,d.color);
-      ctx.fillStyle=g;roundRect(ctx,labelW,y,barW,barH,4);ctx.fill();
-    }
-    // valeur
-    ctx.fillStyle='#F0F0F8';ctx.font=`700 11px Outfit,sans-serif`;ctx.textAlign='left';
-    ctx.fillText(d.val+'€',labelW+barW+6,y+barH/2);
-  });
-}
-
-function drawLine(id,labels,vals,color){
-  const {ctx,w,h}=getCanvas(id,190);
-  if(!vals.length||vals.every(v=>!v)){
-    ctx.fillStyle='#55556A';ctx.font='12px Outfit,sans-serif';ctx.textAlign='center';
-    ctx.fillText('Aucune depense enregistree',w/2,h/2);return;
-  }
-  const padL=46,padR=16,padT=16,padB=32;
-  const gW=w-padL-padR,gH=h-padT-padB;
-  const maxV=Math.max(...vals,1);
-  // grille
-  ctx.strokeStyle='rgba(255,255,255,0.04)';ctx.lineWidth=1;
-  [0,0.25,0.5,0.75,1].forEach(t=>{
-    const y=padT+gH*(1-t);
-    ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(padL+gW,y);ctx.stroke();
-    ctx.fillStyle='#55556A';ctx.font='10px Outfit,sans-serif';ctx.textAlign='right';ctx.textBaseline='middle';
-    ctx.fillText(Math.round(maxV*t)+'€',padL-6,y);
-  });
-  // labels x
-  labels.forEach((l,i)=>{
-    const x=padL+i*(gW/(labels.length-1||1));
-    ctx.fillStyle='#55556A';ctx.font='10px Outfit,sans-serif';ctx.textAlign='center';ctx.textBaseline='top';
-    if(labels.length<=8||i%(Math.ceil(labels.length/6))===0)ctx.fillText(l,x,h-padB+6);
-  });
-  const px=i=>padL+i*(gW/(vals.length-1||1));
-  const py=v=>padT+gH*(1-v/maxV);
-  // remplissage dégradé
-  const grad=ctx.createLinearGradient(0,padT,0,padT+gH);
-  grad.addColorStop(0,color+'44');grad.addColorStop(1,color+'00');
-  ctx.beginPath();ctx.moveTo(px(0),py(vals[0]));
-  for(let i=1;i<vals.length;i++){
-    const cp1x=px(i-1)+(px(i)-px(i-1))/2,cp2x=cp1x;
-    ctx.bezierCurveTo(cp1x,py(vals[i-1]),cp2x,py(vals[i]),px(i),py(vals[i]));
-  }
-  ctx.lineTo(px(vals.length-1),padT+gH);ctx.lineTo(px(0),padT+gH);ctx.closePath();
-  ctx.fillStyle=grad;ctx.fill();
-  // ligne
-  ctx.beginPath();ctx.moveTo(px(0),py(vals[0]));
-  for(let i=1;i<vals.length;i++){
-    const cp1x=px(i-1)+(px(i)-px(i-1))/2,cp2x=cp1x;
-    ctx.bezierCurveTo(cp1x,py(vals[i-1]),cp2x,py(vals[i]),px(i),py(vals[i]));
-  }
-  ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
-  // points
-  vals.forEach((v,i)=>{
-    ctx.beginPath();ctx.arc(px(i),py(v),4,0,Math.PI*2);
-    ctx.fillStyle='#0A0A0F';ctx.fill();
-    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
-    ctx.shadowColor=color;ctx.shadowBlur=8;ctx.stroke();ctx.shadowBlur=0;
-  });
-}
-
-function roundRect(ctx,x,y,w,h,r){
-  ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
-  ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);
-  ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);
-  ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);
-  ctx.arcTo(x,y,x+r,y,r);ctx.closePath();
-}
-
-// ════════════════════════════════════════
-// NAVIGATION
-// ════════════════════════════════════════
-function switchTab(name,el){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.drawer-nav-item,.drawer-footer-btn').forEach(t=>t.classList.remove('active'));
-  const page=document.getElementById('page-'+name);
-  if(page)page.classList.add('active');
-  // activer l'item drawer correspondant
-  const dnavEl=document.getElementById('dnav-'+name)||el;
-  if(dnavEl)dnavEl.classList.add('active');
-  if(name==='stats')renderStatsPage();
-  if(name==='map')initMapPage();
-  if(name==='dashboard')renderDashboard();
-  if(name==='finances'){renderFinances();updateFinanceFilter();}
-  if(name==='entretiens'){renderEntretiens();updateEntretienFilter();}
-  if(name==='employees')renderEmployees();
-  if(name==='settings')renderSettingsMembers();
-  if(name==='plans')renderPlans();
-}
-
-// ════════════════════════════════════════
-// VÉHICULES
-// ════════════════════════════════════════
-function formatPlaque(input){
-  let v=input.value.toUpperCase().replace(/[^A-Z0-9]/g,''),f='';
-  if(v.length<=2)f=v;else if(v.length<=5)f=v.slice(0,2)+'-'+v.slice(2);
-  else if(v.length<=7)f=v.slice(0,2)+'-'+v.slice(2,5)+'-'+v.slice(5);
-  else f=v.slice(0,2)+'-'+v.slice(2,5)+'-'+v.slice(5,7);
-  input.value=f;
-}
-function openAddModal(){document.getElementById('addModal').classList.add('open');}
-async function saveVehicle(){
-  const marque=document.getElementById('inputMarque').value.trim();
-  const modele=document.getElementById('inputModele').value.trim();
-  const dateCT=document.getElementById('inputDateCT').value;
-  if(!marque||!modele||!dateCT){toast('Remplissez marque, modele et date CT.','error');return;}
-  const v={id:Date.now(),marque,modele,plaque:document.getElementById('inputPlaque').value.trim(),owner:document.getElementById('inputOwner').value.trim(),email:document.getElementById('inputEmail').value.trim(),dateCT,km:document.getElementById('inputKm').value};
-  // Sync Supabase
-  if(currentUser){
-    const newId=await saveVehicleToSupabase(v);
-    v.id=newId;
-  }
-  vehicles.push(v);
-  save();render();closeModal('addModal');
-  toast(marque+' '+modele+' ajoute !','success');
-  ['inputMarque','inputModele','inputPlaque','inputOwner','inputEmail','inputDateCT','inputKm'].forEach(id=>document.getElementById(id).value='');
-}
-function askDeleteVehicle(id){
-  const v=vehicles.find(x=>x.id===id);if(!v)return;
-  pendingDeleteId=id;pendingDeleteType='vehicle';
-  document.getElementById('confirmTitle').textContent='Supprimer ce véhicule ?';
-  document.getElementById('confirmName').textContent=`${v.marque} ${v.modele} · ${v.plaque}`;
-  document.getElementById('confirmSub').textContent='Cette action est irréversible.';
-  document.getElementById('confirmBtn').onclick=doDelete;
-  document.getElementById('confirmModal').classList.add('open');
-}
-function askDeleteHistory(id){
-  const h=history.find(x=>x.id===id);if(!h)return;
-  const vs=h.vs||{};
-  const v=vehicles.find(x=>x.id===h.vehicleId);
-  pendingDeleteId=id;pendingDeleteType='history';
-  document.getElementById('confirmTitle').textContent='Supprimer ce contrôle ?';
-  document.getElementById('confirmName').textContent=`${v?v.marque+' '+v.modele:vs.m?vs.m+' '+vs.mo:'Véhicule'} · ${fmtDate(h.date)}`;
-  document.getElementById('confirmSub').textContent='Cette action est irréversible.';
-  document.getElementById('confirmBtn').onclick=doDelete;
-  document.getElementById('confirmModal').classList.add('open');
-}
-async function doDelete(){
-  const id=pendingDeleteId;const type=pendingDeleteType;
-  if(type==='vehicle'){
-    vehicles=vehicles.filter(v=>v.id!==id);
-    if(currentUser)await deleteVehicleFromSupabase(id);
-  }else if(type==='history'){
-    history=history.filter(h=>h.id!==id);
-    if(currentUser)await deleteHistoryFromSupabase(id);
-  }
-  save();render();closeModal('confirmModal');
-  toast('Supprime.','');
-  pendingDeleteId=null;pendingDeleteType=null;
-}
-
-// ════════════════════════════════════════
-// HISTORIQUE
-// ════════════════════════════════════════
-function openHistoryModal(){
-  editingHistId=null;
-  document.getElementById('histModalTitle').textContent='Ajouter un contrôle';
-  document.getElementById('histSaveBtn').textContent='Enregistrer';
-  const sel=document.getElementById('histVehicle');
-  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}">${v.marque} ${v.modele} (${v.plaque})</option>`).join('');
-  document.getElementById('histDate').value=new Date().toISOString().split('T')[0];
-  document.getElementById('histResult').value='Favorable';
-  document.getElementById('histCenter').value='';document.getElementById('histCost').value='';
-  pendingDocs=[];renderDocList();
-  document.getElementById('urlInputWrap').style.display='none';
-  document.getElementById('historyModal').classList.add('open');
-}
-function openEditHistoryModal(histId){
-  const h=history.find(x=>x.id===histId);if(!h)return;
-  editingHistId=histId;
-  document.getElementById('histModalTitle').textContent='Modifier le contrôle';
-  document.getElementById('histSaveBtn').textContent='Enregistrer les modifications';
-  const sel=document.getElementById('histVehicle');
-  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}">${v.marque} ${v.modele} (${v.plaque})</option>`).join('');
-  sel.value=h.vehicleId;
-  document.getElementById('histDate').value=h.date;
-  document.getElementById('histResult').value=h.result;
-  document.getElementById('histCenter').value=h.center||'';
-  document.getElementById('histCost').value=h.cost||'';
-  pendingDocs=h.docs?[...h.docs]:[];renderDocList();
-  document.getElementById('urlInputWrap').style.display='none';
-  document.getElementById('historyModal').classList.add('open');
-}
-async function saveHistory(){
-  const vehicleId=document.getElementById('histVehicle').value;
-  const date=document.getElementById('histDate').value;
-  if(!vehicleId||!date){toast('Selectionnez un vehicule et une date.','error');return;}
-  const veh=vehicles.find(v=>String(v.id)===String(vehicleId));
-  const entry={vehicleId,date,result:document.getElementById('histResult').value,centre:document.getElementById('histCenter').value.trim(),cost:parseFloat(document.getElementById('histCost').value)||null,docs:[...pendingDocs],vs:veh?{m:veh.marque,mo:veh.modele,p:veh.plaque}:{}};
-  if(editingHistId){
-    const idx=history.findIndex(h=>String(h.id)===String(editingHistId));
-    if(idx!==-1)history[idx]={...history[idx],...entry};
-    if(currentUser)await saveHistoryToSupabase({...history[idx],id:editingHistId});
-    toast('Controle modifie !','success');
-  }else{
-    const newEntry={id:Date.now(),...entry};
-    if(currentUser){const newId=await saveHistoryToSupabase(newEntry);newEntry.id=newId;}
-    history.push(newEntry);
-    toast('Controle enregistre !','success');
-  }
-  editingHistId=null;pendingDocs=[];renderDocList();
-  document.getElementById('histModalTitle').textContent='Ajouter un controle';
-  document.getElementById('histSaveBtn').textContent='Enregistrer';
-  save();render();closeModal('historyModal');
-}
-
-// ════════════════════════════════════════
-// DOCUMENTS
-// ════════════════════════════════════════
-function handleDrop(e){e.preventDefault();document.getElementById('dropZone').classList.remove('drag-over');Array.from(e.dataTransfer.files).forEach(processFile);}
-function handleFilePick(e){Array.from(e.target.files).forEach(processFile);e.target.value='';}
-function processFile(file){
-  const isPdf=file.type==='application/pdf',isImg=file.type.startsWith('image/');
-  if(!isPdf&&!isImg){toast('PDF ou image uniquement.','error');return;}
-  const r=new FileReader();r.onload=e=>{pendingDocs.push({id:Date.now()+Math.random(),type:isPdf?'pdf':'img',name:file.name,data:e.target.result});renderDocList();};r.readAsDataURL(file);
-}
-function toggleUrlInput(){const w=document.getElementById('urlInputWrap');w.style.display=w.style.display==='none'?'block':'none';if(w.style.display==='block')document.getElementById('urlInput').focus();}
-function addUrl(){const val=document.getElementById('urlInput').value.trim();if(!val||!val.startsWith('http')){toast('URL invalide.','error');return;}pendingDocs.push({id:Date.now(),type:'url',name:val,data:val});document.getElementById('urlInput').value='';document.getElementById('urlInputWrap').style.display='none';renderDocList();}
-function removeDoc(id){pendingDocs=pendingDocs.filter(d=>d.id!==id);renderDocList();}
-function renderDocList(){
-  const icons={pdf:'📄',img:'🖼️',url:'🔗'},labels={pdf:'PDF',img:'Image',url:'Lien'};
-  document.getElementById('docList').innerHTML=pendingDocs.map(d=>`<div class="doc-chip"><span style="font-size:1rem">${icons[d.type]}</span><span class="doc-chip-name">${d.name}</span><span class="doc-chip-type">${labels[d.type]}</span><button class="doc-chip-del" onclick="removeDoc(${d.id})">✕</button></div>`).join('');
-}
-function openDoc(histId,docId){
-  const h=history.find(x=>x.id===histId);if(!h||!h.docs)return;
-  const doc=h.docs.find(d=>d.id===docId);if(!doc)return;
-  if(doc.type==='url'){const a=document.createElement('a');a.href=doc.data;a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();document.body.removeChild(a);return;}
-  document.getElementById('viewerTitle').textContent=doc.name;
-  document.getElementById('viewerBody').innerHTML=doc.type==='img'?`<img src="${doc.data}" style="max-width:100%;max-height:calc(100vh - 80px);border-radius:8px">`:`<iframe src="${doc.data}" style="width:min(900px,100%);height:calc(100vh - 80px);border:none;border-radius:8px"></iframe>`;
-  document.getElementById('docViewer').classList.add('open');
-}
-function closeViewer(){document.getElementById('docViewer').classList.remove('open');}
-
-// ════════════════════════════════════════
-// EMAIL
-// ════════════════════════════════════════
-function openEmailModal(){
-  document.getElementById('emailDays').value=settings.alertDays;
-  const targets=vehicles.filter(v=>daysUntil(v.dateCT)<=settings.alertDays);
-  document.getElementById('emailRecipients').innerHTML=targets.length
-    ?`<p style="font-size:.78rem;font-weight:600;margin-bottom:8px;color:var(--ink2)">${targets.length} destinataire(s) détecté(s) :</p>`+targets.map(v=>`<div style="display:flex;justify-content:space-between;font-size:.8rem;padding:6px 0;border-bottom:1px solid var(--border)"><span style="color:var(--ink)">${v.marque} ${v.modele}</span><span style="color:var(--ink3)">${v.email||'Pas d\'email'}</span></div>`).join('')
-    :`<p style="color:var(--ok);font-size:.84rem">✅ Aucun véhicule n'expire dans ce délai.</p>`;
-  document.getElementById('emailModal').classList.add('open');
-}
-function sendEmails(){
-  const days=parseInt(document.getElementById('emailDays').value)||14;
-  const targets=vehicles.filter(v=>daysUntil(v.dateCT)<=days&&v.email);
-  if(!targets.length){toast('Aucun email à envoyer.','');return;}
-  targets.forEach(v=>console.log(`[EMAIL] ${v.email} — ${v.marque} ${v.modele} expire le ${fmtDate(v.dateCT)}`));
-  closeModal('emailModal');toast(`${targets.length} rappel(s) simulé(s) !`,'success');
-}
-
-// ════════════════════════════════════════
-// MODALS & UTILS
-// ════════════════════════════════════════
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.modal-overlay').forEach(o=>{o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open');});});
-function resetData(){
-  if(!confirm('Effacer toutes les données locales ?'))return;
-  localStorage.removeItem('ct_v');
-  localStorage.removeItem('ct_h');
-  vehicles=[];history=[];
-  save();render();
-  toast('Données effacées','');
-}
-function toast(msg,type=''){
-  const c=document.getElementById('toastContainer'),el=document.createElement('div');
-  el.className=`toast ${type}`;el.textContent=msg;c.appendChild(el);setTimeout(()=>el.remove(),3000);
-}
-
-// ════════════════════════════════════════
-// CARTE OSM
-// ════════════════════════════════════════
-function initMapPage(){
-  if(!document.getElementById('leaflet-css')){
-    const l=document.createElement('link');l.id='leaflet-css';l.rel='stylesheet';
-    l.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css';
-    document.head.appendChild(l);
-  }
-  if(!window.L&&!document.getElementById('leaflet-js')){
-    const s=document.createElement('script');s.id='leaflet-js';
-    s.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
-    document.head.appendChild(s);
-  }
-}
-
-// Géocodage via photon.komoot.io (pas de CORS, pas d'auth)
-let _acTimer=null;
-function onCityInput(val){
-  clearTimeout(_acTimer);
-  const box=document.getElementById('autocompleteBox');
-  if(val.length<2){box.style.display='none';return;}
-  _acTimer=setTimeout(()=>fetchAutocomplete(val),350);
-}
-async function fetchAutocomplete(q){
-  try{
-    const url=`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=5&lang=fr&bbox=-5.559,41.131,9.685,51.294`;
-    const r=await fetch(url);
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    const box=document.getElementById('autocompleteBox');
-    const cities=data.features.filter(f=>['city','town','village','municipality'].includes(f.properties.type||f.properties.osm_value));
-    if(!cities.length){box.style.display='none';return;}
-    box.innerHTML=cities.map(f=>{
-      const p=f.properties;
-      const name=p.name||p.city||q;
-      const dept=p.county||p.state||'';
-      const [lon,lat]=f.geometry.coordinates;
-      return `<div class="autocomplete-item" onclick="selectCity('${name.replace(/'/g,"\\'")}',${lat},${lon})"><strong>${name}</strong> <small>${dept}</small></div>`;
-    }).join('');
-    box.style.display='block';
-  }catch(e){
-    // Fallback silencieux — l'utilisateur peut toujours appuyer sur Chercher
-    console.log('autocomplete unavailable:',e.message);
-  }
-}
-document.addEventListener('click',e=>{
-  const box=document.getElementById('autocompleteBox');
-  if(box&&!e.target.closest('#cityInput')&&!e.target.closest('#autocompleteBox'))box.style.display='none';
-});
-function selectCity(name,lat,lon){
-  document.getElementById('cityInput').value=name;
-  document.getElementById('autocompleteBox').style.display='none';
-  doSearch(parseFloat(lat),parseFloat(lon),name);
-}
-
-// Géocodage principal via photon.komoot.io
-async function searchCTCenters(){
-  const q=document.getElementById('cityInput').value.trim();
-  if(!q){toast('Entrez une ville','error');return;}
-  setMapStatus('⏳',`Recherche de "${q}"...`);
-  document.getElementById('ctCentersList').innerHTML='';
-  try{
-    const url=`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=1&lang=fr&bbox=-5.559,41.131,9.685,51.294`;
-    const r=await fetch(url);
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const data=await r.json();
-    if(!data.features||!data.features.length){
-      setMapStatus('😕',`Ville "${q}" introuvable. Essayez avec un nom différent.`);return;
-    }
-    const [lon,lat]=data.features[0].geometry.coordinates;
-    doSearch(parseFloat(lat),parseFloat(lon),q);
-  }catch(e){
-    console.error('Geocode error:',e);
-    // Dernier recours : Nominatim
-    try{
-      const r2=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=1&countrycodes=fr`);
-      const d2=await r2.json();
-      if(!d2.length){setMapStatus('😕',`Ville "${q}" introuvable.`);return;}
-      doSearch(parseFloat(d2[0].lat),parseFloat(d2[0].lon),q);
-    }catch(e2){
-      setMapStatus('⚠️',`Impossible de localiser la ville. Cette fonctionnalité nécessite un accès internet direct (pas disponible dans cet aperçu).<br><br><small>💡 Téléchargez le fichier et ouvrez-le dans votre navigateur pour utiliser la carte.</small>`);
-    }
-  }
-}
-
-async function doSearch(lat,lon,cityName){
-  setMapStatus('⏳',`Chargement de la carte...`);
-  document.getElementById('mapContainer').style.display='block';
-  let tries=0;while(!window.L&&tries<40){await new Promise(r=>setTimeout(r,200));tries++;}
-  if(!window.L){setMapStatus('⚠️','Impossible de charger la carte. Vérifiez votre connexion.');return;}
-  if(!window._ctMap){
-    window._ctMap=L.map('mapContainer',{zoomControl:true}).setView([lat,lon],13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:19}).addTo(window._ctMap);
-  }else{
-    window._ctMap.setView([lat,lon],13);
-    (window._ctMarkers||[]).forEach(m=>m.remove());
-  }
-  window._ctMarkers=[];
-  const cityIcon=L.divIcon({html:'<div style="background:#00E5A0;width:12px;height:12px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 12px rgba(0,229,160,0.6)"></div>',iconSize:[12,12],className:''});
-  window._ctMarkers.push(L.marker([lat,lon],{icon:cityIcon}).addTo(window._ctMap).bindPopup(`<b>📍 ${cityName}</b>`));
-  setMapStatus('⏳',`Recherche des centres CT proches...`);
-
-  // Essai Overpass principal, puis miroir alternatif
-  const query=`[out:json][timeout:25];(node["amenity"="vehicle_inspection"](around:15000,${lat},${lon});way["amenity"="vehicle_inspection"](around:15000,${lat},${lon}););out center;`;
-  const overpassUrls=[
-    'https://overpass-api.de/api/interpreter',
-    'https://overpass.kumi.systems/api/interpreter',
-    'https://overpass.openstreetmap.ru/api/interpreter',
-  ];
-  let data=null;
-  for(const url of overpassUrls){
-    try{
-      const r=await fetch(url,{method:'POST',body:query});
-      if(!r.ok)continue;
-      data=await r.json();
-      break;
-    }catch(e){continue;}
-  }
-  if(!data){
-    setMapStatus('⚠️',`Impossible de charger les centres CT.<br><small>Les APIs de carte peuvent être bloquées dans cet aperçu. <b>Téléchargez le fichier</b> et ouvrez-le localement pour accéder à cette fonctionnalité.</small>`);
-    return;
-  }
-  renderCTResults(data.elements,lat,lon,cityName);
-}
-
-function renderCTResults(elements,refLat,refLon,cityName){
-  document.getElementById('mapStatus').style.display='none';
-  const container=document.getElementById('ctCentersList');
-  if(!elements||!elements.length){
-    setMapStatus('😕',`Aucun centre CT référencé à 15 km de ${cityName}.<br><small style="color:var(--ink3);font-size:.75rem">Les données OpenStreetMap peuvent être incomplètes dans cette zone.</small>`);
-    return;
-  }
-  const dist=(la1,lo1,la2,lo2)=>{const R=6371,dLa=(la2-la1)*Math.PI/180,dLo=(lo2-lo1)*Math.PI/180,a=Math.sin(dLa/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLo/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));};
-  const centers=elements.map(el=>{
-    const clat=el.lat||(el.center&&el.center.lat),clon=el.lon||(el.center&&el.center.lon),t=el.tags||{};
-    return{name:t.name||t.brand||'Centre de contrôle technique',address:[t['addr:housenumber'],t['addr:street'],t['addr:city']].filter(Boolean).join(' ')||'Adresse non renseignée',phone:t.phone||t['contact:phone']||null,website:t.website||t['contact:website']||null,brand:t.brand&&t.brand!==t.name?t.brand:null,lat:clat,lon:clon,distance:clat?dist(refLat,refLon,clat,clon):99};
-  }).filter(c=>c.lat).sort((a,b)=>a.distance-b.distance);
-
-  const ctIcon=L.divIcon({html:'<div style="background:#FF8C42;width:24px;height:24px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2.5px solid #fff;box-shadow:0 2px 8px rgba(255,140,66,0.5)"></div>',iconSize:[24,24],iconAnchor:[12,24],className:''});
-  centers.forEach((c,i)=>{window._ctMarkers.push(L.marker([c.lat,c.lon],{icon:ctIcon}).addTo(window._ctMap).bindPopup(`<b>${c.name}</b><br><small>${c.address}</small><br><small><b>${c.distance.toFixed(1)} km</b></small>`));});
-  if(centers.length){try{window._ctMap.fitBounds(L.featureGroup(window._ctMarkers).getBounds().pad(0.3));}catch(e){}}
-
-  container.innerHTML=`<p style="font-size:.75rem;color:var(--ink3);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)">${centers.length} centre(s) trouvé(s) · rayon 15 km</p>`+
-    centers.map((c,i)=>`
-    <div class="ct-card">
-      <div class="ct-header">
-        <div style="flex:1">
-          <div class="ct-name">${c.name}</div>
-          ${c.brand?`<div class="ct-brand">${c.brand}</div>`:''}
-          <div class="ct-addr">📍 ${c.address}</div>
-        </div>
-        <div><div class="ct-dist">${c.distance.toFixed(1)}<small>km</small></div></div>
-      </div>
-      <div class="ct-actions">
-        ${c.phone?`<a href="tel:${c.phone}" class="ct-btn call">📞 Appeler</a>`:''}
-        ${c.website?`<a href="${c.website}" target="_blank" rel="noopener" class="ct-btn">🌐 Site</a>`:''}
-        <a href="https://www.openstreetmap.org/directions?to=${c.lat},${c.lon}" target="_blank" rel="noopener" class="ct-btn">🗺️ Itinéraire</a>
-        <button class="ct-btn" onclick="window._ctMap.setView([${c.lat},${c.lon}],17);window._ctMarkers[${i+1}]&&window._ctMarkers[${i+1}].openPopup();document.getElementById('mapContainer').scrollIntoView({behavior:'smooth'})">📍 Voir</button>
-      </div>
-    </div>`).join('');
-}
-function setMapStatus(icon,msg){const s=document.getElementById('mapStatus');s.style.display='block';s.innerHTML=`<div class="map-empty-icon">${icon}</div><p style="font-size:.86rem;color:var(--ink2);line-height:1.6">${msg}</p>`;}
-
-
-// ════════════════════════════════════════
-// AUTH & SUPABASE SYNC
-// ════════════════════════════════════════
-function switchAuthTab(tab){
-  document.getElementById('tabLogin').classList.toggle('active',tab==='login');
-  document.getElementById('tabSignup').classList.toggle('active',tab==='signup');
-  document.getElementById('authLogin').style.display=tab==='login'?'block':'none';
-  document.getElementById('authSignup').style.display=tab==='signup'?'block':'none';
-}
-
-async function doLoginGoogle(){
-  try{
-    const redirectTo = 'https://autoct.vercel.app';
-    const url = SUPA_URL+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(redirectTo);
-    window.location.href = url;
-  }catch(e){
-    console.error('Google login error:',e);
-  }
-}
-
-async function doLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pass=document.getElementById('loginPass').value;
-  const btn=document.getElementById('loginBtn');
-  const err=document.getElementById('loginErr');
-  if(!email||!pass){err.textContent='Remplissez tous les champs.';return;}
-  btn.disabled=true;btn.textContent='Connexion...';err.textContent='';
-  try{
-    const data=await _authPost('token?grant_type=password',{email,password:pass});
-    _saveSession(data);
-    await onLogin(data.user);
-  }catch(e){
-    err.textContent=e.message.includes('Invalid')?'Email ou mot de passe incorrect.':e.message;
-    btn.disabled=false;btn.textContent='Se connecter';
-  }
-}
-
-async function doSignup(){
-  const email=document.getElementById('signupEmail').value.trim();
-  const pass=document.getElementById('signupPass').value;
-  const btn=document.getElementById('signupBtn');
-  const err=document.getElementById('signupErr');
-  if(!email||!pass){err.textContent='Remplissez tous les champs.';return;}
-  if(pass.length<8){err.textContent='Mot de passe minimum 8 caracteres.';return;}
-  btn.disabled=true;btn.textContent='Creation...';err.textContent='';
-  try{
-    const data=await _authPost('signup',{email,password:pass});
-    if(data.access_token){
-      _saveSession(data);
-      await onLogin(data.user);
-    }else{
-      err.style.color='var(--accent)';
-      err.textContent='Compte cree ! Verifiez votre email pour confirmer.';
-      btn.disabled=false;btn.textContent='Creer mon compte';
-    }
-  }catch(e){
-    err.textContent=e.message;
-    btn.disabled=false;btn.textContent='Creer mon compte';
-  }
-}
-
-async function onLogin(user){
-  currentUser=user;
-  document.getElementById('authScreen').style.display='none';
-  const chip=document.getElementById('userChip');
-  chip.style.display='flex';
-  const displayName = user.user_metadata&&user.user_metadata.full_name ? user.user_metadata.full_name : user.email.split('@')[0];
-  chip.textContent='👤 '+displayName;
-  render();
-  // 1. Charger workspaces EN PREMIER pour restaurer l'espace actif
-  await loadWorkspaces();
-  // Charger le rôle si workspace restauré
-  if(currentWorkspace&&currentUser){
-    try{
-      const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
-      currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
-    }catch(e){currentWorkspace._myRole='member';}
-  }
-  // 2. Charger les données de l'espace actif
-  await loadFromSupabase();
-  await loadEmployees();
-  await loadEntretiens();
-  await loadFinances();
-  save();
-  render();
-  renderWorkspacePicker();
-  toast('Bienvenue '+displayName+' !','success');
-}
-
-function showUserMenu(){
-  if(!currentUser)return;
-  const ok=confirm('Se déconnecter de AutoCT ?');
-  if(ok)doLogout();
-}
-
-async function doLogout(){
-  try{await fetch(SUPA_URL+'/auth/v1/logout',{method:'POST',headers:_headers()});}catch(e){}
-  currentUser=null;_accessToken=null;_refreshToken=null;
-  localStorage.removeItem('ct_session');
-  localStorage.removeItem('ct_v');
-  localStorage.removeItem('ct_h');
-  location.reload();
-}
-
-async function loadFromSupabase(){
-  if(!currentUser)return;
-  try{
-    const [vData,hData]=await Promise.all([
-      _rest('GET','vehicles',null,currentWorkspace?{'workspace_id':'eq.'+currentWorkspace.id,'order':'created_at.asc','select':'*'}:{'user_id':'eq.'+currentUser.id,'workspace_id':'is.null','order':'created_at.asc','select':'*'}),
-      _rest('GET','history',null,{'user_id':'eq.'+currentUser.id,'order':'date.desc','select':'*'})
-    ]);
-    if(vData){
-      vehicles=vData.map(v=>({
-        id:v.id,marque:v.marque,modele:v.modele,plaque:v.immat,
-        owner:v.proprietaire,email:v.email,dateCT:v.date_ct,km:v.km
-      }));
-    }
-    if(hData){
-      history=hData.map(h=>({
-        id:h.id,vehicleId:h.vehicle_id,date:h.date,result:h.result,
-        centre:h.centre,cost:h.cost,notes:h.notes||'',docs:h.docs||[],vs:h.vs||{}
-      }));
-    }
-    save();
-  }catch(e){console.error('Load error:',e);}
-}
-
-async function saveVehicleToSupabase(v){
-  if(!currentUser)return v.id;
-  const row={user_id:currentUser.id,marque:v.marque,modele:v.modele,immat:v.plaque,
-    proprietaire:v.owner,email:v.email,date_ct:v.dateCT,km:parseInt(v.km)||0,
-    workspace_id:currentWorkspace?currentWorkspace.id:null};
-  try{
-    if(v.id&&typeof v.id==='string'){
-      await _rest('PATCH','vehicles?id=eq.'+v.id,row);
-      return v.id;
-    }else{
-      const data=await _rest('POST','vehicles',row);
-      return data&&data[0]?data[0].id:v.id;
-    }
-  }catch(e){console.error('saveVehicle:',e);return v.id;}
-}
-
-async function deleteVehicleFromSupabase(id){
-  if(!currentUser||typeof id!=='string')return;
-  try{await _rest('DELETE','vehicles?id=eq.'+id);}catch(e){}
-}
-
-async function saveHistoryToSupabase(h){
-  if(!currentUser)return h.id;
-  const vId=typeof h.vehicleId==='string'?h.vehicleId:null;
-  const row={user_id:currentUser.id,vehicle_id:vId,date:h.date,result:h.result,
-    centre:h.centre||h.center||'',cost:parseInt(h.cost)||0,notes:h.notes||'',
-    docs:h.docs||[],vs:h.vs||{}};
-  try{
-    if(h.id&&typeof h.id==='string'){
-      await _rest('PATCH','history?id=eq.'+h.id,row);
-      return h.id;
-    }else{
-      const data=await _rest('POST','history',row);
-      return data&&data[0]?data[0].id:h.id;
-    }
-  }catch(e){console.error('saveHistory:',e);return h.id;}
-}
-
-async function deleteHistoryFromSupabase(id){
-  if(!currentUser||typeof id!=='string')return;
-  try{await _rest('DELETE','history?id=eq.'+id);}catch(e){}
-}
-
-// ════════════════════════════════════════
-// STRIPE / ABONNEMENTS
-// ════════════════════════════════════════
-const STRIPE_PK = 'pk_test_51TAT2JQOV50ZaPr1fhgE0AKC4EQhXmhcJWCQzIYzMy7LfO8cmrlZxqVpdw2hLuC0QjXz5B4CWu4yK0C95qDsni1w00nAMy3Nrk';
-const STRIPE_PRICES = {
-  pro: 'price_1TAT4IQOV50ZaPr1ywm0awf9',
-  entreprise: 'price_1TAT5oQOV50ZaPr1aRX9FEh3'
-};
-
-async function subscribePlan(plan){
-  if(!currentUser){toast('Connectez-vous dabord','');return;}
-  const priceId=STRIPE_PRICES[plan];
-  if(!priceId)return;
-
-  toast('Redirection vers le paiement...','success');
-
-  // Créer session Stripe Checkout via Edge Function
-  try{
-    const resp=await fetch(`${SUPA_URL}/functions/v1/create-checkout`,{
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'Authorization':'Bearer '+SUPA_KEY
-      },
-      body:JSON.stringify({
-        priceId,
-        userId:currentUser.id,
-        email:currentUser.email,
-        successUrl:window.location.origin+'?checkout=success',
-        cancelUrl:window.location.origin+'?checkout=cancel'
-      })
-    });
-    const data=await resp.json();
-    if(data.url){
-      window.location.href=data.url;
-    }else{
-      toast('Erreur: '+( data.error||'inconnue'),'');
-    }
-  }catch(e){
-    toast('Erreur connexion','');
-    console.error(e);
-  }
-}
-
-function renderPlans(){
-  // Afficher le plan actuel
-  const banner=document.getElementById('currentPlanBanner');
-  if(!banner)return;
-  const plan=currentUser?._plan||'gratuit';
-  const labels={gratuit:'Gratuit',pro:'Pro',entreprise:'Entreprise'};
-  const colors={gratuit:'var(--surface2)',pro:'var(--accent-dim)',entreprise:'var(--blue-dim)'};
-  const textColors={gratuit:'var(--ink2)',pro:'var(--accent)',entreprise:'var(--blue)'};
-  banner.style.display='block';
-  banner.innerHTML=`<div style="padding:12px 16px;border-radius:var(--radius-sm);background:${colors[plan]};border:1px solid;border-color:${textColors[plan]};color:${textColors[plan]};font-weight:600;font-size:.85rem">
-    ✨ Votre plan actuel : <strong>${labels[plan]||plan}</strong>
-    ${plan!=='gratuit'?'<span style="float:right;font-size:.75rem;opacity:.7">Actif</span>':''}
-  </div>`;
-}
-
-// Vérifier si retour de checkout
-function checkCheckoutReturn(){
-  const params=new URLSearchParams(window.location.search);
-  if(params.get('checkout')==='success'){
-    toast('🎉 Abonnement activé ! Bienvenue !','success');
-    window.history.replaceState({},'',window.location.pathname);
-  }else if(params.get('checkout')==='cancel'){
-    toast('Paiement annulé','');
-    window.history.replaceState({},'',window.location.pathname);
-  }
-}
-
-// ════════════════════════════════════════
-// DRAWER / NAVIGATION
-// ════════════════════════════════════════
-function toggleDrawer(){
-  const drawer=document.getElementById('mainDrawer');
-  const overlay=document.getElementById('drawerOverlay');
-  const btn=document.getElementById('hamburgerBtn');
-  const isOpen=drawer.classList.contains('open');
-  drawer.classList.toggle('open',!isOpen);
-  overlay.classList.toggle('open',!isOpen);
-  btn.classList.toggle('open',!isOpen);
-}
-function closeDrawer(){
-  document.getElementById('mainDrawer').classList.remove('open');
-  document.getElementById('drawerOverlay').classList.remove('open');
-  document.getElementById('hamburgerBtn').classList.remove('open');
-}
-
-// ════════════════════════════════════════
-// DASHBOARD
-// ════════════════════════════════════════
-function renderDashboard(){
-  const el=document.getElementById('dashContent');
-  if(!el)return;
-
-  // ── KPI globaux
-  const totalVeh=vehicles.length;
-  const ctExpired=vehicles.filter(v=>daysUntil(v.dateCT)<0).length;
-  const ctSoon=vehicles.filter(v=>{const d=daysUntil(v.dateCT);return d>=0&&d<=settings.alertDays;}).length;
-  const totalEmp=employees.length;
-  const totalRev=finances.filter(f=>f.type==='revenu').reduce((s,f)=>s+parseFloat(f.montant||0),0);
-  const totalDep=finances.filter(f=>f.type==='depense').reduce((s,f)=>s+parseFloat(f.montant||0),0);
-  const rentab=totalRev-totalDep;
-  const prochainsEntr=entretiens.filter(e=>e.prochaine_date&&daysUntil(e.prochaine_date)<=30).length;
-
-  // ── Alertes critiques toutes catégories
-  const alerts=[];
-  vehicles.forEach(v=>{const d=daysUntil(v.dateCT);if(d<=settings.alertDays)alerts.push({icon:'🚗',label:v.marque+' '+v.modele+' · '+v.plaque,sub:'Contrôle technique',days:d,urgent:d<0});});
-  employees.forEach(emp=>{
-    const name=(emp.prenom||'')+' '+(emp.nom||'');
-    if(emp.permis_expiration){const d=daysUntil(emp.permis_expiration);if(d<=settings.alertDays)alerts.push({icon:'👷',label:name,sub:'Permis de conduire',days:d,urgent:d<0});}
-    if(emp.carte_expiration){const d=daysUntil(emp.carte_expiration);if(d<=settings.alertDays)alerts.push({icon:'📇',label:name,sub:'Carte conducteur',days:d,urgent:d<0});}
-    if(emp.fco_date){const d=daysUntil(emp.fco_date);if(d<=settings.alertDays)alerts.push({icon:'🎓',label:name,sub:'FCO',days:d,urgent:d<0});}
-  });
-  entretiens.forEach(e=>{
-    if(e.prochaine_date){const d=daysUntil(e.prochaine_date);if(d<=settings.alertDays){const v=vehicles.find(x=>x.id===e.vehicle_id);alerts.push({icon:'🔧',label:e.type,sub:v?v.marque+' '+v.modele:'',days:d,urgent:d<0});}}
-  });
-  alerts.sort((a,b)=>a.days-b.days);
-
-  // ── Prochains entretiens (7 prochains)
-  const prochains=entretiens.filter(e=>e.prochaine_date).sort((a,b)=>new Date(a.prochaine_date)-new Date(b.prochaine_date)).slice(0,5);
-
-  // ── Top véhicules rentables
-  const vRentab=vehicles.map(v=>{
-    const rev=finances.filter(f=>f.vehicle_id===v.id&&f.type==='revenu').reduce((s,f)=>s+parseFloat(f.montant||0),0);
-    const dep=finances.filter(f=>f.vehicle_id===v.id&&f.type==='depense').reduce((s,f)=>s+parseFloat(f.montant||0),0);
-    return{v,net:rev-dep,rev,dep};
-  }).filter(x=>x.rev>0||x.dep>0).sort((a,b)=>b.net-a.net);
-
-  el.innerHTML=`
-    <!-- KPI grid -->
-    <div class="dash-kpi-grid">
-      <div class="dash-kpi">
-        <div class="dash-kpi-accent" style="background:var(--accent)"></div>
-        <div class="dash-kpi-icon">🚗</div>
-        <div class="dash-kpi-val">${totalVeh}</div>
-        <div class="dash-kpi-label">Véhicules</div>
-      </div>
-      <div class="dash-kpi" style="${ctExpired?'border-color:var(--urgent)':''}">
-        <div class="dash-kpi-accent" style="background:${ctExpired?'var(--urgent)':'var(--accent)'}"></div>
-        <div class="dash-kpi-icon">${ctExpired?'🚨':'✅'}</div>
-        <div class="dash-kpi-val" style="color:${ctExpired?'var(--urgent)':ctSoon?'var(--warn)':'var(--accent)'}">${ctExpired+ctSoon}</div>
-        <div class="dash-kpi-label">Alertes CT</div>
-      </div>
-      <div class="dash-kpi">
-        <div class="dash-kpi-accent" style="background:#4F8EF7"></div>
-        <div class="dash-kpi-icon">👷</div>
-        <div class="dash-kpi-val" style="color:#4F8EF7">${totalEmp}</div>
-        <div class="dash-kpi-label">Employés</div>
-      </div>
-      <div class="dash-kpi">
-        <div class="dash-kpi-accent" style="background:${rentab>=0?'var(--accent)':'var(--urgent)'}"></div>
-        <div class="dash-kpi-icon">💰</div>
-        <div class="dash-kpi-val" style="color:${rentab>=0?'var(--accent)':'var(--urgent)'}">${rentab>=0?'+':''}${rentab.toFixed(0)}€</div>
-        <div class="dash-kpi-label">Rentabilité</div>
-      </div>
-    </div>
-
-    <!-- Alertes critiques -->
-    <div class="dash-section">
-      <div class="dash-section-title">⚠️ Alertes critiques (${alerts.length})</div>
-      ${alerts.length?alerts.slice(0,6).map(a=>`
-        <div class="dash-alert-row">
-          <span style="font-size:1.2rem">${a.icon}</span>
-          <div style="flex:1">
-            <div style="font-weight:600;font-size:.85rem">${a.label}</div>
-            <div style="font-size:.75rem;color:var(--ink3)">${a.sub}</div>
-          </div>
-          <span class="chip ${a.urgent?'chip-urgent':'chip-warn'}">${a.urgent?'EXPIRÉ':a.days+'j'}</span>
-        </div>`).join('')
-        :`<div class="dash-empty">✅ Aucune alerte — tout est en ordre !</div>`}
-    </div>
-
-    <!-- Prochains entretiens -->
-    <div class="dash-section">
-      <div class="dash-section-title">🔧 Prochains entretiens</div>
-      ${prochains.length?prochains.map(e=>{
-        const v=vehicles.find(x=>x.id===e.vehicle_id);
-        const d=daysUntil(e.prochaine_date);
-        return`<div class="dash-entretien-row">
-          <span style="font-size:1.1rem">${entretienIcons[e.type]||'🔩'}</span>
-          <div style="flex:1">
-            <div style="font-weight:600;font-size:.85rem">${e.type}</div>
-            <div style="font-size:.75rem;color:var(--ink3)">${v?v.marque+' '+v.modele+' · '+v.plaque:''}</div>
-          </div>
-          <div style="text-align:right">
-            <div style="font-size:.8rem;font-weight:600;color:${d<0?'var(--urgent)':d<=7?'var(--warn)':'var(--ink2)'}">${fmtDate(e.prochaine_date)}</div>
-            <div style="font-size:.72rem;color:var(--ink3)">${d<0?'Retard '+Math.abs(d)+'j':d+'j'}</div>
-          </div>
-        </div>`;
-      }).join(''):`<div class="dash-empty">Aucun entretien planifié</div>`}
-    </div>
-
-    <!-- Rentabilité par véhicule -->
-    ${vRentab.length?`<div class="dash-section">
-      <div class="dash-section-title">📈 Rentabilité par véhicule</div>
-      ${vRentab.map(x=>`
-        <div class="dash-entretien-row">
-          <span style="font-size:1.1rem">${vehicleIcon(x.v.marque)}</span>
-          <div style="flex:1">
-            <div style="font-weight:600;font-size:.85rem">${x.v.marque} ${x.v.modele}</div>
-            <div style="font-size:.75rem;color:var(--ink3)">${x.v.plaque} · Rev: ${x.rev.toFixed(0)}€ / Dép: ${x.dep.toFixed(0)}€</div>
-          </div>
-          <div style="font-weight:700;font-size:.95rem;color:${x.net>=0?'var(--accent)':'var(--urgent)'}">${x.net>=0?'+':''}${x.net.toFixed(0)}€</div>
-        </div>`).join('')}
-    </div>`:''}
-  `;
-}
-
-// ════════════════════════════════════════
-// FINANCES
-// ════════════════════════════════════════
-let finances=[], editingFinanceId=null, currentFinType='revenu';
-
-function setFinType(type){
-  currentFinType=type;
-  const cats={revenu:['Transport','Location','Autre'],depense:['Carburant','Entretien','Assurance','Péage','Amende','Salaire chauffeur','Autre']};
-  const sel=document.getElementById('financeCategorie');
-  sel.innerHTML=cats[type].map(c=>`<option>${c}</option>`).join('');
-  document.getElementById('finTypRevenu').className='btn '+(type==='revenu'?'btn-primary':'');
-  document.getElementById('finTypRevenu').style.background=type==='revenu'?'':'var(--surface2)';
-  document.getElementById('finTypDepense').className='btn '+(type==='depense'?'btn-primary':'');
-  document.getElementById('finTypDepense').style.background=type==='depense'?'':'var(--surface2)';
-}
-
-async function loadFinances(){
-  if(!currentUser)return;
-  try{
-    const params=currentWorkspace
-      ?{'workspace_id':'eq.'+currentWorkspace.id,'order':'date.desc','select':'*'}
-      :{'user_id':'eq.'+currentUser.id,'workspace_id':'is.null','order':'date.desc','select':'*'};
-    const data=await _rest('GET','finances',null,params);
-    finances=data||[];
-  }catch(e){console.error('loadFinances:',e);finances=[];}
-  renderFinances();
-  updateFinanceFilter();
-}
-
-function updateFinanceFilter(){
-  const sel=document.getElementById('financeVehicleFilter');
-  if(!sel)return;
-  const cur=sel.value;
-  sel.innerHTML='<option value="">Tous les véhicules</option>'+
-    vehicles.map(v=>`<option value="${v.id}" ${v.id===cur?'selected':''}>${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
-}
-
-function renderFinances(){
-  const el=document.getElementById('financeList');
-  const kpiEl=document.getElementById('financeKpi');
-  if(!el)return;
-  const vFilter=document.getElementById('financeVehicleFilter')?.value||'';
-  const tFilter=document.getElementById('financeTypeFilter')?.value||'';
-  let list=finances;
-  if(vFilter)list=list.filter(f=>f.vehicle_id===vFilter);
-  if(tFilter)list=list.filter(f=>f.type===tFilter);
-
-  // KPI
-  const totalRev=finances.filter(f=>f.type==='revenu').reduce((s,f)=>s+parseFloat(f.montant||0),0);
-  const totalDep=finances.filter(f=>f.type==='depense').reduce((s,f)=>s+parseFloat(f.montant||0),0);
-  const rentab=totalRev-totalDep;
-  if(kpiEl)kpiEl.innerHTML=`
-    <div class="fin-kpi"><div class="fin-kpi-label">Revenus</div><div class="fin-kpi-val" style="color:var(--accent)">${totalRev.toFixed(0)}€</div></div>
-    <div class="fin-kpi"><div class="fin-kpi-label">Dépenses</div><div class="fin-kpi-val" style="color:var(--urgent)">${totalDep.toFixed(0)}€</div></div>
-    <div class="fin-kpi"><div class="fin-kpi-label">Rentabilité</div><div class="fin-kpi-val" style="color:${rentab>=0?'var(--accent)':'var(--urgent)'}">${rentab>=0?'+':''}${rentab.toFixed(0)}€</div></div>`;
-
-  // Graphique rentabilité par véhicule
-  const chartCard=document.getElementById('financeChartCard');
-  if(chartCard&&vehicles.length){
-    chartCard.style.display='block';
-    setTimeout(()=>drawFinanceChart(),50);
-  }
-
-  if(!list.length){
-    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--ink3)">
-      <div style="font-size:2rem;margin-bottom:12px">💰</div>
-      <div style="font-weight:600;margin-bottom:6px">Aucune transaction</div>
-      <div style="font-size:.85rem">Ajoutez revenus et dépenses</div>
-    </div>`;return;
-  }
-  el.innerHTML=list.map(f=>{
-    const v=vehicles.find(x=>x.id===f.vehicle_id);
-    const isRev=f.type==='revenu';
-    return `<div class="fin-card">
-      <div class="fin-dot" style="background:${isRev?'var(--accent)':'var(--urgent)'}"></div>
-      <div class="fin-info">
-        <div class="fin-label">${f.categorie||f.type} ${f.description?'· '+f.description:''}</div>
-        <div class="fin-meta">${v?v.marque+' '+v.modele+' · ':''} ${f.date?fmtDate(f.date):''}</div>
-      </div>
-      <div class="fin-amount" style="color:${isRev?'var(--accent)':'var(--urgent)'}">${isRev?'+':'−'}${parseFloat(f.montant||0).toFixed(0)}€</div>
-      <button class="icon-btn" onclick="openEditFinance('${f.id}')">✏️</button>
-      <button class="icon-btn del" onclick="deleteFinance('${f.id}')">🗑</button>
-    </div>`;
-  }).join('');
-}
-
-function drawFinanceChart(){
-  const canvas=document.getElementById('chartFinance');
-  if(!canvas)return;
-  const ctx=canvas.getContext('2d');
-  const W=canvas.offsetWidth;canvas.width=W;canvas.height=180;
-  ctx.clearRect(0,0,W,180);
-  const data=vehicles.map(v=>{
-    const rev=finances.filter(f=>f.vehicle_id===v.id&&f.type==='revenu').reduce((s,f)=>s+parseFloat(f.montant||0),0);
-    const dep=finances.filter(f=>f.vehicle_id===v.id&&f.type==='depense').reduce((s,f)=>s+parseFloat(f.montant||0),0);
-    return{label:v.marque+' '+v.modele,rev,dep,net:rev-dep};
-  }).filter(d=>d.rev>0||d.dep>0);
-  if(!data.length)return;
-  const max=Math.max(...data.map(d=>Math.max(d.rev,d.dep)),1);
-  const bH=28,gap=12,padL=100,padR=20,padT=10;
-  data.forEach((d,i)=>{
-    const y=padT+i*(bH*2+gap);
-    ctx.fillStyle='rgba(255,255,255,0.1)';ctx.font='11px Outfit,sans-serif';
-    ctx.fillText(d.label.substring(0,12),0,y+bH-4);
-    // Revenu
-    const rW=(d.rev/max)*(W-padL-padR);
-    ctx.fillStyle='rgba(0,229,160,0.7)';ctx.beginPath();ctx.roundRect(padL,y,rW,bH-2,4);ctx.fill();
-    ctx.fillStyle='#fff';ctx.fillText(d.rev.toFixed(0)+'€',padL+rW+4,y+bH-4);
-    // Dépense
-    const dW=(d.dep/max)*(W-padL-padR);
-    ctx.fillStyle='rgba(255,69,103,0.7)';ctx.beginPath();ctx.roundRect(padL,y+bH,dW,bH-2,4);ctx.fill();
-    ctx.fillStyle='#fff';ctx.fillText(d.dep.toFixed(0)+'€',padL+dW+4,y+bH*2-4);
-  });
-}
-
-function openFinanceModal(){
-  editingFinanceId=null;
-  document.getElementById('financeModalTitle').textContent='Nouvelle transaction';
-  setFinType('revenu');
-  const sel=document.getElementById('financeVehicle');
-  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}">${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
-  document.getElementById('financeDate').value=new Date().toISOString().split('T')[0];
-  document.getElementById('financeMontant').value='';
-  document.getElementById('financeDesc').value='';
-  document.getElementById('financeModal').classList.add('open');
-}
-
-function openEditFinance(id){
-  const f=finances.find(x=>x.id===id);
-  if(!f)return;
-  editingFinanceId=id;
-  document.getElementById('financeModalTitle').textContent='Modifier transaction';
-  setFinType(f.type||'revenu');
-  const sel=document.getElementById('financeVehicle');
-  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}" ${v.id===f.vehicle_id?'selected':''}>${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
-  document.getElementById('financeCategorie').value=f.categorie||'';
-  document.getElementById('financeMontant').value=f.montant||'';
-  document.getElementById('financeDate').value=f.date||'';
-  document.getElementById('financeDesc').value=f.description||'';
-  document.getElementById('financeModal').classList.add('open');
-}
-
-async function saveFinance(){
-  const vehicleId=document.getElementById('financeVehicle').value;
-  const montant=parseFloat(document.getElementById('financeMontant').value);
-  if(!vehicleId||!montant){toast('Renseignez le véhicule et le montant','');return;}
-  const row={
-    user_id:currentUser.id,
-    workspace_id:currentWorkspace?currentWorkspace.id:null,
-    vehicle_id:vehicleId,
-    type:currentFinType,
-    categorie:document.getElementById('financeCategorie').value,
-    montant,
-    date:document.getElementById('financeDate').value||null,
-    description:document.getElementById('financeDesc').value.trim()||null
-  };
-  try{
-    if(editingFinanceId){
-      await _rest('PATCH','finances?id=eq.'+editingFinanceId,row);
-      const idx=finances.findIndex(f=>f.id===editingFinanceId);
-      if(idx>=0)finances[idx]={...finances[idx],...row};
-    }else{
-      const data=await _rest('POST','finances',row);
-      if(data&&data[0])finances.unshift(data[0]);
-    }
-    closeModal('financeModal');
-    renderFinances();
-    toast('Transaction enregistrée','success');
-  }catch(e){console.error('saveFinance:',e);toast('Erreur: '+e.message,'');}
-}
-
-async function deleteFinance(id){
-  if(!confirm('Supprimer cette transaction ?'))return;
-  try{
-    await _rest('DELETE','finances?id=eq.'+id);
-    finances=finances.filter(f=>f.id!==id);
-    renderFinances();
-    toast('Transaction supprimée','');
-  }catch(e){console.error('deleteFinance:',e);}
-}
-
-// ════════════════════════════════════════
-// ENTRETIENS
-// ════════════════════════════════════════
-let entretiens=[], editingEntretienId=null;
-
-const entretienIcons={'Vidange':'🛢️','Révision':'🔧','Contrôle technique':'📋','Pneus':'🔄','Freins':'🛑','Courroie de distribution':'⚙️','Filtre à air':'💨','Filtre à carburant':'⛽','Batterie':'🔋','Climatisation':'❄️','Autre':'🔩'};
-
-async function loadEntretiens(){
-  if(!currentUser)return;
-  try{
-    const params=currentWorkspace
-      ?{'workspace_id':'eq.'+currentWorkspace.id,'order':'date.desc','select':'*'}
-      :{'user_id':'eq.'+currentUser.id,'workspace_id':'is.null','order':'date.desc','select':'*'};
-    const data=await _rest('GET','entretiens',null,params);
-    entretiens=data||[];
-  }catch(e){console.error('loadEntretiens:',e);entretiens=[];}
-  renderEntretiens();
-  updateEntretienFilter();
-}
-
-function updateEntretienFilter(){
-  const sel=document.getElementById('entretienVehicleFilter');
-  if(!sel)return;
-  const current=sel.value;
-  sel.innerHTML='<option value="">Tous les véhicules</option>'+
-    vehicles.map(v=>`<option value="${v.id}" ${v.id===current?'selected':''}>${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
-}
-
-function renderEntretiens(){
-  const el=document.getElementById('entretienList');
-  if(!el)return;
-  const filter=document.getElementById('entretienVehicleFilter')?.value||'';
-  const list=filter?entretiens.filter(e=>e.vehicle_id===filter):entretiens;
-  if(!list.length){
-    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--ink3)">
-      <div style="font-size:2rem;margin-bottom:12px">🔧</div>
-      <div style="font-weight:600;margin-bottom:6px">Aucun entretien</div>
-      <div style="font-size:.85rem">Ajoutez le premier entretien</div>
-    </div>`;
-    return;
-  }
-  el.innerHTML=list.map(e=>{
-    const v=vehicles.find(x=>x.id===e.vehicle_id);
-    const icon=entretienIcons[e.type]||'🔩';
-    const hasNext=e.prochaine_date||e.prochain_km;
-    const nextDays=e.prochaine_date?daysUntil(e.prochaine_date):null;
-    const nextStatus=nextDays!==null?(nextDays<0?'urgent':nextDays<=30?'warn':'ok'):'ok';
-    return `<div class="entr-card">
-      <div class="entr-header">
-        <div class="entr-icon">${icon}</div>
-        <div style="flex:1">
-          <div class="entr-type">${e.type}</div>
-          <div class="entr-vehicle">${v?v.marque+' '+v.modele+' · '+v.plaque:'Véhicule inconnu'}</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          ${e.cout?`<span style="font-weight:700;color:var(--accent)">${parseFloat(e.cout).toFixed(0)}€</span>`:''}
-          <button class="icon-btn" onclick="openEditEntretien('${e.id}')">✏️</button>
-          <button class="icon-btn del" onclick="deleteEntretien('${e.id}')">🗑</button>
-        </div>
-      </div>
-      <div class="entr-meta">
-        ${e.date?`<span class="entr-tag">📅 ${fmtDate(e.date)}</span>`:''}
-        ${e.km?`<span class="entr-tag">📍 ${parseInt(e.km).toLocaleString()} km</span>`:''}
-        ${e.prestataire?`<span class="entr-tag">🏪 ${e.prestataire}</span>`:''}
-        ${e.notes?`<span class="entr-tag">📝 ${e.notes.substring(0,40)}${e.notes.length>40?'...':''}</span>`:''}
-      </div>
-      ${hasNext?`<div class="entr-next" style="${nextStatus==='urgent'?'background:var(--urgent-dim);color:var(--urgent)':nextStatus==='warn'?'background:var(--warn-dim);color:var(--warn)':''}">
-        ⏭ Prochain : ${e.prochaine_date?fmtDate(e.prochaine_date):''}${e.prochaine_date&&e.prochain_km?' · ':''}${e.prochain_km?parseInt(e.prochain_km).toLocaleString()+' km':''}
-        ${nextDays!==null?` (${nextDays<0?'En retard de '+Math.abs(nextDays)+'j':nextDays+'j'})` :''}
-      </div>`:''}
-    </div>`;
-  }).join('');
-}
-
-function openEntretienModal(){
-  editingEntretienId=null;
-  document.getElementById('entretienModalTitle').textContent='Nouvel entretien';
-  document.getElementById('entretienSaveBtn').textContent='Enregistrer';
-  const sel=document.getElementById('entretienVehicle');
-  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}">${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
-  document.getElementById('entretienDate').value=new Date().toISOString().split('T')[0];
-  ['entretienKm','entretienCout','entretienPrestataire','entretienNotes','entretienProchaineDate','entretienProchainKm'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-  document.getElementById('entretienModal').classList.add('open');
-}
-
-function openEditEntretien(id){
-  const e=entretiens.find(x=>x.id===id);
-  if(!e)return;
-  editingEntretienId=id;
-  document.getElementById('entretienModalTitle').textContent='Modifier entretien';
-  const sel=document.getElementById('entretienVehicle');
-  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}" ${v.id===e.vehicle_id?'selected':''}>${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
-  document.getElementById('entretienType').value=e.type||'Vidange';
-  document.getElementById('entretienDate').value=e.date||'';
-  document.getElementById('entretienKm').value=e.km||'';
-  document.getElementById('entretienCout').value=e.cout||'';
-  document.getElementById('entretienPrestataire').value=e.prestataire||'';
-  document.getElementById('entretienNotes').value=e.notes||'';
-  document.getElementById('entretienProchaineDate').value=e.prochaine_date||'';
-  document.getElementById('entretienProchainKm').value=e.prochain_km||'';
-  document.getElementById('entretienModal').classList.add('open');
-}
-
-async function saveEntretien(){
-  const vehicleId=document.getElementById('entretienVehicle').value;
-  if(!vehicleId){toast('Sélectionnez un véhicule','');return;}
-  const row={
-    user_id:currentUser.id,
-    workspace_id:currentWorkspace?currentWorkspace.id:null,
-    // workspace_id null = espace personnel
-    vehicle_id:vehicleId,
-    type:document.getElementById('entretienType').value,
-    date:document.getElementById('entretienDate').value||null,
-    km:parseInt(document.getElementById('entretienKm').value)||null,
-    cout:parseFloat(document.getElementById('entretienCout').value)||null,
-    prestataire:document.getElementById('entretienPrestataire').value.trim()||null,
-    notes:document.getElementById('entretienNotes').value.trim()||null,
-    prochaine_date:document.getElementById('entretienProchaineDate').value||null,
-    prochain_km:parseInt(document.getElementById('entretienProchainKm').value)||null
-  };
-  try{
-    if(editingEntretienId){
-      await _rest('PATCH','entretiens?id=eq.'+editingEntretienId,row);
-      const idx=entretiens.findIndex(e=>e.id===editingEntretienId);
-      if(idx>=0)entretiens[idx]={...entretiens[idx],...row};
-    }else{
-      const data=await _rest('POST','entretiens',row);
-      if(data&&data[0])entretiens.unshift(data[0]);
-    }
-    closeModal('entretienModal');
-    renderEntretiens();
-    toast('Entretien enregistré','success');
-  }catch(e){console.error('saveEntretien:',e);toast('Erreur: '+e.message,'');}
-}
-
-async function deleteEntretien(id){
-  if(!confirm('Supprimer cet entretien ?'))return;
-  try{
-    await _rest('DELETE','entretiens?id=eq.'+id);
-    entretiens=entretiens.filter(e=>e.id!==id);
-    renderEntretiens();
-    toast('Entretien supprimé','');
-  }catch(e){console.error('deleteEntretien:',e);}
-}
-
-// ════════════════════════════════════════
-// EMPLOYÉS
-// ════════════════════════════════════════
-let employees=[], editingEmpId=null;
-
-async function loadEmployees(){
-  if(!currentUser||!currentWorkspace)return;
-  try{
-    const data=await _rest('GET','employees',null,{'workspace_id':'eq.'+currentWorkspace.id,'order':'nom.asc','select':'*'});
-    employees=data||[];
-  }catch(e){console.error('loadEmployees:',e);employees=[];}
-  renderEmployees();
-}
-
-function getDocStatus(dateStr){
-  if(!dateStr)return{cls:'neutral',label:'Non renseigné'};
-  const days=daysUntil(dateStr);
-  if(days<0)return{cls:'urgent',label:`Expiré (${Math.abs(days)}j)`};
-  if(days<=30)return{cls:'warn',label:`Expire dans ${days}j`};
-  return{cls:'ok',label:`Valide (${days}j)`};
-}
-
-function renderEmployees(){
-  const el=document.getElementById('employeeList');
-  if(!el)return;
-  if(!currentWorkspace){
-    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--ink3)">
-      <div style="font-size:2rem;margin-bottom:12px">👷</div>
-      <div style="font-weight:600;margin-bottom:6px">Espace pro requis</div>
-      <div style="font-size:.85rem">Sélectionnez un espace pro pour gérer les employés</div>
-    </div>`;
-    return;
-  }
-  if(!employees.length){
-    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--ink3)">
-      <div style="font-size:2rem;margin-bottom:12px">👷</div>
-      <div style="font-weight:600;margin-bottom:6px">Aucun employé</div>
-      <div style="font-size:.85rem">Ajoutez votre premier employé</div>
-    </div>`;
-    return;
-  }
-  el.innerHTML=employees.map(emp=>{
-    const permis=getDocStatus(emp.permis_expiration);
-    const carte=getDocStatus(emp.carte_expiration);
-    const fco=getDocStatus(emp.fco_date);
-    const initials=(emp.prenom?emp.prenom[0]:'')+(emp.nom?emp.nom[0]:'');
-    return `<div class="emp-card">
-      <div class="emp-header">
-        <div class="emp-avatar">${initials||'👷'}</div>
-        <div style="flex:1">
-          <div class="emp-name">${emp.prenom||''} ${emp.nom||''}</div>
-          <div class="emp-contact">${emp.email||''} ${emp.telephone?'· '+emp.telephone:''}</div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="icon-btn" onclick="openEditEmployee('${emp.id}')" title="Modifier">✏️</button>
-          <button class="icon-btn del" onclick="deleteEmployee('${emp.id}')" title="Supprimer">🗑</button>
-        </div>
-      </div>
-      <div class="emp-badges">
-        <div class="emp-badge ${permis.cls}">🪪 Permis ${emp.permis_categories||''} · ${permis.label}</div>
-        <div class="emp-badge ${carte.cls}">📇 Carte · ${carte.label}</div>
-        <div class="emp-badge ${fco.cls}">🎓 FCO · ${fco.label}</div>
-        ${emp.notes?`<div class="emp-badge neutral">📝 ${emp.notes.substring(0,30)}${emp.notes.length>30?'...':''}</div>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function openEmployeeModal(){
-  editingEmpId=null;
-  document.getElementById('empModalTitle').textContent='Nouvel employé';
-  document.getElementById('empSaveBtn').textContent='Enregistrer';
-  ['empPrenom','empNom','empEmail','empTel','empPermis','empCarte','empNotes'].forEach(id=>document.getElementById(id).value='');
-  ['empPermisExp','empCarteExp','empFimo','empFco'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('employeeModal').classList.add('open');
-}
-
-function openEditEmployee(id){
-  const emp=employees.find(e=>e.id===id);
-  if(!emp)return;
-  editingEmpId=id;
-  document.getElementById('empModalTitle').textContent='Modifier employé';
-  document.getElementById('empSaveBtn').textContent='Enregistrer';
-  document.getElementById('empPrenom').value=emp.prenom||'';
-  document.getElementById('empNom').value=emp.nom||'';
-  document.getElementById('empEmail').value=emp.email||'';
-  document.getElementById('empTel').value=emp.telephone||'';
-  document.getElementById('empPermis').value=emp.permis_categories||'';
-  document.getElementById('empPermisExp').value=emp.permis_expiration||'';
-  document.getElementById('empCarte').value=emp.carte_conducteur||'';
-  document.getElementById('empCarteExp').value=emp.carte_expiration||'';
-  document.getElementById('empFimo').value=emp.fimo_date||'';
-  document.getElementById('empFco').value=emp.fco_date||'';
-  document.getElementById('empNotes').value=emp.notes||'';
-  document.getElementById('employeeModal').classList.add('open');
-}
-
-async function saveEmployee(){
-  if(!currentWorkspace){toast('Sélectionnez un espace pro','');return;}
-  const row={
-    workspace_id:currentWorkspace.id,
-    user_id:currentUser.id,
-    prenom:document.getElementById('empPrenom').value.trim(),
-    nom:document.getElementById('empNom').value.trim(),
-    email:document.getElementById('empEmail').value.trim(),
-    telephone:document.getElementById('empTel').value.trim(),
-    permis_categories:document.getElementById('empPermis').value.trim()||null,
-    permis_expiration:document.getElementById('empPermisExp').value||null,
-    carte_conducteur:document.getElementById('empCarte').value.trim(),
-    carte_expiration:document.getElementById('empCarteExp').value||null,
-    fimo_date:document.getElementById('empFimo').value||null,
-    fco_date:document.getElementById('empFco').value||null,
-    notes:document.getElementById('empNotes').value.trim()
-  };
-  if(!row.nom&&!row.prenom){toast('Renseignez au moins un nom','');return;}
-  try{
-    if(editingEmpId){
-      await _rest('PATCH','employees?id=eq.'+editingEmpId,row);
-      const idx=employees.findIndex(e=>e.id===editingEmpId);
-      if(idx>=0)employees[idx]={...employees[idx],...row};
-    }else{
-      const data=await _rest('POST','employees',row);
-      if(data&&data[0])employees.push(data[0]);
-    }
-    closeModal('employeeModal');
-    renderEmployees();
-    toast('Employé enregistré','success');
-  }catch(e){console.error('saveEmployee:',e);toast('Erreur: '+e.message,'');}
-}
-
-async function deleteEmployee(id){
-  if(!confirm('Supprimer cet employé ?'))return;
-  try{
-    await _rest('DELETE','employees?id=eq.'+id);
-    employees=employees.filter(e=>e.id!==id);
-    renderEmployees();
-    toast('Employé supprimé','');
-  }catch(e){console.error('deleteEmployee:',e);}
-}
-
-// ════════════════════════════════════════
-// GESTION MEMBRES
-// ════════════════════════════════════════
-async function renderSettingsMembers(){
-  const section=document.getElementById('settingsMembersSection');
-  const listEl=document.getElementById('settingsMembersList');
-  const codeEl=document.getElementById('settingsInviteCode');
-  if(!section)return;
-  // Afficher seulement si espace pro actif ET propriétaire
-  if(!currentWorkspace||!currentUser||currentWorkspace._myRole!=='owner'){
-    section.style.display='none';
-    return;
-  }
-  section.style.display='block';
-  if(codeEl)codeEl.textContent=currentWorkspace.invite_code||'';
-  if(!listEl)return;
-  listEl.innerHTML=`<div style="color:var(--ink3);font-size:.85rem">Chargement...</div>`;
-  try{
-    const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'select':'*'});
-    if(!members||!members.length){listEl.innerHTML='<div style="color:var(--ink3);font-size:.85rem">Aucun membre</div>';return;}
-    listEl.innerHTML=members.map(m=>{
-      const isMe=m.user_id===currentUser.id;
-      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
-        <div style="width:34px;height:34px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">
-          ${m.role==='owner'?'👑':m.role==='admin'?'🔧':'👤'}
-        </div>
-        <div style="flex:1">
-          <div style="font-weight:600;font-size:.85rem;color:var(--ink)">${isMe?'Vous':m.user_id.substring(0,12)+'...'}</div>
-          <div style="font-size:.75rem;color:var(--ink3)">${getRoleLabel(m.role)}</div>
-        </div>
-        ${!isMe?`<select onchange="updateMemberRole('${m.id}',this.value)" style="padding:5px 8px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.78rem;outline:none">
-          <option value="admin" ${m.role==='admin'?'selected':''}>Admin</option>
-          <option value="member" ${m.role==='member'?'selected':''}>Membre</option>
-        </select>
-        <button onclick="removeMember('${m.id}')" style="padding:5px 10px;background:var(--urgent-dim);color:var(--urgent);border:1px solid rgba(244,63,94,0.25);border-radius:var(--radius-sm);font-size:.75rem;cursor:pointer;font-family:var(--font-body)">Retirer</button>`:''}
-      </div>`;
-    }).join('');
-  }catch(e){listEl.innerHTML=`<div style="color:var(--urgent);font-size:.85rem">Erreur chargement</div>`;}
-}
-
-function copyInviteCode(){
-  const code=currentWorkspace?.invite_code||'';
-  navigator.clipboard.writeText(code).then(()=>toast('Code copié !','success')).catch(()=>{
-    const el=document.getElementById('settingsInviteCode');
-    if(el){const sel=window.getSelection();const range=document.createRange();range.selectNodeContents(el);sel.removeAllRanges();sel.addRange(range);}
-  });
-}
-
-async function openManageMembers(){
-  if(!currentWorkspace)return;
-  closeModal('workspaceModal');
-  document.getElementById('manageMembersModal').classList.add('open');
-  await loadMembers();
-}
-
-async function loadMembers(){
-  const el=document.getElementById('membersList');
-  if(!el)return;
-  el.innerHTML=`<div style="text-align:center;padding:20px;color:var(--ink3)">Chargement...</div>`;
-  try{
-    const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'select':'*'});
-    if(!members||!members.length){el.innerHTML='<div style="color:var(--ink3);text-align:center">Aucun membre</div>';return;}
-    el.innerHTML=members.map(m=>{
-      const isMe=m.user_id===currentUser.id;
-      return `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface2);border-radius:var(--radius-sm);margin-bottom:8px">
-        <div style="flex:1">
-          <div style="font-weight:600;font-size:.85rem">${isMe?'(Vous)':m.user_id.substring(0,8)+'...'}</div>
-          <div style="font-size:.75rem;color:var(--ink3)">${getRoleLabel(m.role)}</div>
-        </div>
-        ${!isMe&&currentWorkspace._myRole==='owner'?`
-        <select onchange="updateMemberRole('${m.id}',this.value)" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.8rem;outline:none">
-          <option value="admin" ${m.role==='admin'?'selected':''}>Admin</option>
-          <option value="member" ${m.role==='member'?'selected':''}>Membre</option>
-        </select>
-        <button class="btn btn-danger btn-sm" onclick="removeMember('${m.id}')">Retirer</button>`:''}
-      </div>`;
-    }).join('');
-  }catch(e){el.innerHTML='<div style="color:var(--urgent)">Erreur chargement</div>';}
-}
-
-async function updateMemberRole(memberId, newRole){
-  try{
-    await _rest('PATCH','workspace_members?id=eq.'+memberId,{role:newRole});
-    toast('Rôle mis à jour','success');
-    await loadMembers();
-  }catch(e){toast('Erreur','');}
-}
-
-async function removeMember(memberId){
-  if(!confirm('Retirer ce membre ?'))return;
-  try{
-    await _rest('DELETE','workspace_members?id=eq.'+memberId);
-    toast('Membre retiré','success');
-    await loadMembers();
-  }catch(e){toast('Erreur','');}
-}
-
-// ════════════════════════════════════════
-// WORKSPACES
-// ════════════════════════════════════════
-let workspaces=[], currentWorkspace=null;
-function canEdit(){
-  if(!currentWorkspace)return true;
-  if(!currentUser)return false;
-  const role=currentWorkspace._myRole;
-  return role==='owner'||role==='admin';
-}
-function canDelete(){
-  if(!currentWorkspace)return true;
-  if(!currentUser)return false;
-  const role=currentWorkspace._myRole;
-  return role==='owner'||role==='admin';
-}
-function canAdd(){
-  // membres peuvent ajouter, seuls owner/admin peuvent modifier/supprimer
-  if(!currentWorkspace)return true;
-  if(!currentUser)return false;
-  return true; // tous les membres peuvent ajouter
-}
-function getRoleLabel(role){
-  return{owner:'👑 Propriétaire',admin:'🔧 Admin',member:'👤 Membre'}[role]||role;
-}
-
-async function loadWorkspaces(){
-  if(!currentUser)return;
-  try{
-    // Espaces dont je suis propriétaire
-    const owned=await _rest('GET','workspaces',null,{'owner_id':'eq.'+currentUser.id,'select':'*'});
-    // Espaces dont je suis membre
-    const memberships=await _rest('GET','workspace_members',null,{'user_id':'eq.'+currentUser.id,'select':'*,workspaces(*)'});
-    const memberSpaces=(memberships||[]).map(m=>m.workspaces).filter(Boolean);
-    workspaces=[...(owned||[]),...memberSpaces];
-    // Dédupliquer
-    workspaces=workspaces.filter((w,i,a)=>a.findIndex(x=>x.id===w.id)===i);
-  }catch(e){console.error('loadWorkspaces:',e);workspaces=[];}
-  // Restaurer l'espace sauvegardé
-  const savedWsId=localStorage.getItem('ct_ws');
-  if(savedWsId&&!currentWorkspace){
-    const ws=workspaces.find(w=>w.id===savedWsId);
-    if(ws){
-      currentWorkspace={...ws};
-      try{
-        const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
-        currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
-      }catch(e){currentWorkspace._myRole='member';}
-    }
-  } else if(currentWorkspace&&currentUser){
-    const ws=workspaces.find(w=>w.id===currentWorkspace.id);
-    if(ws){
-      currentWorkspace={...ws};
-      try{
-        const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
-        currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
-      }catch(e){currentWorkspace._myRole='member';}
-    }
-  }
-  renderWorkspacePicker();
-}
-
-function renderWorkspacePicker(){
-  // Sync drawer workspace
-  const dwsPicker=document.getElementById('drawerWsPicker');
-  const dwsIcon=document.getElementById('drawerWsIcon');
-  const dwsName=document.getElementById('drawerWsName');
-  if(dwsPicker){
-    if(currentUser){
-      dwsPicker.style.display='block';
-      dwsIcon.textContent=currentWorkspace?'🏢':'👤';
-      const roleLabel=currentWorkspace&&currentWorkspace._myRole?` · ${getRoleLabel(currentWorkspace._myRole)}`:'';
-      dwsName.textContent=currentWorkspace?currentWorkspace.name+''+roleLabel:'Personnel';
-    } else {
-      dwsPicker.style.display='none';
-    }
-  }
-  const picker=document.getElementById('workspacePicker');
-  if(!picker)return;
-  if(!currentUser){picker.style.display='none';return;}
-  picker.style.display='flex';
-  if(currentWorkspace){
-    document.getElementById('workspaceIcon').textContent='🏢';
-    document.getElementById('workspaceName').textContent=currentWorkspace.name;
-  }else{
-    document.getElementById('workspaceIcon').textContent='👤';
-    document.getElementById('workspaceName').textContent='Personnel';
-  }
-}
-
-function openWorkspaceModal(){
-  const list=document.getElementById('workspaceList');
-  // Espace personnel
-  const isPersonal=!currentWorkspace;
-  list.innerHTML=`
-    <div class="ws-item ${isPersonal?'active':''}" onclick="switchWorkspace(null)">
-      <div class="ws-icon">👤</div>
-      <div class="ws-info">
-        <div class="ws-name">Personnel</div>
-        <div class="ws-role">Mes véhicules personnels</div>
-      </div>
-      ${isPersonal?'<span style="color:var(--accent)">✓</span>':''}
-    </div>
-    ${workspaces.map(w=>{
-      const active=currentWorkspace&&currentWorkspace.id===w.id;
-      const isOwner=w.owner_id===currentUser.id;
-      return `<div class="ws-item ${active?'active':''}" onclick="switchWorkspace('${w.id}')">
-        <div class="ws-icon">🏢</div>
-        <div class="ws-info">
-          <div class="ws-name">${w.name}</div>
-          <div class="ws-role">${isOwner?`Propriétaire &middot; Code: <span class="ws-code" onclick="copyCode(event,'${w.invite_code}')">${w.invite_code}</span>`:'Membre'}</div>
-        </div>
-        ${active?'<span style="color:var(--accent)">✓</span>':''}
-      </div>`;
-    }).join('')}`;
-  document.getElementById('workspaceModal').classList.add('open');
-}
-
-function copyCode(e, code){
-  e.stopPropagation();
-  navigator.clipboard.writeText(code).then(()=>toast('Code copié !','success'));
-}
-
-async function switchWorkspace(wsId){
-  closeModal('workspaceModal');
-  if(!wsId){
-    currentWorkspace=null;
-    localStorage.removeItem('ct_ws');
-  }else{
-    currentWorkspace=workspaces.find(w=>w.id===wsId)||null;
-    if(currentWorkspace){
-      // Sauvegarder immédiatement
-      localStorage.setItem('ct_ws', currentWorkspace.id);
-      // Charger mon rôle dans cet espace
-      try{
-        const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
-        currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
-      }catch(e){currentWorkspace._myRole='member';}
-    }
-  }
-  // Recharger toutes les données du nouvel espace
-  vehicles=[];history=[];employees=[];entretiens=[];finances=[];
-  render();
-  await loadFromSupabase();
-  await loadEmployees();
-  await loadEntretiens();
-  await loadFinances();
-  save();render();
-  renderWorkspacePicker();
-  updateEntretienFilter();
-  updateFinanceFilter();
-  renderEmployees();
-  renderEntretiens();
-  renderFinances();
-  toast(currentWorkspace?'Espace: '+currentWorkspace.name:'Espace personnel','success');
-}
-
-function openCreateWorkspace(){
-  closeModal('workspaceModal');
-  document.getElementById('wsNameInput').value='';
-  document.getElementById('wsCreateErr').textContent='';
-  document.getElementById('createWorkspaceModal').classList.add('open');
-}
-
-async function createWorkspace(){
-  const name=document.getElementById('wsNameInput').value.trim();
-  const err=document.getElementById('wsCreateErr');
-  if(!name){err.textContent='Donnez un nom à votre espace.';return;}
-  try{
-    const data=await _rest('POST','workspaces',{name,owner_id:currentUser.id});
-    const ws=data&&data[0];
-    if(ws){
-      workspaces.push(ws);
-      closeModal('createWorkspaceModal');
-      toast('Espace "'+name+'" créé ! Code: '+ws.invite_code,'success');
-      renderWorkspacePicker();
-    }
-  }catch(e){err.textContent='Erreur: '+e.message;}
-}
-
-function openJoinWorkspace(){
-  closeModal('workspaceModal');
-  document.getElementById('wsCodeInput').value='';
-  document.getElementById('wsJoinErr').textContent='';
-  document.getElementById('joinWorkspaceModal').classList.add('open');
-}
-
-async function joinWorkspace(){
-  const code=document.getElementById('wsCodeInput').value.trim().toUpperCase();
-  const err=document.getElementById('wsJoinErr');
-  if(!code){err.textContent='Entrez un code invitation.';return;}
-  try{
-    // Trouver l'espace avec ce code
-    const data=await _rest('GET','workspaces',null,{'invite_code':'eq.'+code,'select':'*'});
-    if(!data||!data[0]){err.textContent='Code invalide.';return;}
-    const ws=data[0];
-    // Rejoindre
-    await _rest('POST','workspace_members',{workspace_id:ws.id,user_id:currentUser.id,role:'member'});
-    workspaces.push(ws);
-    closeModal('joinWorkspaceModal');
-    toast('Vous avez rejoint "'+ws.name+'" !','success');
-    renderWorkspacePicker();
-  }catch(e){
-    if(e.message.includes('duplicate'))err.textContent='Vous êtes déjà membre de cet espace.';
-    else err.textContent='Erreur: '+e.message;
-  }
-}
-
-// ════════════════════════════════════════
-// INIT APP
-// ════════════════════════════════════════
-async function startApp(){
-  // Vérifier si on revient d'un OAuth Google (token dans l'URL hash)
-  const hashStr=window.location.hash;
-  if(hashStr&&hashStr.includes('access_token')){
-    try{
-      const params=new URLSearchParams(hashStr.substring(1));
-      const accessToken=params.get('access_token');
-      const refreshToken=params.get('refresh_token');
-      if(accessToken){
-        const r=await fetch(SUPA_URL+'/auth/v1/user',{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+accessToken}});
-        const userData=await r.json();
-        _saveSession({access_token:accessToken,refresh_token:refreshToken,expires_at:Math.floor(Date.now()/1000)+3600,user:userData});
-        window.history.replaceState(null,'',location.pathname);
-        await onLogin(userData);
-        return;
-      }
-    }catch(e){console.error('OAuth callback error:',e);}
-  }
-
-  // Vérifier session existante (stockée en local)
-  const user=await _getSession();
-  if(user){
-    currentUser=user;
-    const chip=document.getElementById('userChip');
-    const authEl=document.getElementById('authScreen');
-    if(chip){chip.style.display='flex';chip.textContent='👤 '+(user.email||'').split('@')[0];}
-    if(authEl)authEl.style.display='none';
-    render();
-    loadFromSupabase().then(()=>{save();render();loadEntretiens();loadFinances();updateEntretienFilter();updateFinanceFilter();});
-    loadWorkspaces();
-  }else{
-    vehicles=[];history=[];
-    const authEl=document.getElementById('authScreen');
-    if(authEl)authEl.style.display='flex';
-  }
-}
-
-function initLocalData(){
-  // Pas de donnees demo - compte vierge
-  vehicles=[];history=[];
-}
-
-// ════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════
-document.addEventListener('DOMContentLoaded', ()=>startApp());
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 </script>
 </body>
 </html>
