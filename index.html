@@ -1002,6 +1002,52 @@ function renderHome(){
       }).join('');
   }
 
+  // Alertes employés
+  const alertDays=settings.alertDays||30;
+  const empAlerts=[];
+  employees.forEach(emp=>{
+    const name=(emp.prenom||'')+' '+(emp.nom||'');
+    if(emp.permis_expiration){const d=daysUntil(emp.permis_expiration);if(d<=alertDays)empAlerts.push({name,label:'Permis',days:d,type:d<0?'urgent':'warning'});}
+    if(emp.carte_expiration){const d=daysUntil(emp.carte_expiration);if(d<=alertDays)empAlerts.push({name,label:'Carte conducteur',days:d,type:d<0?'urgent':'warning'});}
+    if(emp.fco_date){const d=daysUntil(emp.fco_date);if(d<=alertDays)empAlerts.push({name,label:'FCO',days:d,type:d<0?'urgent':'warning'});}
+    if(emp.permis_expiration){const d=daysUntil(emp.permis_expiration);if(d<=alertDays){};}
+  });
+  // Alertes entretiens
+  const entrAlerts=[];
+  entretiens.forEach(e=>{
+    if(e.prochaine_date){
+      const d=daysUntil(e.prochaine_date);
+      if(d<=alertDays){
+        const v=vehicles.find(x=>x.id===e.vehicle_id);
+        entrAlerts.push({label:e.type,vehicle:v?v.marque+' '+v.modele+' · '+v.plaque:'',days:d,type:d<0?'urgent':'warning'});
+      }
+    }
+  });
+
+  if(empAlerts.length||entrAlerts.length){
+    const extra=empAlerts.map(a=>`<div class="alert-item ${a.type}">
+      <div class="alert-pulse ${a.type}"></div>
+      <div class="alert-text">
+        <strong>👷 ${a.name}</strong>
+        <span>${a.label} ${a.days<0?`expiré depuis ${Math.abs(a.days)}j`:`expire dans ${a.days}j`}</span>
+      </div>
+      <span class="chip ${a.days<0?'chip-urgent':'chip-warn'}">${a.days<0?'EXPIRÉ':a.days+'j'}</span>
+    </div>`).join('')+
+    entrAlerts.map(a=>`<div class="alert-item ${a.type}">
+      <div class="alert-pulse ${a.type}"></div>
+      <div class="alert-text">
+        <strong>🔧 ${a.label}</strong>
+        <span>${a.vehicle} · ${a.days<0?`en retard de ${Math.abs(a.days)}j`:`dans ${a.days}j`}</span>
+      </div>
+      <span class="chip ${a.days<0?'chip-urgent':'chip-warn'}">${a.days<0?'RETARD':a.days+'j'}</span>
+    </div>`).join('');
+    if(!critical.length){
+      alertsEl.innerHTML=`<div class="section-header"><span class="section-title">Alertes</span></div>`+extra;
+    } else {
+      alertsEl.innerHTML+=extra;
+    }
+  }
+
   // Véhicules
   document.getElementById('vehicleCount').textContent=`${vehicles.length} véhicule${vehicles.length!==1?'s':''}`;
   const vList=document.getElementById('vehicleList');
