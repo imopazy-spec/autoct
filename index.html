@@ -178,6 +178,16 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 .auth-btn:hover{opacity:.85}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-err{font-size:.8rem;color:var(--urgent);margin-top:10px;text-align:center;min-height:18px}
+/* FINANCES */
+.fin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.fin-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.fin-info{flex:1}
+.fin-label{font-weight:600;font-size:.9rem}
+.fin-meta{font-size:.78rem;color:var(--ink3);margin-top:2px}
+.fin-amount{font-weight:700;font-size:1rem}
+.fin-kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;text-align:center}
+.fin-kpi-val{font-size:1.3rem;font-weight:800;font-family:var(--font-display);margin-top:4px}
+.fin-kpi-label{font-size:.7rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em}
 /* ENTRETIENS */
 .entr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
 .entr-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
@@ -530,14 +540,78 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   <div id="entretienList"></div>
 </main></div>
 
+<!-- ══ PAGE FINANCES ══ -->
+<div class="page" id="page-finances"><main>
+  <div class="page-hero" style="margin-top:8px">
+    <div class="page-hero-label">Gestion financière</div>
+    <h1>Finances</h1>
+  </div>
+  <!-- KPI -->
+  <div id="financeKpi" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px"></div>
+  <!-- Filtre -->
+  <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <select id="financeVehicleFilter" style="flex:1;padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.85rem;outline:none" onchange="renderFinances()">
+      <option value="">Tous les véhicules</option>
+    </select>
+    <select id="financeTypeFilter" style="padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.85rem;outline:none" onchange="renderFinances()">
+      <option value="">Tout</option>
+      <option value="revenu">Revenus</option>
+      <option value="depense">Dépenses</option>
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="openFinanceModal()">+ Ajouter</button>
+  </div>
+  <!-- Graphique rentabilité par véhicule -->
+  <div class="chart-card" id="financeChartCard" style="margin-bottom:16px;display:none">
+    <div class="chart-label">Rentabilité par véhicule</div>
+    <div style="position:relative;height:180px"><canvas id="chartFinance"></canvas></div>
+  </div>
+  <div id="financeList"></div>
+</main></div>
+
 <!-- ══ BOTTOM NAV ══ -->
 <nav class="bottom-nav">
   <button class="nav-tab active" onclick="switchTab('home',this)"><span class="tab-icon">🏠</span>Accueil</button>
   <button class="nav-tab" onclick="switchTab('entretiens',this)"><span class="tab-icon">🔧</span>Entretiens</button>
+  <button class="nav-tab" onclick="switchTab('finances',this)"><span class="tab-icon">💰</span>Finances</button>
   <button class="nav-tab" onclick="switchTab('employees',this)"><span class="tab-icon">👷</span>Employés</button>
-  <button class="nav-tab" onclick="switchTab('map',this)"><span class="tab-icon">📍</span>Centres CT</button>
   <button class="nav-tab" onclick="switchTab('settings',this)"><span class="tab-icon">⚙️</span>Réglages</button>
 </nav>
+
+<!-- ══ MODAL FINANCE ══ -->
+<div class="modal-overlay" id="financeModal"><div class="modal" style="max-width:460px">
+  <span class="modal-handle"></span>
+  <h2 class="modal-title" id="financeModalTitle">Nouvelle transaction</h2>
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <button id="finTypRevenu" class="btn btn-primary" style="flex:1;justify-content:center" onclick="setFinType('revenu')">📈 Revenu</button>
+    <button id="finTypDepense" class="btn" style="flex:1;justify-content:center;background:var(--surface2)" onclick="setFinType('depense')">📉 Dépense</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="form-group"><label>Véhicule</label>
+      <select id="financeVehicle" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.9rem;outline:none"></select>
+    </div>
+    <div class="form-group"><label>Catégorie</label>
+      <select id="financeCategorie" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.9rem;outline:none">
+        <option value="Transport">Transport</option>
+        <option value="Carburant">Carburant</option>
+        <option value="Entretien">Entretien</option>
+        <option value="Assurance">Assurance</option>
+        <option value="Péage">Péage</option>
+        <option value="Amende">Amende</option>
+        <option value="Salaire chauffeur">Salaire chauffeur</option>
+        <option value="Autre">Autre</option>
+      </select>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="form-group"><label>Montant (€)</label><input type="number" id="financeMontant" placeholder="0.00" step="0.01" min="0"></div>
+    <div class="form-group"><label>Date</label><input type="date" id="financeDate"></div>
+  </div>
+  <div class="form-group" style="margin-bottom:16px"><label>Description</label><input type="text" id="financeDesc" placeholder="Ex: Course Lyon-Paris, Vidange camion..."></div>
+  <div style="display:flex;gap:10px">
+    <button class="btn" style="flex:1;background:var(--surface2)" onclick="closeModal('financeModal')">Annuler</button>
+    <button class="btn btn-primary" style="flex:1" id="financeSaveBtn" onclick="saveFinance()">Enregistrer</button>
+  </div>
+</div></div>
 
 <!-- ══ MODAL ENTRETIEN ══ -->
 <div class="modal-overlay" id="entretienModal"><div class="modal" style="max-width:520px">
@@ -1728,6 +1802,187 @@ async function deleteHistoryFromSupabase(id){
 }
 
 // ════════════════════════════════════════
+// FINANCES
+// ════════════════════════════════════════
+let finances=[], editingFinanceId=null, currentFinType='revenu';
+
+function setFinType(type){
+  currentFinType=type;
+  const cats={revenu:['Transport','Location','Autre'],depense:['Carburant','Entretien','Assurance','Péage','Amende','Salaire chauffeur','Autre']};
+  const sel=document.getElementById('financeCategorie');
+  sel.innerHTML=cats[type].map(c=>`<option>${c}</option>`).join('');
+  document.getElementById('finTypRevenu').className='btn '+(type==='revenu'?'btn-primary':'');
+  document.getElementById('finTypRevenu').style.background=type==='revenu'?'':'var(--surface2)';
+  document.getElementById('finTypDepense').className='btn '+(type==='depense'?'btn-primary':'');
+  document.getElementById('finTypDepense').style.background=type==='depense'?'':'var(--surface2)';
+}
+
+async function loadFinances(){
+  if(!currentUser)return;
+  try{
+    const params=currentWorkspace
+      ?{'workspace_id':'eq.'+currentWorkspace.id,'order':'date.desc','select':'*'}
+      :{'user_id':'eq.'+currentUser.id,'workspace_id':'is.null','order':'date.desc','select':'*'};
+    const data=await _rest('GET','finances',null,params);
+    finances=data||[];
+  }catch(e){console.error('loadFinances:',e);finances=[];}
+  renderFinances();
+  updateFinanceFilter();
+}
+
+function updateFinanceFilter(){
+  const sel=document.getElementById('financeVehicleFilter');
+  if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Tous les véhicules</option>'+
+    vehicles.map(v=>`<option value="${v.id}" ${v.id===cur?'selected':''}>${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
+}
+
+function renderFinances(){
+  const el=document.getElementById('financeList');
+  const kpiEl=document.getElementById('financeKpi');
+  if(!el)return;
+  const vFilter=document.getElementById('financeVehicleFilter')?.value||'';
+  const tFilter=document.getElementById('financeTypeFilter')?.value||'';
+  let list=finances;
+  if(vFilter)list=list.filter(f=>f.vehicle_id===vFilter);
+  if(tFilter)list=list.filter(f=>f.type===tFilter);
+
+  // KPI
+  const totalRev=finances.filter(f=>f.type==='revenu').reduce((s,f)=>s+parseFloat(f.montant||0),0);
+  const totalDep=finances.filter(f=>f.type==='depense').reduce((s,f)=>s+parseFloat(f.montant||0),0);
+  const rentab=totalRev-totalDep;
+  if(kpiEl)kpiEl.innerHTML=`
+    <div class="fin-kpi"><div class="fin-kpi-label">Revenus</div><div class="fin-kpi-val" style="color:var(--accent)">${totalRev.toFixed(0)}€</div></div>
+    <div class="fin-kpi"><div class="fin-kpi-label">Dépenses</div><div class="fin-kpi-val" style="color:var(--urgent)">${totalDep.toFixed(0)}€</div></div>
+    <div class="fin-kpi"><div class="fin-kpi-label">Rentabilité</div><div class="fin-kpi-val" style="color:${rentab>=0?'var(--accent)':'var(--urgent)'}">${rentab>=0?'+':''}${rentab.toFixed(0)}€</div></div>`;
+
+  // Graphique rentabilité par véhicule
+  const chartCard=document.getElementById('financeChartCard');
+  if(chartCard&&vehicles.length){
+    chartCard.style.display='block';
+    setTimeout(()=>drawFinanceChart(),50);
+  }
+
+  if(!list.length){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--ink3)">
+      <div style="font-size:2rem;margin-bottom:12px">💰</div>
+      <div style="font-weight:600;margin-bottom:6px">Aucune transaction</div>
+      <div style="font-size:.85rem">Ajoutez revenus et dépenses</div>
+    </div>`;return;
+  }
+  el.innerHTML=list.map(f=>{
+    const v=vehicles.find(x=>x.id===f.vehicle_id);
+    const isRev=f.type==='revenu';
+    return `<div class="fin-card">
+      <div class="fin-dot" style="background:${isRev?'var(--accent)':'var(--urgent)'}"></div>
+      <div class="fin-info">
+        <div class="fin-label">${f.categorie||f.type} ${f.description?'· '+f.description:''}</div>
+        <div class="fin-meta">${v?v.marque+' '+v.modele+' · ':''} ${f.date?fmtDate(f.date):''}</div>
+      </div>
+      <div class="fin-amount" style="color:${isRev?'var(--accent)':'var(--urgent)'}">${isRev?'+':'−'}${parseFloat(f.montant||0).toFixed(0)}€</div>
+      <button class="icon-btn" onclick="openEditFinance('${f.id}')">✏️</button>
+      <button class="icon-btn del" onclick="deleteFinance('${f.id}')">🗑</button>
+    </div>`;
+  }).join('');
+}
+
+function drawFinanceChart(){
+  const canvas=document.getElementById('chartFinance');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.offsetWidth;canvas.width=W;canvas.height=180;
+  ctx.clearRect(0,0,W,180);
+  const data=vehicles.map(v=>{
+    const rev=finances.filter(f=>f.vehicle_id===v.id&&f.type==='revenu').reduce((s,f)=>s+parseFloat(f.montant||0),0);
+    const dep=finances.filter(f=>f.vehicle_id===v.id&&f.type==='depense').reduce((s,f)=>s+parseFloat(f.montant||0),0);
+    return{label:v.marque+' '+v.modele,rev,dep,net:rev-dep};
+  }).filter(d=>d.rev>0||d.dep>0);
+  if(!data.length)return;
+  const max=Math.max(...data.map(d=>Math.max(d.rev,d.dep)),1);
+  const bH=28,gap=12,padL=100,padR=20,padT=10;
+  data.forEach((d,i)=>{
+    const y=padT+i*(bH*2+gap);
+    ctx.fillStyle='rgba(255,255,255,0.1)';ctx.font='11px Outfit,sans-serif';
+    ctx.fillText(d.label.substring(0,12),0,y+bH-4);
+    // Revenu
+    const rW=(d.rev/max)*(W-padL-padR);
+    ctx.fillStyle='rgba(0,229,160,0.7)';ctx.beginPath();ctx.roundRect(padL,y,rW,bH-2,4);ctx.fill();
+    ctx.fillStyle='#fff';ctx.fillText(d.rev.toFixed(0)+'€',padL+rW+4,y+bH-4);
+    // Dépense
+    const dW=(d.dep/max)*(W-padL-padR);
+    ctx.fillStyle='rgba(255,69,103,0.7)';ctx.beginPath();ctx.roundRect(padL,y+bH,dW,bH-2,4);ctx.fill();
+    ctx.fillStyle='#fff';ctx.fillText(d.dep.toFixed(0)+'€',padL+dW+4,y+bH*2-4);
+  });
+}
+
+function openFinanceModal(){
+  editingFinanceId=null;
+  document.getElementById('financeModalTitle').textContent='Nouvelle transaction';
+  setFinType('revenu');
+  const sel=document.getElementById('financeVehicle');
+  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}">${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
+  document.getElementById('financeDate').value=new Date().toISOString().split('T')[0];
+  document.getElementById('financeMontant').value='';
+  document.getElementById('financeDesc').value='';
+  document.getElementById('financeModal').classList.add('open');
+}
+
+function openEditFinance(id){
+  const f=finances.find(x=>x.id===id);
+  if(!f)return;
+  editingFinanceId=id;
+  document.getElementById('financeModalTitle').textContent='Modifier transaction';
+  setFinType(f.type||'revenu');
+  const sel=document.getElementById('financeVehicle');
+  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}" ${v.id===f.vehicle_id?'selected':''}>${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
+  document.getElementById('financeCategorie').value=f.categorie||'';
+  document.getElementById('financeMontant').value=f.montant||'';
+  document.getElementById('financeDate').value=f.date||'';
+  document.getElementById('financeDesc').value=f.description||'';
+  document.getElementById('financeModal').classList.add('open');
+}
+
+async function saveFinance(){
+  const vehicleId=document.getElementById('financeVehicle').value;
+  const montant=parseFloat(document.getElementById('financeMontant').value);
+  if(!vehicleId||!montant){toast('Renseignez le véhicule et le montant','');return;}
+  const row={
+    user_id:currentUser.id,
+    workspace_id:currentWorkspace?currentWorkspace.id:null,
+    vehicle_id:vehicleId,
+    type:currentFinType,
+    categorie:document.getElementById('financeCategorie').value,
+    montant,
+    date:document.getElementById('financeDate').value||null,
+    description:document.getElementById('financeDesc').value.trim()||null
+  };
+  try{
+    if(editingFinanceId){
+      await _rest('PATCH','finances?id=eq.'+editingFinanceId,row);
+      const idx=finances.findIndex(f=>f.id===editingFinanceId);
+      if(idx>=0)finances[idx]={...finances[idx],...row};
+    }else{
+      const data=await _rest('POST','finances',row);
+      if(data&&data[0])finances.unshift(data[0]);
+    }
+    closeModal('financeModal');
+    renderFinances();
+    toast('Transaction enregistrée','success');
+  }catch(e){console.error('saveFinance:',e);toast('Erreur: '+e.message,'');}
+}
+
+async function deleteFinance(id){
+  if(!confirm('Supprimer cette transaction ?'))return;
+  try{
+    await _rest('DELETE','finances?id=eq.'+id);
+    finances=finances.filter(f=>f.id!==id);
+    renderFinances();
+    toast('Transaction supprimée','');
+  }catch(e){console.error('deleteFinance:',e);}
+}
+
+// ════════════════════════════════════════
 // ENTRETIENS
 // ════════════════════════════════════════
 let entretiens=[], editingEntretienId=null;
@@ -2093,16 +2348,19 @@ async function switchWorkspace(wsId){
     currentWorkspace=workspaces.find(w=>w.id===wsId)||null;
   }
   // Recharger toutes les données du nouvel espace
-  vehicles=[];history=[];employees=[];entretiens=[];
+  vehicles=[];history=[];employees=[];entretiens=[];finances=[];
   render();
   await loadFromSupabase();
   await loadEmployees();
   await loadEntretiens();
+  await loadFinances();
   save();render();
   renderWorkspacePicker();
   updateEntretienFilter();
+  updateFinanceFilter();
   renderEmployees();
   renderEntretiens();
+  renderFinances();
   toast(currentWorkspace?'Espace: '+currentWorkspace.name:'Espace personnel','success');
 }
 
@@ -2188,7 +2446,7 @@ async function startApp(){
     if(chip){chip.style.display='flex';chip.textContent='👤 '+(user.email||'').split('@')[0];}
     if(authEl)authEl.style.display='none';
     render();
-    loadFromSupabase().then(()=>{save();render();loadEntretiens();updateEntretienFilter();});
+    loadFromSupabase().then(()=>{save();render();loadEntretiens();loadFinances();updateEntretienFilter();updateFinanceFilter();});
     loadWorkspaces();
   }else{
     vehicles=[];history=[];
