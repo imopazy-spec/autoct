@@ -178,6 +178,15 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 .auth-btn:hover{opacity:.85}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-err{font-size:.8rem;color:var(--urgent);margin-top:10px;text-align:center;min-height:18px}
+/* ENTRETIENS */
+.entr-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.entr-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.entr-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--surface2);flex-shrink:0}
+.entr-type{font-weight:700;font-size:.95rem}
+.entr-vehicle{font-size:.8rem;color:var(--ink3);margin-top:2px}
+.entr-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.entr-tag{font-size:.75rem;padding:4px 10px;border-radius:6px;background:var(--surface2);color:var(--ink2)}
+.entr-next{margin-top:10px;padding:8px 12px;background:var(--accent-dim);border-radius:8px;font-size:.8rem;color:var(--accent);display:flex;align-items:center;gap:6px}
 /* EMPLOYÉS */
 .emp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
 .emp-header{display:flex;align-items:center;gap:14px;margin-bottom:14px}
@@ -506,14 +515,75 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   <div id="employeeList"></div>
 </main></div>
 
+<!-- ══ PAGE ENTRETIENS ══ -->
+<div class="page" id="page-entretiens"><main>
+  <div class="page-hero" style="margin-top:8px">
+    <div class="page-hero-label">Maintenance</div>
+    <h1>Entretiens</h1>
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <select id="entretienVehicleFilter" style="padding:8px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.85rem;outline:none" onchange="renderEntretiens()">
+      <option value="">Tous les véhicules</option>
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="openEntretienModal()">+ Ajouter</button>
+  </div>
+  <div id="entretienList"></div>
+</main></div>
+
 <!-- ══ BOTTOM NAV ══ -->
 <nav class="bottom-nav">
   <button class="nav-tab active" onclick="switchTab('home',this)"><span class="tab-icon">🏠</span>Accueil</button>
-  <button class="nav-tab" onclick="switchTab('history',this)"><span class="tab-icon">📋</span>Historique</button>
+  <button class="nav-tab" onclick="switchTab('entretiens',this)"><span class="tab-icon">🔧</span>Entretiens</button>
   <button class="nav-tab" onclick="switchTab('employees',this)"><span class="tab-icon">👷</span>Employés</button>
   <button class="nav-tab" onclick="switchTab('map',this)"><span class="tab-icon">📍</span>Centres CT</button>
   <button class="nav-tab" onclick="switchTab('settings',this)"><span class="tab-icon">⚙️</span>Réglages</button>
 </nav>
+
+<!-- ══ MODAL ENTRETIEN ══ -->
+<div class="modal-overlay" id="entretienModal"><div class="modal" style="max-width:520px">
+  <span class="modal-handle"></span>
+  <h2 class="modal-title" id="entretienModalTitle">Nouvel entretien</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="form-group"><label>Véhicule</label>
+      <select id="entretienVehicle" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.9rem;outline:none"></select>
+    </div>
+    <div class="form-group"><label>Type d'entretien</label>
+      <select id="entretienType" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.9rem;outline:none">
+        <option>Vidange</option>
+        <option>Révision</option>
+        <option>Contrôle technique</option>
+        <option>Pneus</option>
+        <option>Freins</option>
+        <option>Courroie de distribution</option>
+        <option>Filtre à air</option>
+        <option>Filtre à carburant</option>
+        <option>Batterie</option>
+        <option>Climatisation</option>
+        <option>Autre</option>
+      </select>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="form-group"><label>Date</label><input type="date" id="entretienDate"></div>
+    <div class="form-group"><label>Kilométrage</label><input type="number" id="entretienKm" placeholder="150000"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="form-group"><label>Coût (€)</label><input type="number" id="entretienCout" placeholder="0.00" step="0.01"></div>
+    <div class="form-group"><label>Prestataire</label><input type="text" id="entretienPrestataire" placeholder="Garage Martin..."></div>
+  </div>
+  <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
+    <div style="font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:10px">📅 Prochain entretien</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>Date prévue</label><input type="date" id="entretienProchaineDate"></div>
+      <div class="form-group"><label>Km prévu</label><input type="number" id="entretienProchainKm" placeholder="160000"></div>
+    </div>
+  </div>
+  <div class="form-group" style="margin-bottom:16px"><label>Notes</label><textarea id="entretienNotes" placeholder="Détails de l'intervention..." style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none;resize:vertical;min-height:70px"></textarea></div>
+  <div style="display:flex;gap:10px">
+    <button class="btn" style="flex:1;background:var(--surface2)" onclick="closeModal('entretienModal')">Annuler</button>
+    <button class="btn btn-primary" style="flex:1" id="entretienSaveBtn" onclick="saveEntretien()">Enregistrer</button>
+  </div>
+</div></div>
 
 <!-- ══ MODAL EMPLOYÉ ══ -->
 <div class="modal-overlay" id="employeeModal"><div class="modal" style="max-width:520px">
@@ -530,7 +600,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
     <div style="font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:10px">🪪 Permis de conduire</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="form-group"><label>Catégories</label><input type="text" id="empPermis" placeholder="B, C, CE..."></div>
+      <div class="form-group"><label>Catégorie(s)</label><input type="text" id="empPermis" placeholder="B, C, CE..."></div>
       <div class="form-group"><label>Expiration permis</label><input type="date" id="empPermisExp"></div>
     </div>
   </div>
@@ -1658,6 +1728,148 @@ async function deleteHistoryFromSupabase(id){
 }
 
 // ════════════════════════════════════════
+// ENTRETIENS
+// ════════════════════════════════════════
+let entretiens=[], editingEntretienId=null;
+
+const entretienIcons={'Vidange':'🛢️','Révision':'🔧','Contrôle technique':'📋','Pneus':'🔄','Freins':'🛑','Courroie de distribution':'⚙️','Filtre à air':'💨','Filtre à carburant':'⛽','Batterie':'🔋','Climatisation':'❄️','Autre':'🔩'};
+
+async function loadEntretiens(){
+  if(!currentUser)return;
+  try{
+    const params=currentWorkspace?{'workspace_id':'eq.'+currentWorkspace.id,'order':'date.desc','select':'*'}:{'user_id':'eq.'+currentUser.id,'order':'date.desc','select':'*'};
+    const data=await _rest('GET','entretiens',null,params);
+    entretiens=data||[];
+  }catch(e){console.error('loadEntretiens:',e);entretiens=[];}
+  renderEntretiens();
+  updateEntretienFilter();
+}
+
+function updateEntretienFilter(){
+  const sel=document.getElementById('entretienVehicleFilter');
+  if(!sel)return;
+  const current=sel.value;
+  sel.innerHTML='<option value="">Tous les véhicules</option>'+
+    vehicles.map(v=>`<option value="${v.id}" ${v.id===current?'selected':''}>${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
+}
+
+function renderEntretiens(){
+  const el=document.getElementById('entretienList');
+  if(!el)return;
+  const filter=document.getElementById('entretienVehicleFilter')?.value||'';
+  const list=filter?entretiens.filter(e=>e.vehicle_id===filter):entretiens;
+  if(!list.length){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--ink3)">
+      <div style="font-size:2rem;margin-bottom:12px">🔧</div>
+      <div style="font-weight:600;margin-bottom:6px">Aucun entretien</div>
+      <div style="font-size:.85rem">Ajoutez le premier entretien</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML=list.map(e=>{
+    const v=vehicles.find(x=>x.id===e.vehicle_id);
+    const icon=entretienIcons[e.type]||'🔩';
+    const hasNext=e.prochaine_date||e.prochain_km;
+    const nextDays=e.prochaine_date?daysUntil(e.prochaine_date):null;
+    const nextStatus=nextDays!==null?(nextDays<0?'urgent':nextDays<=30?'warn':'ok'):'ok';
+    return `<div class="entr-card">
+      <div class="entr-header">
+        <div class="entr-icon">${icon}</div>
+        <div style="flex:1">
+          <div class="entr-type">${e.type}</div>
+          <div class="entr-vehicle">${v?v.marque+' '+v.modele+' · '+v.plaque:'Véhicule inconnu'}</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          ${e.cout?`<span style="font-weight:700;color:var(--accent)">${parseFloat(e.cout).toFixed(0)}€</span>`:''}
+          <button class="icon-btn" onclick="openEditEntretien('${e.id}')">✏️</button>
+          <button class="icon-btn del" onclick="deleteEntretien('${e.id}')">🗑</button>
+        </div>
+      </div>
+      <div class="entr-meta">
+        ${e.date?`<span class="entr-tag">📅 ${fmtDate(e.date)}</span>`:''}
+        ${e.km?`<span class="entr-tag">📍 ${parseInt(e.km).toLocaleString()} km</span>`:''}
+        ${e.prestataire?`<span class="entr-tag">🏪 ${e.prestataire}</span>`:''}
+        ${e.notes?`<span class="entr-tag">📝 ${e.notes.substring(0,40)}${e.notes.length>40?'...':''}</span>`:''}
+      </div>
+      ${hasNext?`<div class="entr-next" style="${nextStatus==='urgent'?'background:var(--urgent-dim);color:var(--urgent)':nextStatus==='warn'?'background:var(--warn-dim);color:var(--warn)':''}">
+        ⏭ Prochain : ${e.prochaine_date?fmtDate(e.prochaine_date):''}${e.prochaine_date&&e.prochain_km?' · ':''}${e.prochain_km?parseInt(e.prochain_km).toLocaleString()+' km':''}
+        ${nextDays!==null?` (${nextDays<0?'En retard de '+Math.abs(nextDays)+'j':nextDays+'j'})` :''}
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function openEntretienModal(){
+  editingEntretienId=null;
+  document.getElementById('entretienModalTitle').textContent='Nouvel entretien';
+  document.getElementById('entretienSaveBtn').textContent='Enregistrer';
+  const sel=document.getElementById('entretienVehicle');
+  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}">${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
+  document.getElementById('entretienDate').value=new Date().toISOString().split('T')[0];
+  ['entretienKm','entretienCout','entretienPrestataire','entretienNotes','entretienProchaineDate','entretienProchainKm'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('entretienModal').classList.add('open');
+}
+
+function openEditEntretien(id){
+  const e=entretiens.find(x=>x.id===id);
+  if(!e)return;
+  editingEntretienId=id;
+  document.getElementById('entretienModalTitle').textContent='Modifier entretien';
+  const sel=document.getElementById('entretienVehicle');
+  sel.innerHTML=vehicles.map(v=>`<option value="${v.id}" ${v.id===e.vehicle_id?'selected':''}>${v.marque} ${v.modele} · ${v.plaque}</option>`).join('');
+  document.getElementById('entretienType').value=e.type||'Vidange';
+  document.getElementById('entretienDate').value=e.date||'';
+  document.getElementById('entretienKm').value=e.km||'';
+  document.getElementById('entretienCout').value=e.cout||'';
+  document.getElementById('entretienPrestataire').value=e.prestataire||'';
+  document.getElementById('entretienNotes').value=e.notes||'';
+  document.getElementById('entretienProchaineDate').value=e.prochaine_date||'';
+  document.getElementById('entretienProchainKm').value=e.prochain_km||'';
+  document.getElementById('entretienModal').classList.add('open');
+}
+
+async function saveEntretien(){
+  const vehicleId=document.getElementById('entretienVehicle').value;
+  if(!vehicleId){toast('Sélectionnez un véhicule','');return;}
+  const row={
+    user_id:currentUser.id,
+    workspace_id:currentWorkspace?currentWorkspace.id:null,
+    vehicle_id:vehicleId,
+    type:document.getElementById('entretienType').value,
+    date:document.getElementById('entretienDate').value||null,
+    km:parseInt(document.getElementById('entretienKm').value)||null,
+    cout:parseFloat(document.getElementById('entretienCout').value)||null,
+    prestataire:document.getElementById('entretienPrestataire').value.trim()||null,
+    notes:document.getElementById('entretienNotes').value.trim()||null,
+    prochaine_date:document.getElementById('entretienProchaineDate').value||null,
+    prochain_km:parseInt(document.getElementById('entretienProchainKm').value)||null
+  };
+  try{
+    if(editingEntretienId){
+      await _rest('PATCH','entretiens?id=eq.'+editingEntretienId,row);
+      const idx=entretiens.findIndex(e=>e.id===editingEntretienId);
+      if(idx>=0)entretiens[idx]={...entretiens[idx],...row};
+    }else{
+      const data=await _rest('POST','entretiens',row);
+      if(data&&data[0])entretiens.unshift(data[0]);
+    }
+    closeModal('entretienModal');
+    renderEntretiens();
+    toast('Entretien enregistré','success');
+  }catch(e){console.error('saveEntretien:',e);toast('Erreur: '+e.message,'');}
+}
+
+async function deleteEntretien(id){
+  if(!confirm('Supprimer cet entretien ?'))return;
+  try{
+    await _rest('DELETE','entretiens?id=eq.'+id);
+    entretiens=entretiens.filter(e=>e.id!==id);
+    renderEntretiens();
+    toast('Entretien supprimé','');
+  }catch(e){console.error('deleteEntretien:',e);}
+}
+
+// ════════════════════════════════════════
 // EMPLOYÉS
 // ════════════════════════════════════════
 let employees=[], editingEmpId=null;
@@ -1763,7 +1975,7 @@ async function saveEmployee(){
     nom:document.getElementById('empNom').value.trim(),
     email:document.getElementById('empEmail').value.trim(),
     telephone:document.getElementById('empTel').value.trim(),
-    permis_categories:document.getElementById('empPermis').value.trim(),
+    permis_categories:document.getElementById('empPermis').value.trim()||null,
     permis_expiration:document.getElementById('empPermisExp').value||null,
     carte_conducteur:document.getElementById('empCarte').value.trim(),
     carte_expiration:document.getElementById('empCarteExp').value||null,
@@ -1878,9 +2090,10 @@ async function switchWorkspace(wsId){
     currentWorkspace=workspaces.find(w=>w.id===wsId)||null;
   }
   // Recharger les données de cet espace
-  vehicles=[];history=[];employees=[];
+  vehicles=[];history=[];employees=[];entretiens=[];
   await loadFromSupabase();
   await loadEmployees();
+  await loadEntretiens();
   save();render();
   renderWorkspacePicker();
   updateEditButtons();
@@ -1969,7 +2182,7 @@ async function startApp(){
     if(chip){chip.style.display='flex';chip.textContent='👤 '+(user.email||'').split('@')[0];}
     if(authEl)authEl.style.display='none';
     render();
-    loadFromSupabase().then(()=>{save();render();});
+    loadFromSupabase().then(()=>{save();render();loadEntretiens();updateEntretienFilter();});
     loadWorkspaces();
   }else{
     vehicles=[];history=[];
