@@ -44,13 +44,13 @@
   --font-mono:'DM Mono',monospace;
 }
 html{scroll-behavior:smooth;height:100%}
-body{font-family:var(--font-body);background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:var(--bottom-h);-webkit-font-smoothing:antialiased;}
+body{font-family:var(--font-body);background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:var(--bottom-h);padding-top:var(--nav-h);-webkit-font-smoothing:antialiased;}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
 
 /* ── TOP NAV ── */
-.top-nav{height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200;background:var(--bg2);border-bottom:1px solid var(--border)}
+.top-nav{height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:fixed;top:0;left:0;right:0;z-index:200;background:var(--bg2);border-bottom:1px solid var(--border)}
 .logo{font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--ink);letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;gap:10px}
 .logo-dot{width:8px;height:8px;border-radius:2px;background:var(--accent)}
 .nav-actions{display:flex;gap:8px}
@@ -410,7 +410,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 
 <!-- TOP NAV -->
 <!-- ══ PAGE ABONNEMENT ══ -->
-<div class="page" id="page-plans"><main>
+<div class="page" id="page-plans" style="padding-top:0"><main>
   <div class="page-hero" style="margin-top:8px">
     <div class="page-hero-label">Abonnement</div>
     <h1>Nos offres</h1>
@@ -2082,7 +2082,8 @@ async function subscribePlan(plan){
       method:'POST',
       headers:{
         'Content-Type':'application/json',
-        'Authorization':'Bearer '+(_accessToken||'')
+        'Authorization':'Bearer '+SUPA_KEY,
+        'x-user-token':_accessToken||''
       },
       body:JSON.stringify({
         priceId,
