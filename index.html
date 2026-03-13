@@ -332,7 +332,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   </div>
   <div class="nav-actions">
     <button class="nav-btn" onclick="openEmailModal()">✉ Rappels</button>
-    <button class="nav-btn primary" onclick="openAddModal()">+ Véhicule</button>
+    <button class="nav-btn primary" id="btnAddVehicle" onclick="openAddModal()">+ Véhicule</button>
   </div>
 </nav>
 
@@ -356,7 +356,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 <div class="page" id="page-history"><main>
   <div class="section-header" style="margin-top:8px">
     <span class="section-title">Historique des CT</span>
-    <button class="btn btn-primary btn-sm" onclick="openHistoryModal()">+ Ajouter</button>
+    <button class="btn btn-primary btn-sm" id="btnAddHistory" onclick="openHistoryModal()">+ Ajouter</button>
   </div>
   <div class="history-list" id="historyList"></div>
 </main></div>
@@ -757,6 +757,14 @@ function checkNotifications(){
   }
 }
 
+function updateEditButtons(){
+  const edit=canEdit();
+  const btnV=document.getElementById('btnAddVehicle');
+  const btnH=document.getElementById('btnAddHistory');
+  if(btnV)btnV.style.display=edit?'':'none';
+  if(btnH)btnH.style.display=edit?'':'none';
+}
+
 function renderHome(){
   // Stats
   const expired=vehicles.filter(v=>daysUntil(v.dateCT)<0).length;
@@ -806,7 +814,7 @@ function renderHome(){
         <span class="status-pill ${st.cls}">${st.label}</span>
       </div>
       <div class="vehicle-actions">
-        <button class="icon-btn del" onclick="askDeleteVehicle('${v.id}')" title="Supprimer">🗑</button>
+        ${canEdit()?`<button class="icon-btn del" onclick="askDeleteVehicle('${v.id}')" title="Supprimer">🗑</button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -843,8 +851,8 @@ function renderHistoryList(){
       </div>
       <div class="history-footer">
         <div class="history-btns">
-          <button class="mini-btn" onclick="openEditHistoryModal('${h.id}')">✏️ Modifier</button>
-          <button class="mini-btn del-btn" onclick="askDeleteHistory('${h.id}')">🗑 Supprimer</button>
+          ${canEdit()?`<button class="mini-btn" onclick="openEditHistoryModal('${h.id}')">✏️ Modifier</button>
+          <button class="mini-btn del-btn" onclick="askDeleteHistory('${h.id}')">🗑 Supprimer</button>`:''}
         </div>
         <span class="chip chip-${h.result==='Favorable'?'ok':h.result==='Défavorable'?'urgent':'warn'}">${h.result}</span>
       </div>
@@ -1545,7 +1553,8 @@ async function loadFromSupabase(){
 async function saveVehicleToSupabase(v){
   if(!currentUser)return v.id;
   const row={user_id:currentUser.id,marque:v.marque,modele:v.modele,immat:v.plaque,
-    proprietaire:v.owner,email:v.email,date_ct:v.dateCT,km:parseInt(v.km)||0};
+    proprietaire:v.owner,email:v.email,date_ct:v.dateCT,km:parseInt(v.km)||0,
+    workspace_id:currentWorkspace?currentWorkspace.id:null};
   try{
     if(v.id&&typeof v.id==='string'){
       await _rest('PATCH','vehicles?id=eq.'+v.id,row);
@@ -1588,6 +1597,12 @@ async function deleteHistoryFromSupabase(id){
 // WORKSPACES
 // ════════════════════════════════════════
 let workspaces=[], currentWorkspace=null;
+function canEdit(){
+  // Espace personnel -> toujours éditable
+  if(!currentWorkspace)return true;
+  // Espace pro -> seulement le propriétaire
+  return currentWorkspace.owner_id===currentUser.id;
+}
 
 async function loadWorkspaces(){
   if(!currentUser)return;
@@ -1663,6 +1678,7 @@ async function switchWorkspace(wsId){
   await loadFromSupabase();
   save();render();
   renderWorkspacePicker();
+  updateEditButtons();
   toast(currentWorkspace?'Espace: '+currentWorkspace.name:'Espace personnel','success');
 }
 
