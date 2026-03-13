@@ -1362,6 +1362,10 @@ function switchTab(name,el){
   el.classList.add('active');
   if(name==='stats')renderStatsPage();
   if(name==='map')initMapPage();
+  if(name==='dashboard')renderDashboard();
+  if(name==='finances'){renderFinances();updateFinanceFilter();}
+  if(name==='entretiens'){renderEntretiens();updateEntretienFilter();}
+  if(name==='employees')renderEmployees();
 }
 
 // ════════════════════════════════════════
