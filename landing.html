@@ -1967,15 +1967,26 @@ async function onLogin(user){
   document.getElementById('authScreen').style.display='none';
   const chip=document.getElementById('userChip');
   chip.style.display='flex';
-  // Afficher le vrai nom Google si dispo
   const displayName = user.user_metadata&&user.user_metadata.full_name ? user.user_metadata.full_name : user.email.split('@')[0];
   chip.textContent='👤 '+displayName;
-  // Afficher le cache local immédiatement
   render();
-  // Charger depuis Supabase en arrière-plan
+  // 1. Charger workspaces EN PREMIER pour restaurer l'espace actif
+  await loadWorkspaces();
+  // Charger le rôle si workspace restauré
+  if(currentWorkspace&&currentUser){
+    try{
+      const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
+      currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
+    }catch(e){currentWorkspace._myRole='member';}
+  }
+  // 2. Charger les données de l'espace actif
   await loadFromSupabase();
+  await loadEmployees();
+  await loadEntretiens();
+  await loadFinances();
   save();
   render();
+  renderWorkspacePicker();
   toast('Bienvenue '+displayName+' !','success');
 }
 
