@@ -2070,7 +2070,7 @@ const STRIPE_PRICES = {
 };
 
 async function subscribePlan(plan){
-  if(!currentUser){toast('Connectez-vous d'abord','');return;}
+  if(!currentUser){toast('Connectez-vous dabord','');return;}
   const priceId=STRIPE_PRICES[plan];
   if(!priceId)return;
 
