@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="AutoCT — La plateforme de gestion de flotte pour les professionnels du transport. CT, entretiens, employés, finances. Tout en un.">
+<title>AutoCT — Gestion de flotte intelligente</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#141618;
+  --bg2:#1C1F21;
+  --surface:#222527;
+  --surface2:#2A2E31;
+  --border:rgba(255,255,255,0.06);
+  --border2:rgba(255,255,255,0.1);
+  --ink:#F0F2F4;
+  --ink2:#8A9099;
+  --ink3:#4A5260;
+  --orange:#F97316;
+  --orange-dim:rgba(249,115,22,0.15);
+  --orange-glow:rgba(249,115,22,0.4);
+  --green:#22C55E;
+  --red:#F43F5E;
+  --blue:#3B82F6;
+  --font-display:'Barlow Condensed',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-body);background:var(--bg);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* ── NOISE TEXTURE ── */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:.4}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(20,22,24,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink);display:flex;align-items:center;gap:10px}
+.nav-logo-dot{width:8px;height:8px;border-radius:2px;background:var(--orange)}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-link{color:var(--ink2);font-size:.88rem;font-weight:500;text-decoration:none;transition:color .2s}
+.nav-link:hover{color:var(--ink)}
+.nav-cta{background:var(--orange);color:#fff;padding:9px 22px;border-radius:6px;font-size:.88rem;font-weight:600;text-decoration:none;transition:all .2s;letter-spacing:.02em}
+.nav-cta:hover{opacity:.9;box-shadow:0 4px 20px var(--orange-glow)}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(249,115,22,0.08),transparent 70%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;mask-image:radial-gradient(ellipse 80% 80% at 50% 0%,black,transparent)}
+.hero-label{font-family:var(--font-mono);font-size:.72rem;font-weight:500;color:var(--orange);letter-spacing:.2em;text-transform:uppercase;margin-bottom:24px;opacity:0;animation:fadeUp .6s .2s forwards}
+.hero-title{font-family:var(--font-display);font-size:clamp(4rem,12vw,9rem);font-weight:900;line-height:.92;letter-spacing:-1px;text-transform:uppercase;color:var(--ink);margin-bottom:8px;opacity:0;animation:fadeUp .6s .3s forwards}
+.hero-title span{color:var(--orange);font-style:italic}
+.hero-sub{font-size:clamp(1rem,2.5vw,1.25rem);color:var(--ink2);max-width:560px;line-height:1.6;margin:28px auto 48px;font-weight:300;opacity:0;animation:fadeUp .6s .5s forwards}
+.hero-actions{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp .6s .65s forwards}
+.btn-primary{background:var(--orange);color:#fff;padding:14px 32px;border-radius:8px;font-size:1rem;font-weight:600;text-decoration:none;transition:all .2s;letter-spacing:.02em}
+.btn-primary:hover{opacity:.9;box-shadow:0 8px 30px var(--orange-glow);transform:translateY(-2px)}
+.btn-ghost{background:transparent;color:var(--ink);padding:14px 32px;border-radius:8px;font-size:1rem;font-weight:500;text-decoration:none;border:1px solid var(--border2);transition:all .2s}
+.btn-ghost:hover{border-color:rgba(255,255,255,0.25);background:var(--surface)}
+.hero-stats{display:flex;gap:48px;justify-content:center;margin-top:72px;opacity:0;animation:fadeUp .6s .8s forwards;flex-wrap:wrap}
+.hero-stat-val{font-family:var(--font-display);font-size:2.5rem;font-weight:800;color:var(--ink);letter-spacing:1px}
+.hero-stat-label{font-size:.78rem;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:.1em}
+
+/* ── MARQUEE ── */
+.marquee-wrap{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);padding:16px 0;overflow:hidden;white-space:nowrap}
+.marquee-track{display:inline-flex;animation:marquee 20s linear infinite;gap:0}
+.marquee-item{font-family:var(--font-display);font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:.15em;color:var(--ink3);padding:0 32px}
+.marquee-item span{color:var(--orange);margin-right:32px}
+
+/* ── FEATURES ── */
+.section{padding:100px 40px;max-width:1200px;margin:0 auto}
+.section-eyebrow{font-family:var(--font-mono);font-size:.7rem;color:var(--orange);letter-spacing:.2em;text-transform:uppercase;margin-bottom:16px}
+.section-title{font-family:var(--font-display);font-size:clamp(2.5rem,6vw,4.5rem);font-weight:800;text-transform:uppercase;letter-spacing:1px;line-height:.95;color:var(--ink);margin-bottom:20px}
+.section-sub{font-size:1rem;color:var(--ink2);max-width:480px;line-height:1.7;font-weight:300}
+
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:2px;margin-top:64px;background:var(--border)}
+.feat-card{background:var(--bg);padding:40px 36px;transition:background .2s;position:relative;overflow:hidden}
+.feat-card:hover{background:var(--bg2)}
+.feat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--orange);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.feat-card:hover::before{transform:scaleX(1)}
+.feat-icon{font-size:2rem;margin-bottom:20px;display:block}
+.feat-name{font-family:var(--font-display);font-size:1.3rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink);margin-bottom:10px}
+.feat-desc{font-size:.88rem;color:var(--ink2);line-height:1.65;font-weight:300}
+
+/* ── BENTO ── */
+.bento-section{padding:0 40px 100px;max-width:1200px;margin:0 auto}
+.bento-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:auto;gap:12px}
+.bento-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;position:relative;overflow:hidden}
+.bento-card.wide{grid-column:span 2}
+.bento-card.tall{grid-row:span 2}
+.bento-card-label{font-family:var(--font-mono);font-size:.65rem;color:var(--orange);letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+.bento-card-title{font-family:var(--font-display);font-size:1.6rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink);margin-bottom:8px}
+.bento-card-desc{font-size:.83rem;color:var(--ink2);line-height:1.6;font-weight:300}
+.bento-number{font-family:var(--font-display);font-size:5rem;font-weight:900;color:var(--orange);opacity:.15;position:absolute;bottom:-10px;right:16px;line-height:1;letter-spacing:-2px}
+
+/* ── PRICING ── */
+.pricing-section{padding:100px 40px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.pricing-inner{max-width:1000px;margin:0 auto}
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:64px}
+.price-card{background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:36px;position:relative;transition:all .25s}
+.price-card:hover{border-color:var(--border2);transform:translateY(-4px)}
+.price-card.featured{border-color:var(--orange);background:linear-gradient(135deg,rgba(249,115,22,0.05),transparent)}
+.price-name{font-family:var(--font-display);font-size:1rem;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--ink2);margin-bottom:16px}
+.price-amount{font-family:var(--font-display);font-size:3.5rem;font-weight:900;color:var(--ink);line-height:1}
+.price-period{font-size:.85rem;color:var(--ink3);font-weight:400;font-family:var(--font-body)}
+.price-divider{height:1px;background:var(--border);margin:24px 0}
+.price-feature{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--ink2);margin-bottom:10px}
+.price-feature.ok{color:var(--ink)}
+.price-dot{width:6px;height:6px;border-radius:50%;background:var(--ink3);flex-shrink:0}
+.price-dot.ok{background:var(--green)}
+.price-btn{display:block;width:100%;padding:13px;border-radius:8px;font-size:.9rem;font-weight:600;text-align:center;text-decoration:none;margin-top:28px;transition:all .2s;border:none;cursor:pointer;font-family:var(--font-body)}
+.price-btn.primary{background:var(--orange);color:#fff}
+.price-btn.primary:hover{opacity:.9;box-shadow:0 6px 24px var(--orange-glow)}
+.price-btn.ghost{background:var(--surface);color:var(--ink);border:1px solid var(--border2)}
+.price-btn.ghost:hover{background:var(--surface2)}
+
+/* ── TESTIMONIALS ── */
+.testi-section{padding:100px 40px;max-width:1200px;margin:0 auto}
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:64px}
+.testi-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px}
+.testi-quote{font-size:.95rem;color:var(--ink);line-height:1.7;margin-bottom:24px;font-style:italic;font-weight:300}
+.testi-author{display:flex;align-items:center;gap:12px}
+.testi-avatar{width:40px;height:40px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.testi-name{font-weight:600;font-size:.88rem;color:var(--ink)}
+.testi-role{font-size:.75rem;color:var(--ink3)}
+
+/* ── CTA FINAL ── */
+.cta-section{padding:120px 40px;text-align:center;position:relative;overflow:hidden}
+.cta-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(249,115,22,0.07),transparent);pointer-events:none}
+.cta-title{font-family:var(--font-display);font-size:clamp(3rem,8vw,6rem);font-weight:900;text-transform:uppercase;letter-spacing:1px;line-height:.95;color:var(--ink);margin-bottom:24px}
+.cta-title span{color:var(--orange)}
+.cta-sub{font-size:1.05rem;color:var(--ink2);margin-bottom:48px;font-weight:300}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:var(--font-display);font-size:1.1rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--ink3);display:flex;align-items:center;gap:8px}
+.footer-logo-dot{width:6px;height:6px;border-radius:2px;background:var(--orange)}
+.footer-links{display:flex;gap:24px}
+.footer-link{color:var(--ink3);font-size:.82rem;text-decoration:none;transition:color .2s}
+.footer-link:hover{color:var(--ink)}
+.footer-copy{color:var(--ink3);font-size:.78rem}
+
+/* ── SCROLL REVEAL ── */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .7s,transform .7s}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .section,.bento-section,.testi-section,.cta-section{padding-left:20px;padding-right:20px}
+  .bento-grid{grid-template-columns:1fr}
+  .bento-card.wide,.bento-card.tall{grid-column:span 1;grid-row:span 1}
+  .hero-stats{gap:28px}
+  footer{flex-direction:column;align-items:flex-start;padding:32px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><div class="nav-logo-dot"></div>AutoCT</div>
+  <div class="nav-links">
+    <a href="#features" class="nav-link">Fonctionnalités</a>
+    <a href="#pricing" class="nav-link">Tarifs</a>
+    <a href="#testimonials" class="nav-link">Avis</a>
+    <a href="https://autoct.vercel.app/app" class="nav-cta">Commencer gratuitement</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-label">Gestion de flotte professionnelle</div>
+  <h1 class="hero-title">Votre flotte.<br><span>Sous contrôle.</span></h1>
+  <p class="hero-sub">AutoCT centralise la gestion de vos véhicules, employés et finances. Plus jamais de CT expiré, plus jamais de permis oublié.</p>
+  <div class="hero-actions">
+    <a href="https://autoct.vercel.app" class="btn-primary">Essayer gratuitement →</a>
+    <a href="#features" class="btn-ghost">Voir les fonctionnalités</a>
+  </div>
+  <div class="hero-stats">
+    <div>
+      <div class="hero-stat-val">100%</div>
+      <div class="hero-stat-label">Alertes automatiques</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">0€</div>
+      <div class="hero-stat-label">Pour commencer</div>
+    </div>
+    <div>
+      <div class="hero-stat-val">24/7</div>
+      <div class="hero-stat-label">Surveillance active</div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item"><span>✦</span> Contrôle Technique</span>
+    <span class="marquee-item"><span>✦</span> Gestion Employés</span>
+    <span class="marquee-item"><span>✦</span> Rappels Email</span>
+    <span class="marquee-item"><span>✦</span> Module Finances</span>
+    <span class="marquee-item"><span>✦</span> Tableau de Bord</span>
+    <span class="marquee-item"><span>✦</span> Multi-Utilisateurs</span>
+    <span class="marquee-item"><span>✦</span> Transport Routier</span>
+    <span class="marquee-item"><span>✦</span> Contrôle Technique</span>
+    <span class="marquee-item"><span>✦</span> Gestion Employés</span>
+    <span class="marquee-item"><span>✦</span> Rappels Email</span>
+    <span class="marquee-item"><span>✦</span> Module Finances</span>
+    <span class="marquee-item"><span>✦</span> Tableau de Bord</span>
+    <span class="marquee-item"><span>✦</span> Multi-Utilisateurs</span>
+    <span class="marquee-item"><span>✦</span> Transport Routier</span>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section reveal">
+    <div class="section-eyebrow">Fonctionnalités</div>
+    <h2 class="section-title">Tout ce dont<br>vous avez besoin</h2>
+    <p class="section-sub">Une plateforme complète pensée pour les professionnels du transport et de la logistique.</p>
+  </div>
+  <div style="max-width:1200px;margin:0 auto;padding:0 40px">
+    <div class="features-grid reveal">
+      <div class="feat-card">
+        <span class="feat-icon">🚗</span>
+        <div class="feat-name">Contrôle Technique</div>
+        <p class="feat-desc">Suivez les dates de CT de toute votre flotte. Alertes automatiques avant expiration. Historique complet des passages.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">👷</span>
+        <div class="feat-name">Gestion Employés</div>
+        <p class="feat-desc">Permis de conduire, cartes conducteur, FIMO/FCO — toutes les échéances réglementaires sous contrôle.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">🔧</span>
+        <div class="feat-name">Entretiens</div>
+        <p class="feat-desc">Planifiez vidanges, révisions et réparations. Suivez les kilométrages et prestataires. Anticipez les coûts.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">💰</span>
+        <div class="feat-name">Finances</div>
+        <p class="feat-desc">Revenus vs dépenses par véhicule. Rentabilité en temps réel. Prenez les bonnes décisions avec les bons chiffres.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">📧</span>
+        <div class="feat-name">Rappels Email</div>
+        <p class="feat-desc">Recevez chaque matin un email récapitulatif des CT et documents qui expirent bientôt. Ne ratez plus rien.</p>
+      </div>
+      <div class="feat-card">
+        <span class="feat-icon">👥</span>
+        <div class="feat-name">Multi-Utilisateurs</div>
+        <p class="feat-desc">Gérez votre équipe avec des rôles précis. Propriétaire, Admin, Membre. Chacun voit ce dont il a besoin.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BENTO -->
+<div class="bento-section reveal">
+  <div class="bento-grid">
+    <div class="bento-card wide">
+      <div class="bento-card-label">Tableau de bord</div>
+      <div class="bento-card-title">Vue 360°<br>de votre flotte</div>
+      <p class="bento-card-desc">KPI critiques, alertes prioritaires, prochains entretiens et rentabilité par véhicule — tout en un seul coup d'œil.</p>
+      <div class="bento-number">01</div>
+    </div>
+    <div class="bento-card">
+      <div class="bento-card-label">Alertes</div>
+      <div class="bento-card-title">Zéro oubli</div>
+      <p class="bento-card-desc">CT, permis, FCO, entretiens — chaque échéance déclenchée automatiquement.</p>
+      <div class="bento-number">02</div>
+    </div>
+    <div class="bento-card">
+      <div class="bento-card-label">Sécurité</div>
+      <div class="bento-card-title">Données<br>protégées</div>
+      <p class="bento-card-desc">Chiffrement bout en bout. Vos données vous appartiennent.</p>
+      <div class="bento-number">03</div>
+    </div>
+    <div class="bento-card wide">
+      <div class="bento-card-label">Rentabilité</div>
+      <div class="bento-card-title">Sachez exactement ce que rapporte chaque camion</div>
+      <p class="bento-card-desc">Comparez revenus et dépenses par véhicule, identifiez les moins rentables, optimisez votre flotte.</p>
+      <div class="bento-number">04</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<section id="pricing" class="pricing-section">
+  <div class="pricing-inner">
+    <div class="reveal">
+      <div class="section-eyebrow">Tarifs</div>
+      <h2 class="section-title">Simple.<br>Transparent.</h2>
+      <p class="section-sub">Commencez gratuitement. Passez à Pro quand vous en avez besoin.</p>
+    </div>
+    <div class="pricing-grid reveal">
+
+      <!-- Gratuit -->
+      <div class="price-card">
+        <div class="price-name">Gratuit</div>
+        <div class="price-amount">0€ <span class="price-period">/mois</span></div>
+        <div class="price-divider"></div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>2 véhicules</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Historique CT</div>
+        <div class="price-feature"><div class="price-dot"></div>Rappels email</div>
+        <div class="price-feature"><div class="price-dot"></div>Espaces de travail</div>
+        <div class="price-feature"><div class="price-dot"></div>Gestion employés</div>
+        <div class="price-feature"><div class="price-dot"></div>Module finances</div>
+        <a href="https://autoct.vercel.app" class="price-btn ghost">Commencer →</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="price-card featured">
+        <div style="position:absolute;top:20px;right:20px;background:var(--orange);color:#fff;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:4px">Populaire</div>
+        <div class="price-name">Pro</div>
+        <div class="price-amount">4,99€ <span class="price-period">/mois</span></div>
+        <div class="price-divider"></div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Véhicules illimités</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Historique CT complet</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Rappels email automatiques</div>
+        <div class="price-feature"><div class="price-dot"></div>Espaces de travail</div>
+        <div class="price-feature"><div class="price-dot"></div>Gestion employés</div>
+        <div class="price-feature"><div class="price-dot"></div>Module finances</div>
+        <a href="https://autoct.vercel.app" class="price-btn primary">Choisir Pro →</a>
+      </div>
+
+      <!-- Entreprise -->
+      <div class="price-card">
+        <div class="price-name">Entreprise</div>
+        <div class="price-amount">200€ <span class="price-period">/mois</span></div>
+        <div class="price-divider"></div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Véhicules illimités</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Rappels email automatiques</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Espaces de travail multi-users</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Gestion employés complète</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Module finances & rentabilité</div>
+        <div class="price-feature ok"><div class="price-dot ok"></div>Tableau de bord entreprise</div>
+        <a href="https://autoct.vercel.app" class="price-btn ghost">Contacter →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="testi-section">
+  <div class="reveal">
+    <div class="section-eyebrow">Témoignages</div>
+    <h2 class="section-title">Ils nous<br>font confiance</h2>
+  </div>
+  <div class="testi-grid reveal">
+    <div class="testi-card">
+      <p class="testi-quote">"AutoCT nous a évité une amende de 1500€ en nous alertant 14 jours avant l'expiration du CT de notre semi. Indispensable."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">🚛</div>
+        <div>
+          <div class="testi-name">Marc Lefevre</div>
+          <div class="testi-role">Gérant — Transport Lefevre & Fils</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <p class="testi-quote">"La gestion des cartes conducteur et des FCO depuis une seule interface, c'est exactement ce qu'il nous fallait. Simple et efficace."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">🏢</div>
+        <div>
+          <div class="testi-name">Sophie Martin</div>
+          <div class="testi-role">RH — Groupe Martin Logistics</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <p class="testi-quote">"Je sais enfin quels camions me coûtent de l'argent. Le module finances m'a aidé à optimiser ma flotte de 12 véhicules."</p>
+      <div class="testi-author">
+        <div class="testi-avatar">📊</div>
+        <div>
+          <div class="testi-name">Pierre Dubois</div>
+          <div class="testi-role">Directeur — DBL Transport</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-section">
+  <div class="cta-bg"></div>
+  <div class="reveal">
+    <h2 class="cta-title">Prêt à prendre<br>le <span>contrôle</span> ?</h2>
+    <p class="cta-sub">Rejoignez les professionnels du transport qui font confiance à AutoCT.<br>Gratuit pour commencer, sans carte bancaire.</p>
+    <a href="https://autoct.vercel.app" class="btn-primary" style="font-size:1.1rem;padding:16px 40px">Commencer gratuitement →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><div class="footer-logo-dot"></div>AutoCT</div>
+  <div class="footer-links">
+    <a href="#features" class="footer-link">Fonctionnalités</a>
+    <a href="#pricing" class="footer-link">Tarifs</a>
+    <a href="https://autoct.vercel.app" class="footer-link">Se connecter</a>
+  </div>
+  <div class="footer-copy">© 2026 AutoCT. Tous droits réservés.</div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
