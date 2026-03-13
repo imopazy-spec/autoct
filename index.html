@@ -1737,7 +1737,9 @@ const entretienIcons={'Vidange':'🛢️','Révision':'🔧','Contrôle techniqu
 async function loadEntretiens(){
   if(!currentUser)return;
   try{
-    const params=currentWorkspace?{'workspace_id':'eq.'+currentWorkspace.id,'order':'date.desc','select':'*'}:{'user_id':'eq.'+currentUser.id,'order':'date.desc','select':'*'};
+    const params=currentWorkspace
+      ?{'workspace_id':'eq.'+currentWorkspace.id,'order':'date.desc','select':'*'}
+      :{'user_id':'eq.'+currentUser.id,'workspace_id':'is.null','order':'date.desc','select':'*'};
     const data=await _rest('GET','entretiens',null,params);
     entretiens=data||[];
   }catch(e){console.error('loadEntretiens:',e);entretiens=[];}
@@ -1834,6 +1836,7 @@ async function saveEntretien(){
   const row={
     user_id:currentUser.id,
     workspace_id:currentWorkspace?currentWorkspace.id:null,
+    // workspace_id null = espace personnel
     vehicle_id:vehicleId,
     type:document.getElementById('entretienType').value,
     date:document.getElementById('entretienDate').value||null,
@@ -2091,13 +2094,15 @@ async function switchWorkspace(wsId){
   }
   // Recharger toutes les données du nouvel espace
   vehicles=[];history=[];employees=[];entretiens=[];
-  render(); // Afficher vide immédiatement
+  render();
   await loadFromSupabase();
   await loadEmployees();
   await loadEntretiens();
   save();render();
   renderWorkspacePicker();
   updateEntretienFilter();
+  renderEmployees();
+  renderEntretiens();
   toast(currentWorkspace?'Espace: '+currentWorkspace.name:'Espace personnel','success');
 }
 
