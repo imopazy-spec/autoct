@@ -2972,9 +2972,12 @@ async function switchWorkspace(wsId){
   closeModal('workspaceModal');
   if(!wsId){
     currentWorkspace=null;
+    localStorage.removeItem('ct_ws');
   }else{
     currentWorkspace=workspaces.find(w=>w.id===wsId)||null;
     if(currentWorkspace){
+      // Sauvegarder immédiatement
+      localStorage.setItem('ct_ws', currentWorkspace.id);
       // Charger mon rôle dans cet espace
       try{
         const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
@@ -2996,12 +2999,6 @@ async function switchWorkspace(wsId){
   renderEmployees();
   renderEntretiens();
   renderFinances();
-  // Sauvegarder l'espace actif
-  if(currentWorkspace){
-    localStorage.setItem('ct_ws',currentWorkspace.id);
-  }else{
-    localStorage.removeItem('ct_ws');
-  }
   toast(currentWorkspace?'Espace: '+currentWorkspace.name:'Espace personnel','success');
 }
 
