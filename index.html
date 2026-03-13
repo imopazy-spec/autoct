@@ -210,6 +210,17 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 .auth-btn:hover{opacity:.85}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-err{font-size:.8rem;color:var(--urgent);margin-top:10px;text-align:center;min-height:18px}
+/* PLANS */
+.plan-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.plan-card.featured{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.plan-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.plan-name{font-family:var(--font-display);font-size:1.1rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--ink)}
+.plan-price{font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--ink);margin-top:4px}
+.plan-period{font-size:.85rem;font-weight:400;color:var(--ink3)}
+.plan-badge{padding:4px 10px;border-radius:6px;font-size:.72rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.plan-features{display:flex;flex-direction:column;gap:8px}
+.plan-feat{font-size:.85rem;color:var(--ink)}
+.plan-feat.muted{color:var(--ink3)}
 /* DASHBOARD */
 .dash-section{margin-bottom:20px}
 .dash-section-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin-bottom:10px}
@@ -398,6 +409,81 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 <body>
 
 <!-- TOP NAV -->
+<!-- ══ PAGE ABONNEMENT ══ -->
+<div class="page" id="page-plans"><main>
+  <div class="page-hero" style="margin-top:8px">
+    <div class="page-hero-label">Abonnement</div>
+    <h1>Nos offres</h1>
+  </div>
+  <div id="currentPlanBanner" style="display:none;margin-bottom:20px"></div>
+  <div style="display:flex;flex-direction:column;gap:16px" id="plansList">
+
+    <!-- Gratuit -->
+    <div class="plan-card">
+      <div class="plan-header">
+        <div>
+          <div class="plan-name">Gratuit</div>
+          <div class="plan-price">0€<span class="plan-period">/mois</span></div>
+        </div>
+        <div class="plan-badge" style="background:var(--surface2);color:var(--ink2)">Actuel</div>
+      </div>
+      <div class="plan-features">
+        <div class="plan-feat">✅ 2 véhicules maximum</div>
+        <div class="plan-feat">✅ Historique CT</div>
+        <div class="plan-feat muted">❌ Rappels email</div>
+        <div class="plan-feat muted">❌ Espaces de travail</div>
+        <div class="plan-feat muted">❌ Gestion employés</div>
+        <div class="plan-feat muted">❌ Module finances</div>
+      </div>
+    </div>
+
+    <!-- Pro -->
+    <div class="plan-card featured">
+      <div class="plan-header">
+        <div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">4,99€<span class="plan-period">/mois</span></div>
+        </div>
+        <div class="plan-badge" style="background:var(--accent);color:#fff">Populaire</div>
+      </div>
+      <div class="plan-features">
+        <div class="plan-feat">✅ Véhicules illimités</div>
+        <div class="plan-feat">✅ Historique CT</div>
+        <div class="plan-feat">✅ Rappels email automatiques</div>
+        <div class="plan-feat muted">❌ Espaces de travail</div>
+        <div class="plan-feat muted">❌ Gestion employés</div>
+        <div class="plan-feat muted">❌ Module finances</div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:16px" onclick="subscribePlan('pro')">
+        Choisir Pro →
+      </button>
+    </div>
+
+    <!-- Entreprise -->
+    <div class="plan-card">
+      <div class="plan-header">
+        <div>
+          <div class="plan-name">Entreprise</div>
+          <div class="plan-price">200€<span class="plan-period">/mois</span></div>
+        </div>
+        <div class="plan-badge" style="background:var(--blue-dim);color:var(--blue)">Flotte</div>
+      </div>
+      <div class="plan-features">
+        <div class="plan-feat">✅ Véhicules illimités</div>
+        <div class="plan-feat">✅ Rappels email automatiques</div>
+        <div class="plan-feat">✅ Espaces de travail multi-users</div>
+        <div class="plan-feat">✅ Gestion employés (permis, FCO...)</div>
+        <div class="plan-feat">✅ Module finances & rentabilité</div>
+        <div class="plan-feat">✅ Tableau de bord entreprise</div>
+      </div>
+      <button class="btn" style="width:100%;justify-content:center;margin-top:16px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,0.3)" onclick="subscribePlan('entreprise')">
+        Choisir Entreprise →
+      </button>
+    </div>
+
+  </div>
+</main></div>
+
 <!-- DRAWER OVERLAY -->
 <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
 
@@ -418,6 +504,8 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
     <button class="drawer-nav-item" id="dnav-entretiens" onclick="switchTab('entretiens',this);closeDrawer()"><span class="nav-icon">🔧</span>Entretiens</button>
     <button class="drawer-nav-item" id="dnav-finances" onclick="switchTab('finances',this);closeDrawer()"><span class="nav-icon">💰</span>Finances</button>
     <button class="drawer-nav-item" id="dnav-employees" onclick="switchTab('employees',this);closeDrawer()"><span class="nav-icon">👷</span>Employés</button>
+    <div class="drawer-sep"></div>
+    <button class="drawer-nav-item" id="dnav-plans" onclick="switchTab('plans',this);closeDrawer()"><span class="nav-icon">💳</span>Abonnement</button>
     <div class="drawer-sep"></div>
     <button class="drawer-nav-item" id="dnav-history" onclick="switchTab('history',this);closeDrawer()"><span class="nav-icon">📋</span>Historique CT</button>
     <button class="drawer-nav-item" id="dnav-stats" onclick="switchTab('stats',this);closeDrawer()"><span class="nav-icon">📈</span>Statistiques</button>
@@ -1465,6 +1553,7 @@ function switchTab(name,el){
   if(name==='entretiens'){renderEntretiens();updateEntretienFilter();}
   if(name==='employees')renderEmployees();
   if(name==='settings')renderSettingsMembers();
+  if(name==='plans')renderPlans();
 }
 
 // ════════════════════════════════════════
@@ -1969,6 +2058,77 @@ async function saveHistoryToSupabase(h){
 async function deleteHistoryFromSupabase(id){
   if(!currentUser||typeof id!=='string')return;
   try{await _rest('DELETE','history?id=eq.'+id);}catch(e){}
+}
+
+// ════════════════════════════════════════
+// STRIPE / ABONNEMENTS
+// ════════════════════════════════════════
+const STRIPE_PK = 'pk_test_51TAT2JQOV50ZaPr1fhgE0AKC4EQhXmhcJWCQzIYzMy7LfO8cmrlZxqVpdw2hLuC0QjXz5B4CWu4yK0C95qDsni1w00nAMy3Nrk';
+const STRIPE_PRICES = {
+  pro: 'price_1TAT4IQOV50ZaPr1ywm0awf9',
+  entreprise: 'price_1TAT5oQOV50ZaPr1aRX9FEh3'
+};
+
+async function subscribePlan(plan){
+  if(!currentUser){toast('Connectez-vous d'abord','');return;}
+  const priceId=STRIPE_PRICES[plan];
+  if(!priceId)return;
+
+  toast('Redirection vers le paiement...','success');
+
+  // Créer session Stripe Checkout via Edge Function
+  try{
+    const resp=await fetch(`${SUPA_URL}/functions/v1/create-checkout`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'Authorization':'Bearer '+(_accessToken||'')
+      },
+      body:JSON.stringify({
+        priceId,
+        userId:currentUser.id,
+        email:currentUser.email,
+        successUrl:window.location.origin+'?checkout=success',
+        cancelUrl:window.location.origin+'?checkout=cancel'
+      })
+    });
+    const data=await resp.json();
+    if(data.url){
+      window.location.href=data.url;
+    }else{
+      toast('Erreur: '+( data.error||'inconnue'),'');
+    }
+  }catch(e){
+    toast('Erreur connexion','');
+    console.error(e);
+  }
+}
+
+function renderPlans(){
+  // Afficher le plan actuel
+  const banner=document.getElementById('currentPlanBanner');
+  if(!banner)return;
+  const plan=currentUser?._plan||'gratuit';
+  const labels={gratuit:'Gratuit',pro:'Pro',entreprise:'Entreprise'};
+  const colors={gratuit:'var(--surface2)',pro:'var(--accent-dim)',entreprise:'var(--blue-dim)'};
+  const textColors={gratuit:'var(--ink2)',pro:'var(--accent)',entreprise:'var(--blue)'};
+  banner.style.display='block';
+  banner.innerHTML=`<div style="padding:12px 16px;border-radius:var(--radius-sm);background:${colors[plan]};border:1px solid;border-color:${textColors[plan]};color:${textColors[plan]};font-weight:600;font-size:.85rem">
+    ✨ Votre plan actuel : <strong>${labels[plan]||plan}</strong>
+    ${plan!=='gratuit'?'<span style="float:right;font-size:.75rem;opacity:.7">Actif</span>':''}
+  </div>`;
+}
+
+// Vérifier si retour de checkout
+function checkCheckoutReturn(){
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('checkout')==='success'){
+    toast('🎉 Abonnement activé ! Bienvenue !','success');
+    window.history.replaceState({},'',window.location.pathname);
+  }else if(params.get('checkout')==='cancel'){
+    toast('Paiement annulé','');
+    window.history.replaceState({},'',window.location.pathname);
+  }
 }
 
 // ════════════════════════════════════════
