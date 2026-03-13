@@ -178,6 +178,18 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 .auth-btn:hover{opacity:.85}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-err{font-size:.8rem;color:var(--urgent);margin-top:10px;text-align:center;min-height:18px}
+/* EMPLOYÉS */
+.emp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.emp-header{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.emp-avatar{width:48px;height:48px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;border:2px solid var(--border2)}
+.emp-name{font-weight:700;font-size:1rem}
+.emp-contact{font-size:.8rem;color:var(--ink3)}
+.emp-badges{display:flex;flex-wrap:wrap;gap:8px}
+.emp-badge{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:8px;font-size:.75rem;font-weight:600}
+.emp-badge.ok{background:var(--ok-dim);color:var(--ok)}
+.emp-badge.warn{background:var(--warn-dim);color:var(--warn)}
+.emp-badge.urgent{background:var(--urgent-dim);color:var(--urgent)}
+.emp-badge.neutral{background:var(--surface2);color:var(--ink2)}
 /* WORKSPACE */
 .ws-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-sm);cursor:pointer;transition:background .15s}
 .ws-item:hover{background:var(--surface2)}
@@ -482,14 +494,66 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   </div>
 </div>
 
+<!-- ══ PAGE EMPLOYÉS ══ -->
+<div class="page" id="page-employees"><main>
+  <div class="page-hero" style="margin-top:8px">
+    <div class="page-hero-label">Gestion RH</div>
+    <h1>Employés</h1>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:16px">
+    <button class="btn btn-primary btn-sm" onclick="openEmployeeModal()">+ Ajouter</button>
+  </div>
+  <div id="employeeList"></div>
+</main></div>
+
 <!-- ══ BOTTOM NAV ══ -->
 <nav class="bottom-nav">
   <button class="nav-tab active" onclick="switchTab('home',this)"><span class="tab-icon">🏠</span>Accueil</button>
   <button class="nav-tab" onclick="switchTab('history',this)"><span class="tab-icon">📋</span>Historique</button>
-  <button class="nav-tab" onclick="switchTab('stats',this)"><span class="tab-icon">📊</span>Stats</button>
+  <button class="nav-tab" onclick="switchTab('employees',this)"><span class="tab-icon">👷</span>Employés</button>
   <button class="nav-tab" onclick="switchTab('map',this)"><span class="tab-icon">📍</span>Centres CT</button>
   <button class="nav-tab" onclick="switchTab('settings',this)"><span class="tab-icon">⚙️</span>Réglages</button>
 </nav>
+
+<!-- ══ MODAL EMPLOYÉ ══ -->
+<div class="modal-overlay" id="employeeModal"><div class="modal" style="max-width:520px">
+  <span class="modal-handle"></span>
+  <h2 class="modal-title" id="empModalTitle">Nouvel employé</h2>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="form-group"><label>Prénom</label><input type="text" id="empPrenom" placeholder="Jean"></div>
+    <div class="form-group"><label>Nom</label><input type="text" id="empNom" placeholder="Dupont"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div class="form-group"><label>Email</label><input type="email" id="empEmail" placeholder="jean@entreprise.com"></div>
+    <div class="form-group"><label>Téléphone</label><input type="tel" id="empTel" placeholder="06 12 34 56 78"></div>
+  </div>
+  <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
+    <div style="font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:10px">🪪 Permis de conduire</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>Catégories</label><input type="text" id="empPermis" placeholder="B, C, CE..."></div>
+      <div class="form-group"><label>Expiration permis</label><input type="date" id="empPermisExp"></div>
+    </div>
+  </div>
+  <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
+    <div style="font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:10px">📇 Carte conducteur</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>N° carte</label><input type="text" id="empCarte" placeholder="FR000000000"></div>
+      <div class="form-group"><label>Expiration carte</label><input type="date" id="empCarteExp"></div>
+    </div>
+  </div>
+  <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px">
+    <div style="font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:10px">🎓 Formations (FIMO/FCO)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>Date FIMO</label><input type="date" id="empFimo"></div>
+      <div class="form-group"><label>Date FCO</label><input type="date" id="empFco"></div>
+    </div>
+  </div>
+  <div class="form-group" style="margin-bottom:16px"><label>Notes</label><textarea id="empNotes" placeholder="Informations complémentaires..." style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none;resize:vertical;min-height:70px"></textarea></div>
+  <div style="display:flex;gap:10px">
+    <button class="btn" style="flex:1;background:var(--surface2)" onclick="closeModal('employeeModal')">Annuler</button>
+    <button class="btn btn-primary" style="flex:1" id="empSaveBtn" onclick="saveEmployee()">Enregistrer</button>
+  </div>
+</div></div>
 
 <!-- ══ MODAL VÉHICULE ══ -->
 <div class="modal-overlay" id="addModal"><div class="modal">
@@ -1594,6 +1658,146 @@ async function deleteHistoryFromSupabase(id){
 }
 
 // ════════════════════════════════════════
+// EMPLOYÉS
+// ════════════════════════════════════════
+let employees=[], editingEmpId=null;
+
+async function loadEmployees(){
+  if(!currentUser||!currentWorkspace)return;
+  try{
+    const data=await _rest('GET','employees',null,{'workspace_id':'eq.'+currentWorkspace.id,'order':'nom.asc','select':'*'});
+    employees=data||[];
+  }catch(e){console.error('loadEmployees:',e);employees=[];}
+  renderEmployees();
+}
+
+function getDocStatus(dateStr){
+  if(!dateStr)return{cls:'neutral',label:'Non renseigné'};
+  const days=daysUntil(dateStr);
+  if(days<0)return{cls:'urgent',label:`Expiré (${Math.abs(days)}j)`};
+  if(days<=30)return{cls:'warn',label:`Expire dans ${days}j`};
+  return{cls:'ok',label:`Valide (${days}j)`};
+}
+
+function renderEmployees(){
+  const el=document.getElementById('employeeList');
+  if(!el)return;
+  if(!currentWorkspace){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--ink3)">
+      <div style="font-size:2rem;margin-bottom:12px">👷</div>
+      <div style="font-weight:600;margin-bottom:6px">Espace pro requis</div>
+      <div style="font-size:.85rem">Sélectionnez un espace pro pour gérer les employés</div>
+    </div>`;
+    return;
+  }
+  if(!employees.length){
+    el.innerHTML=`<div style="text-align:center;padding:40px;color:var(--ink3)">
+      <div style="font-size:2rem;margin-bottom:12px">👷</div>
+      <div style="font-weight:600;margin-bottom:6px">Aucun employé</div>
+      <div style="font-size:.85rem">Ajoutez votre premier employé</div>
+    </div>`;
+    return;
+  }
+  el.innerHTML=employees.map(emp=>{
+    const permis=getDocStatus(emp.permis_expiration);
+    const carte=getDocStatus(emp.carte_expiration);
+    const fco=getDocStatus(emp.fco_date);
+    const initials=(emp.prenom?emp.prenom[0]:'')+(emp.nom?emp.nom[0]:'');
+    return `<div class="emp-card">
+      <div class="emp-header">
+        <div class="emp-avatar">${initials||'👷'}</div>
+        <div style="flex:1">
+          <div class="emp-name">${emp.prenom||''} ${emp.nom||''}</div>
+          <div class="emp-contact">${emp.email||''} ${emp.telephone?'· '+emp.telephone:''}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="icon-btn" onclick="openEditEmployee('${emp.id}')" title="Modifier">✏️</button>
+          <button class="icon-btn del" onclick="deleteEmployee('${emp.id}')" title="Supprimer">🗑</button>
+        </div>
+      </div>
+      <div class="emp-badges">
+        <div class="emp-badge ${permis.cls}">🪪 Permis ${emp.permis_categories||''} · ${permis.label}</div>
+        <div class="emp-badge ${carte.cls}">📇 Carte · ${carte.label}</div>
+        <div class="emp-badge ${fco.cls}">🎓 FCO · ${fco.label}</div>
+        ${emp.notes?`<div class="emp-badge neutral">📝 ${emp.notes.substring(0,30)}${emp.notes.length>30?'...':''}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openEmployeeModal(){
+  editingEmpId=null;
+  document.getElementById('empModalTitle').textContent='Nouvel employé';
+  document.getElementById('empSaveBtn').textContent='Enregistrer';
+  ['empPrenom','empNom','empEmail','empTel','empPermis','empCarte','empNotes'].forEach(id=>document.getElementById(id).value='');
+  ['empPermisExp','empCarteExp','empFimo','empFco'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('employeeModal').classList.add('open');
+}
+
+function openEditEmployee(id){
+  const emp=employees.find(e=>e.id===id);
+  if(!emp)return;
+  editingEmpId=id;
+  document.getElementById('empModalTitle').textContent='Modifier employé';
+  document.getElementById('empSaveBtn').textContent='Enregistrer';
+  document.getElementById('empPrenom').value=emp.prenom||'';
+  document.getElementById('empNom').value=emp.nom||'';
+  document.getElementById('empEmail').value=emp.email||'';
+  document.getElementById('empTel').value=emp.telephone||'';
+  document.getElementById('empPermis').value=emp.permis_categories||'';
+  document.getElementById('empPermisExp').value=emp.permis_expiration||'';
+  document.getElementById('empCarte').value=emp.carte_conducteur||'';
+  document.getElementById('empCarteExp').value=emp.carte_expiration||'';
+  document.getElementById('empFimo').value=emp.fimo_date||'';
+  document.getElementById('empFco').value=emp.fco_date||'';
+  document.getElementById('empNotes').value=emp.notes||'';
+  document.getElementById('employeeModal').classList.add('open');
+}
+
+async function saveEmployee(){
+  if(!currentWorkspace){toast('Sélectionnez un espace pro','');return;}
+  const row={
+    workspace_id:currentWorkspace.id,
+    user_id:currentUser.id,
+    prenom:document.getElementById('empPrenom').value.trim(),
+    nom:document.getElementById('empNom').value.trim(),
+    email:document.getElementById('empEmail').value.trim(),
+    telephone:document.getElementById('empTel').value.trim(),
+    permis_categories:document.getElementById('empPermis').value.trim(),
+    permis_expiration:document.getElementById('empPermisExp').value||null,
+    carte_conducteur:document.getElementById('empCarte').value.trim(),
+    carte_expiration:document.getElementById('empCarteExp').value||null,
+    fimo_date:document.getElementById('empFimo').value||null,
+    fco_date:document.getElementById('empFco').value||null,
+    notes:document.getElementById('empNotes').value.trim()
+  };
+  if(!row.nom&&!row.prenom){toast('Renseignez au moins un nom','');return;}
+  try{
+    if(editingEmpId){
+      await _rest('PATCH','employees?id=eq.'+editingEmpId,row);
+      const idx=employees.findIndex(e=>e.id===editingEmpId);
+      if(idx>=0)employees[idx]={...employees[idx],...row};
+    }else{
+      const data=await _rest('POST','employees',row);
+      if(data&&data[0])employees.push(data[0]);
+    }
+    closeModal('employeeModal');
+    renderEmployees();
+    toast('Employé enregistré','success');
+  }catch(e){console.error('saveEmployee:',e);toast('Erreur: '+e.message,'');}
+}
+
+async function deleteEmployee(id){
+  if(!confirm('Supprimer cet employé ?'))return;
+  try{
+    await _rest('DELETE','employees?id=eq.'+id);
+    employees=employees.filter(e=>e.id!==id);
+    renderEmployees();
+    toast('Employé supprimé','');
+  }catch(e){console.error('deleteEmployee:',e);}
+}
+
+// ════════════════════════════════════════
 // WORKSPACES
 // ════════════════════════════════════════
 let workspaces=[], currentWorkspace=null;
@@ -1673,9 +1877,10 @@ async function switchWorkspace(wsId){
   }else{
     currentWorkspace=workspaces.find(w=>w.id===wsId)||null;
   }
-  // Recharger les véhicules de cet espace
-  vehicles=[];history=[];
+  // Recharger les données de cet espace
+  vehicles=[];history=[];employees=[];
   await loadFromSupabase();
+  await loadEmployees();
   save();render();
   renderWorkspacePicker();
   updateEditButtons();
