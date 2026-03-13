@@ -541,7 +541,22 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
       <input type="email" id="settingsEmail" placeholder="votre@email.com" style="width:100%;padding:11px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-body);font-size:.9rem;color:var(--ink);outline:none" onfocus="this.style.borderColor='rgba(0,229,160,0.4)'" onblur="this.style.borderColor='var(--border2)';saveSettings()">
     </div>
   </div>
-  <div style="display:flex;gap:10px;margin-top:4px">
+  <!-- Gestion membres espace pro -->
+  <div id="settingsMembersSection" style="display:none;margin-top:16px">
+    <div class="settings-card">
+      <div style="font-weight:700;font-size:.85rem;color:var(--accent);margin-bottom:14px;text-transform:uppercase;letter-spacing:.08em">👥 Membres de l'espace pro</div>
+      <div id="settingsMembersList"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-size:.8rem;color:var(--ink3);margin-bottom:8px">Code d'invitation</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div id="settingsInviteCode" style="font-family:var(--font-mono);font-size:1rem;font-weight:700;color:var(--ink);background:var(--surface2);padding:8px 14px;border-radius:var(--radius-sm);letter-spacing:3px;flex:1"></div>
+          <button class="btn btn-primary btn-sm" onclick="copyInviteCode()">Copier</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-top:16px">
     <button class="btn btn-danger" style="flex:1;justify-content:center" onclick="showUserMenu()">🚪 Se déconnecter</button>
     <button class="btn" style="flex:1;justify-content:center;background:var(--surface2);color:var(--ink2);border:1px solid var(--border2)" onclick="resetData()">🗑 Effacer données</button>
   </div>
@@ -1449,6 +1464,7 @@ function switchTab(name,el){
   if(name==='finances'){renderFinances();updateFinanceFilter();}
   if(name==='entretiens'){renderEntretiens();updateEntretienFilter();}
   if(name==='employees')renderEmployees();
+  if(name==='settings')renderSettingsMembers();
 }
 
 // ════════════════════════════════════════
@@ -2563,6 +2579,51 @@ async function deleteEmployee(id){
 // ════════════════════════════════════════
 // GESTION MEMBRES
 // ════════════════════════════════════════
+async function renderSettingsMembers(){
+  const section=document.getElementById('settingsMembersSection');
+  const listEl=document.getElementById('settingsMembersList');
+  const codeEl=document.getElementById('settingsInviteCode');
+  if(!section)return;
+  // Afficher seulement si espace pro actif ET propriétaire
+  if(!currentWorkspace||!currentUser||currentWorkspace._myRole!=='owner'){
+    section.style.display='none';
+    return;
+  }
+  section.style.display='block';
+  if(codeEl)codeEl.textContent=currentWorkspace.invite_code||'';
+  if(!listEl)return;
+  listEl.innerHTML=`<div style="color:var(--ink3);font-size:.85rem">Chargement...</div>`;
+  try{
+    const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'select':'*'});
+    if(!members||!members.length){listEl.innerHTML='<div style="color:var(--ink3);font-size:.85rem">Aucun membre</div>';return;}
+    listEl.innerHTML=members.map(m=>{
+      const isMe=m.user_id===currentUser.id;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">
+          ${m.role==='owner'?'👑':m.role==='admin'?'🔧':'👤'}
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.85rem;color:var(--ink)">${isMe?'Vous':m.user_id.substring(0,12)+'...'}</div>
+          <div style="font-size:.75rem;color:var(--ink3)">${getRoleLabel(m.role)}</div>
+        </div>
+        ${!isMe?`<select onchange="updateMemberRole('${m.id}',this.value)" style="padding:5px 8px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.78rem;outline:none">
+          <option value="admin" ${m.role==='admin'?'selected':''}>Admin</option>
+          <option value="member" ${m.role==='member'?'selected':''}>Membre</option>
+        </select>
+        <button onclick="removeMember('${m.id}')" style="padding:5px 10px;background:var(--urgent-dim);color:var(--urgent);border:1px solid rgba(244,63,94,0.25);border-radius:var(--radius-sm);font-size:.75rem;cursor:pointer;font-family:var(--font-body)">Retirer</button>`:''}
+      </div>`;
+    }).join('');
+  }catch(e){listEl.innerHTML=`<div style="color:var(--urgent);font-size:.85rem">Erreur chargement</div>`;}
+}
+
+function copyInviteCode(){
+  const code=currentWorkspace?.invite_code||'';
+  navigator.clipboard.writeText(code).then(()=>toast('Code copié !','success')).catch(()=>{
+    const el=document.getElementById('settingsInviteCode');
+    if(el){const sel=window.getSelection();const range=document.createRange();range.selectNodeContents(el);sel.removeAllRanges();sel.addRange(range);}
+  });
+}
+
 async function openManageMembers(){
   if(!currentWorkspace)return;
   closeModal('workspaceModal');
