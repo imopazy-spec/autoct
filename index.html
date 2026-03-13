@@ -330,7 +330,7 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 
 /* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:flex;align-items:flex-end;justify-content:center;z-index:1000;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:300;opacity:0;pointer-events:none;transition:opacity .25s}
 @media(min-width:600px){.modal-overlay{align-items:center}}
 .modal-overlay.open{opacity:1;pointer-events:all}
 .modal{background:var(--surface);border:1px solid var(--border2);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-height:92vh;overflow-y:auto;transform:translateY(40px);transition:transform .3s cubic-bezier(.16,1,.3,1)}
@@ -547,6 +547,17 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   </div>
 </main></div>
 
+<!-- ══ MODAL GESTION MEMBRES ══ -->
+<div class="modal-overlay" id="manageMembersModal">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-header">
+      <div class="modal-title">👥 Gérer les membres</div>
+      <button class="modal-close" onclick="closeModal('manageMembersModal')">✕</button>
+    </div>
+    <div id="membersList" style="margin-bottom:16px"></div>
+  </div>
+</div>
+
 <!-- ══ MODAL WORKSPACE ══ -->
 <div class="modal-overlay" id="workspaceModal">
   <div class="modal" style="max-width:420px">
@@ -558,6 +569,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
     <div style="border-top:1px solid var(--border);padding-top:16px;display:flex;flex-direction:column;gap:10px">
       <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="openCreateWorkspace()">+ Créer un espace pro</button>
       <button class="btn" style="width:100%;justify-content:center;background:var(--surface2)" onclick="openJoinWorkspace()">🔑 Rejoindre avec un code</button>
+      ${currentWorkspace&&(currentWorkspace._myRole==='owner')?`<button class="btn" style="width:100%;justify-content:center;background:var(--surface2)" onclick="openManageMembers()">👥 Gérer les membres</button>`:''}
     </div>
   </div>
 </div>
@@ -1156,7 +1168,8 @@ function renderHome(){
         <span class="status-pill ${st.cls}">${st.label}</span>
       </div>
       <div class="vehicle-actions">
-        ${canEdit()?`<button class="icon-btn del" onclick="askDeleteVehicle('${v.id}')" title="Supprimer">🗑</button>`:''}
+        ${canEdit()?`<button class="icon-btn" onclick="openEditVehicle&&openEditVehicle('${v.id}')" title="Modifier">✏️</button>`:''}
+        ${canDelete()?`<button class="icon-btn del" onclick="askDeleteVehicle('${v.id}')" title="Supprimer">🗑</button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -2548,14 +2561,81 @@ async function deleteEmployee(id){
 }
 
 // ════════════════════════════════════════
+// GESTION MEMBRES
+// ════════════════════════════════════════
+async function openManageMembers(){
+  if(!currentWorkspace)return;
+  closeModal('workspaceModal');
+  document.getElementById('manageMembersModal').classList.add('open');
+  await loadMembers();
+}
+
+async function loadMembers(){
+  const el=document.getElementById('membersList');
+  if(!el)return;
+  el.innerHTML=`<div style="text-align:center;padding:20px;color:var(--ink3)">Chargement...</div>`;
+  try{
+    const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'select':'*'});
+    if(!members||!members.length){el.innerHTML='<div style="color:var(--ink3);text-align:center">Aucun membre</div>';return;}
+    el.innerHTML=members.map(m=>{
+      const isMe=m.user_id===currentUser.id;
+      return `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface2);border-radius:var(--radius-sm);margin-bottom:8px">
+        <div style="flex:1">
+          <div style="font-weight:600;font-size:.85rem">${isMe?'(Vous)':m.user_id.substring(0,8)+'...'}</div>
+          <div style="font-size:.75rem;color:var(--ink3)">${getRoleLabel(m.role)}</div>
+        </div>
+        ${!isMe&&currentWorkspace._myRole==='owner'?`
+        <select onchange="updateMemberRole('${m.id}',this.value)" style="padding:6px 10px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--ink);font-family:var(--font-body);font-size:.8rem;outline:none">
+          <option value="admin" ${m.role==='admin'?'selected':''}>Admin</option>
+          <option value="member" ${m.role==='member'?'selected':''}>Membre</option>
+        </select>
+        <button class="btn btn-danger btn-sm" onclick="removeMember('${m.id}')">Retirer</button>`:''}
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML='<div style="color:var(--urgent)">Erreur chargement</div>';}
+}
+
+async function updateMemberRole(memberId, newRole){
+  try{
+    await _rest('PATCH','workspace_members?id=eq.'+memberId,{role:newRole});
+    toast('Rôle mis à jour','success');
+    await loadMembers();
+  }catch(e){toast('Erreur','');}
+}
+
+async function removeMember(memberId){
+  if(!confirm('Retirer ce membre ?'))return;
+  try{
+    await _rest('DELETE','workspace_members?id=eq.'+memberId);
+    toast('Membre retiré','success');
+    await loadMembers();
+  }catch(e){toast('Erreur','');}
+}
+
+// ════════════════════════════════════════
 // WORKSPACES
 // ════════════════════════════════════════
 let workspaces=[], currentWorkspace=null;
 function canEdit(){
-  // Espace personnel -> toujours éditable
   if(!currentWorkspace)return true;
-  // Espace pro -> seulement le propriétaire
-  return currentWorkspace.owner_id===currentUser.id;
+  if(!currentUser)return false;
+  const role=currentWorkspace._myRole;
+  return role==='owner'||role==='admin';
+}
+function canDelete(){
+  if(!currentWorkspace)return true;
+  if(!currentUser)return false;
+  const role=currentWorkspace._myRole;
+  return role==='owner'||role==='admin';
+}
+function canAdd(){
+  // membres peuvent ajouter, seuls owner/admin peuvent modifier/supprimer
+  if(!currentWorkspace)return true;
+  if(!currentUser)return false;
+  return true; // tous les membres peuvent ajouter
+}
+function getRoleLabel(role){
+  return{owner:'👑 Propriétaire',admin:'🔧 Admin',member:'👤 Membre'}[role]||role;
 }
 
 async function loadWorkspaces(){
@@ -2570,6 +2650,17 @@ async function loadWorkspaces(){
     // Dédupliquer
     workspaces=workspaces.filter((w,i,a)=>a.findIndex(x=>x.id===w.id)===i);
   }catch(e){console.error('loadWorkspaces:',e);workspaces=[];}
+  // Restaurer le rôle si un espace est déjà sélectionné
+  if(currentWorkspace&&currentUser){
+    const ws=workspaces.find(w=>w.id===currentWorkspace.id);
+    if(ws){
+      currentWorkspace={...ws};
+      try{
+        const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
+        currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
+      }catch(e){currentWorkspace._myRole='member';}
+    }
+  }
   renderWorkspacePicker();
 }
 
@@ -2582,7 +2673,8 @@ function renderWorkspacePicker(){
     if(currentUser){
       dwsPicker.style.display='block';
       dwsIcon.textContent=currentWorkspace?'🏢':'👤';
-      dwsName.textContent=currentWorkspace?currentWorkspace.name:'Personnel';
+      const roleLabel=currentWorkspace&&currentWorkspace._myRole?` · ${getRoleLabel(currentWorkspace._myRole)}`:'';
+      dwsName.textContent=currentWorkspace?currentWorkspace.name+''+roleLabel:'Personnel';
     } else {
       dwsPicker.style.display='none';
     }
@@ -2639,6 +2731,13 @@ async function switchWorkspace(wsId){
     currentWorkspace=null;
   }else{
     currentWorkspace=workspaces.find(w=>w.id===wsId)||null;
+    if(currentWorkspace){
+      // Charger mon rôle dans cet espace
+      try{
+        const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
+        currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
+      }catch(e){currentWorkspace._myRole='member';}
+    }
   }
   // Recharger toutes les données du nouvel espace
   vehicles=[];history=[];employees=[];entretiens=[];finances=[];
