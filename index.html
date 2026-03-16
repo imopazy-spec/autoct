@@ -2037,6 +2037,8 @@ async function onLogin(user){
   save();
   render();
   renderWorkspacePicker();
+  // Charger le plan
+  await loadSubscription();
   // Vérifier si onboarding nécessaire
   await checkOnboarding();
   toast('Bienvenue '+displayName+' !','success');
@@ -2122,6 +2124,32 @@ async function deleteHistoryFromSupabase(id){
   if(!currentUser||typeof id!=='string')return;
   try{await _rest('DELETE','history?id=eq.'+id);}catch(e){}
 }
+
+// ════════════════════════════════════════
+// SUBSCRIPTION
+// ════════════════════════════════════════
+async function loadSubscription(){
+  if(!currentUser) return;
+  try{
+    const data = await _rest('GET','subscriptions',null,{'user_id':'eq.'+currentUser.id,'select':'plan,status,current_period_end'});
+    if(data && data.length>0 && data[0].status==='active'){
+      currentUser._plan = data[0].plan;
+      currentUser._planEnd = data[0].current_period_end;
+    } else {
+      currentUser._plan = 'gratuit';
+    }
+  }catch(e){
+    currentUser._plan = 'gratuit';
+  }
+}
+
+function getPlanLabel(){
+  const plans = {gratuit:'Gratuit',pro:'Pro ✨',entreprise:'Entreprise 🏢'};
+  return plans[currentUser?._plan||'gratuit']||'Gratuit';
+}
+
+function isPro(){return currentUser&&(currentUser._plan==='pro'||currentUser._plan==='entreprise');}
+function isEntreprise(){return currentUser&&currentUser._plan==='entreprise';}
 
 // ════════════════════════════════════════
 // ONBOARDING
@@ -2493,18 +2521,23 @@ async function subscribePlan(plan){
 }
 
 function renderPlans(){
-  // Afficher le plan actuel
   const banner=document.getElementById('currentPlanBanner');
   if(!banner)return;
   const plan=currentUser?._plan||'gratuit';
-  const labels={gratuit:'Gratuit',pro:'Pro',entreprise:'Entreprise'};
+  const labels={gratuit:'Gratuit',pro:'Pro ✨',entreprise:'Entreprise 🏢'};
   const colors={gratuit:'var(--surface2)',pro:'var(--accent-dim)',entreprise:'var(--blue-dim)'};
   const textColors={gratuit:'var(--ink2)',pro:'var(--accent)',entreprise:'var(--blue)'};
+  const endDate=currentUser?._planEnd?new Date(currentUser._planEnd).toLocaleDateString('fr-FR'):'';
   banner.style.display='block';
-  banner.innerHTML=`<div style="padding:12px 16px;border-radius:var(--radius-sm);background:${colors[plan]};border:1px solid;border-color:${textColors[plan]};color:${textColors[plan]};font-weight:600;font-size:.85rem">
-    ✨ Votre plan actuel : <strong>${labels[plan]||plan}</strong>
-    ${plan!=='gratuit'?'<span style="float:right;font-size:.75rem;opacity:.7">Actif</span>':''}
+  banner.innerHTML=`<div style="padding:12px 16px;border-radius:var(--radius-sm);background:${colors[plan]};border:1px solid;border-color:${textColors[plan]};color:${textColors[plan]};font-weight:600;font-size:.85rem;display:flex;justify-content:space-between;align-items:center">
+    <span>✨ Plan actuel : <strong>${labels[plan]||plan}</strong></span>
+    ${endDate&&plan!=='gratuit'?`<span style="font-size:.75rem;opacity:.7">Renouvellement : ${endDate}</span>`:''}
   </div>`;
+
+  // Masquer le bouton du plan actuel
+  document.querySelectorAll('.plan-card .btn-primary, .plan-card .btn').forEach(btn=>{
+    btn.style.display='';
+  });
 }
 
 // Vérifier si retour de checkout
