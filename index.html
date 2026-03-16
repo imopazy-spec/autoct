@@ -2206,6 +2206,9 @@ async function exportVehiclePDF(vehicleId){
 
   const {jsPDF} = window.jspdf;
   const doc = new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  // Fond sombre sur toute la page
+  doc.setFillColor(20,22,24);
+  doc.rect(0,0,210,297,'F');
   const W=210, margin=20;
   let y=20;
 
@@ -2410,9 +2413,9 @@ async function exportVehiclePDF(vehicleId){
 
     const finW=(W-margin*2)/3;
     const finData=[
-      {label:'REVENUS',val:revenus.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€',color:[34,197,94]},
-      {label:'DÉPENSES',val:depenses.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€',color:[244,63,94]},
-      {label:'RENTABILITÉ',val:(rentabilite>=0?'+':'')+rentabilite.toLocaleString('fr-FR',{minimumFractionDigits:2})+'€',color:rentabilite>=0?[34,197,94]:[244,63,94]},
+      {label:'REVENUS',val:revenus.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,' ')+'€',color:[34,197,94]},
+      {label:'DÉPENSES',val:depenses.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,' ')+'€',color:[244,63,94]},
+      {label:'RENTABILITÉ',val:(rentabilite>=0?'+':'')+rentabilite.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,' ')+'€',color:rentabilite>=0?[34,197,94]:[244,63,94]},
     ];
     finData.forEach((f,i)=>{
       const fx=margin+i*finW;
@@ -2637,6 +2640,26 @@ function renderDashboard(){
           </div>
         </div>`;
       }).join(''):`<div class="dash-empty">Aucun entretien planifié</div>`}
+    </div>
+
+    <!-- Véhicules -->
+    <div class="dash-section">
+      <div class="dash-section-title">🚗 Véhicules (${totalVeh})</div>
+      ${vehicles.length?vehicles.map(v=>{
+        const st=ctStatus(v);
+        return`<div class="dash-entretien-row">
+          <span style="font-size:1.4rem">${vehicleIcon(v.marque)}</span>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:.85rem">${v.marque} ${v.modele}</div>
+            <div style="font-size:.75rem;color:var(--ink3)">${v.plaque||'—'} · ${v.owner||''}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="chip chip-${st.cls}" style="font-size:.7rem">${st.label}</span>
+            ${canEdit()?`<button class="icon-btn" onclick="openEditVehicle('${v.id}')" title="Modifier" style="width:30px;height:30px;font-size:.85rem">✏️</button>`:''}
+            <button class="icon-btn" onclick="exportVehiclePDF('${v.id}')" title="PDF" style="width:30px;height:30px;font-size:.85rem">📄</button>
+          </div>
+        </div>`;
+      }).join(''):`<div class="dash-empty">Aucun véhicule enregistré</div>`}
     </div>
 
     <!-- Rentabilité par véhicule -->
