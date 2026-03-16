@@ -930,8 +930,8 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 <!-- ══ MODAL VÉHICULE ══ -->
 <div class="modal-overlay" id="addModal"><div class="modal">
   <span class="modal-handle"></span>
-  <h2 class="modal-title">Nouveau véhicule</h2>
-  <p class="modal-sub">Ajoutez un véhicule à surveiller.</p>
+  <h2 class="modal-title" id="addModalTitle">Nouveau véhicule</h2>
+  <p class="modal-sub" id="addModalSub">Ajoutez un véhicule à surveiller.</p>
   <div class="form-row">
     <div class="form-group"><label>Marque</label><input type="text" id="inputMarque" placeholder="Renault"></div>
     <div class="form-group"><label>Modèle</label><input type="text" id="inputModele" placeholder="Clio"></div>
@@ -947,7 +947,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   <div class="form-group"><label>Email propriétaire</label><input type="email" id="inputEmail" placeholder="email@exemple.com"></div>
   <div class="modal-actions">
     <button class="btn btn-ghost" onclick="closeModal('addModal')">Annuler</button>
-    <button class="btn btn-primary" onclick="saveVehicle()">Enregistrer</button>
+    <button class="btn btn-primary" id="addModalSaveBtn" onclick="saveVehicle()">Enregistrer</button>
   </div>
 </div></div>
 
@@ -1591,7 +1591,37 @@ function formatPlaque(input){
   else f=v.slice(0,2)+'-'+v.slice(2,5)+'-'+v.slice(5,7);
   input.value=f;
 }
-function openAddModal(){document.getElementById('addModal').classList.add('open');}
+let _editingVehicleId = null;
+function openAddModal(){
+  _editingVehicleId = null;
+  document.getElementById('addModalTitle').textContent = 'Nouveau véhicule';
+  document.getElementById('addModalSub').textContent = 'Ajoutez un véhicule à surveiller.';
+  document.getElementById('addModalSaveBtn').textContent = 'Enregistrer';
+  document.getElementById('inputMarque').value='';
+  document.getElementById('inputModele').value='';
+  document.getElementById('inputPlaque').value='';
+  document.getElementById('inputOwner').value='';
+  document.getElementById('inputDateCT').value='';
+  document.getElementById('inputKm').value='';
+  document.getElementById('inputEmail').value='';
+  document.getElementById('addModal').classList.add('open');
+}
+function openEditVehicle(id){
+  const v = vehicles.find(x=>x.id===id);
+  if(!v) return;
+  _editingVehicleId = id;
+  document.getElementById('addModalTitle').textContent = 'Modifier le véhicule';
+  document.getElementById('addModalSub').textContent = 'Modifiez les informations du véhicule.';
+  document.getElementById('addModalSaveBtn').textContent = 'Mettre à jour';
+  document.getElementById('inputMarque').value = v.marque||'';
+  document.getElementById('inputModele').value = v.modele||'';
+  document.getElementById('inputPlaque').value = v.plaque||'';
+  document.getElementById('inputOwner').value = v.owner||'';
+  document.getElementById('inputDateCT').value = v.dateCT||'';
+  document.getElementById('inputKm').value = v.km||'';
+  document.getElementById('inputEmail').value = v.email||'';
+  document.getElementById('addModal').classList.add('open');
+}
 async function saveVehicle(){
   const marque=document.getElementById('inputMarque').value.trim();
   const modele=document.getElementById('inputModele').value.trim();
