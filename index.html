@@ -1995,16 +1995,9 @@ async function onLogin(user){
   const displayName = user.user_metadata&&user.user_metadata.full_name ? user.user_metadata.full_name : user.email.split('@')[0];
   chip.textContent='👤 '+displayName;
   render();
-  // 1. Charger workspaces EN PREMIER pour restaurer l'espace actif
+  // 1. Charger workspaces EN PREMIER
   await loadWorkspaces();
-  // Charger le rôle si workspace restauré
-  if(currentWorkspace&&currentUser){
-    try{
-      const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
-      currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
-    }catch(e){currentWorkspace._myRole='member';}
-  }
-  // 2. Charger les données de l'espace actif
+  // 2. Charger les données de l'espace restauré
   await loadFromSupabase();
   await loadEmployees();
   await loadEntretiens();
@@ -2982,25 +2975,20 @@ async function loadWorkspaces(){
     // Dédupliquer
     workspaces=workspaces.filter((w,i,a)=>a.findIndex(x=>x.id===w.id)===i);
   }catch(e){console.error('loadWorkspaces:',e);workspaces=[];}
-  // Restaurer l'espace sauvegardé
+  // Restaurer l'espace sauvegardé depuis localStorage
   const savedWsId=localStorage.getItem('ct_ws');
-  if(savedWsId&&!currentWorkspace){
+  currentWorkspace=null; // reset avant restauration
+  if(savedWsId){
     const ws=workspaces.find(w=>w.id===savedWsId);
     if(ws){
       currentWorkspace={...ws};
       try{
         const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
         currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
-      }catch(e){currentWorkspace._myRole='member';}
-    }
-  } else if(currentWorkspace&&currentUser){
-    const ws=workspaces.find(w=>w.id===currentWorkspace.id);
-    if(ws){
-      currentWorkspace={...ws};
-      try{
-        const members=await _rest('GET','workspace_members',null,{'workspace_id':'eq.'+currentWorkspace.id,'user_id':'eq.'+currentUser.id,'select':'role'});
-        currentWorkspace._myRole=(members&&members[0])?members[0].role:'member';
-      }catch(e){currentWorkspace._myRole='member';}
+      }catch(e){currentWorkspace._myRole='owner';}
+    }else{
+      // Espace introuvable - nettoyer
+      localStorage.removeItem('ct_ws');
     }
   }
   renderWorkspacePicker();
