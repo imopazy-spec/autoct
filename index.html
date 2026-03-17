@@ -1130,7 +1130,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
       <div style="height:1px;background:rgba(249,115,22,0.2);margin:20px 0"></div>
       <div class="auth-pro-price">200€ <span class="auth-pro-period">/mois</span></div>
       <div style="font-size:.78rem;color:var(--ink3);margin-bottom:4px">Sans engagement · Résiliable à tout moment</div>
-      <button class="auth-pro-btn" onclick="switchAuthTab('signup');setTimeout(()=>subscribePlan('entreprise'),500)">
+      <button class="auth-pro-btn" onclick="startProSignup()">
         Démarrer l'offre Entreprise →
       </button>
       <div style="font-size:.75rem;color:var(--ink3);text-align:center;margin-top:12px">Créez votre compte puis procédez au paiement</div>
@@ -1148,6 +1148,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 const SUPA_URL='https://wihcjzjxeqbspbpaknro.supabase.co';
 const SUPA_KEY='sb_publishable_gtJJ53FE9IxWxG5zTtZlzQ_OHCvYYL4';
 let currentUser=null, _accessToken=null, _refreshToken=null;
+let _pendingPlan=null;
 
 // ── Helpers REST ──
 function _headers(extra={}){
@@ -2032,6 +2033,13 @@ function setMapStatus(icon,msg){const s=document.getElementById('mapStatus');s.s
 // ════════════════════════════════════════
 // AUTH & SUPABASE SYNC
 // ════════════════════════════════════════
+function startProSignup(){
+  localStorage.setItem('ct_intent','entreprise');
+  switchAuthTab('signup');
+  // Scroll vers le formulaire
+  document.getElementById('signupEmail').focus();
+}
+
 function switchAuthTab(tab){
   document.getElementById('tabLogin').classList.toggle('active',tab==='login');
   document.getElementById('tabSignup').classList.toggle('active',tab==='signup');
@@ -2112,7 +2120,15 @@ async function onLogin(user){
   await loadSubscription();
   // Vérifier si onboarding nécessaire
   await checkOnboarding();
-  toast('Bienvenue '+displayName+' !','success');
+  // Vérifier intention pro
+  const intent = localStorage.getItem('ct_intent');
+  if(intent){
+    localStorage.removeItem('ct_intent');
+    toast('Bienvenue '+displayName+' ! Redirection vers le paiement...','success');
+    setTimeout(()=>subscribePlan(intent), 1500);
+  } else {
+    toast('Bienvenue '+displayName+' !','success');
+  }
 }
 
 function showUserMenu(){
@@ -2194,6 +2210,42 @@ async function saveHistoryToSupabase(h){
 async function deleteHistoryFromSupabase(id){
   if(!currentUser||typeof id!=='string')return;
   try{await _rest('DELETE','history?id=eq.'+id);}catch(e){}
+}
+
+function startEntrepriseFlow(){
+  if(currentUser){
+    // Déjà connecté → lancer Stripe directement
+    subscribePlan('entreprise');
+  } else {
+    // Pas connecté → mémoriser et basculer sur inscription
+    _pendingPlan = 'entreprise';
+    switchAuthTab('signup');
+    toast('Créez votre compte pour continuer vers le paiement','success');
+  }
+}
+
+function startEnterpriseSignup(){
+  // Si déjà connecté → lancer Stripe directement
+  if(currentUser){
+    subscribePlan('entreprise');
+    return;
+  }
+  // Sinon → aller sur inscription et stocker l'intention
+  localStorage.setItem('ct_intent','entreprise');
+  switchAuthTab('signup');
+  // Scroll vers le formulaire
+  document.getElementById('authScreen').scrollIntoView({behavior:'smooth'});
+  toast('Créez votre compte puis vous serez redirigé vers le paiement','success');
+}
+
+function startEnterpriseSignup(){
+  _pendingPlan='entreprise';
+  switchAuthTab('signup');
+  // Scroller vers le formulaire
+  document.getElementById('authScreen').scrollIntoView({behavior:'smooth'});
+  // Montrer un message
+  const err=document.getElementById('signupErr');
+  if(err){err.style.color='var(--accent)';err.textContent='✨ Créez votre compte pour accéder au plan Entreprise';}
 }
 
 function showUpgradeModal(msg){
@@ -2560,6 +2612,14 @@ const STRIPE_PRICES = {
   pro: 'price_1TAT4IQOV50ZaPr1ywm0awf9',
   entreprise: 'price_1TAT5oQOV50ZaPr1aRX9FEh3'
 };
+
+
+function startProSignup(){
+  _pendingPlan = 'entreprise';
+  switchAuthTab('signup');
+  // Mettre en valeur le formulaire
+  document.getElementById('signupEmail').focus();
+}
 
 async function subscribePlan(plan){
   if(!currentUser){toast('Connectez-vous dabord','');return;}
