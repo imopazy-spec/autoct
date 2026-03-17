@@ -197,7 +197,7 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 
 /* ── AUTH SCREEN ── */
 #authScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px}
-.auth-box{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px 28px}
+.auth-box{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px 28px;max-height:90vh;overflow-y:auto}
 .auth-screen-inner{display:flex;gap:24px;width:100%;max-width:900px;align-items:flex-start}
 .auth-pro-card{flex:1;background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(249,115,22,0.02));border:1px solid rgba(249,115,22,0.3);border-radius:20px;padding:32px 28px;display:none}
 @media(min-width:768px){.auth-box{flex:1}.auth-pro-card{display:block}}
@@ -1072,26 +1072,26 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
         <div class="auth-err" id="loginErr"></div>
       </div>
       <div id="authSignup" style="display:none">
-        <div class="auth-title">Créer un compte</div>
-        <div class="auth-sub">Informations de votre entreprise pour la facturation.</div>
+        <div class="auth-title" style="font-size:1.1rem">Créer un compte</div>
+        <div class="auth-sub" style="margin-bottom:12px;font-size:.8rem">Informations entreprise pour la facturation.</div>
         
-        <div class="auth-field"><label>Nom de l'entreprise *</label><input type="text" id="signupCompany" placeholder="Transport Dupont SARL"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="auth-field"><label>SIRET *</label><input type="text" id="signupSiret" placeholder="123 456 789 00012" maxlength="17"></div>
-          <div class="auth-field"><label>N° TVA</label><input type="text" id="signupTva" placeholder="FR12345678901"></div>
+        <div class="auth-field" style="margin-bottom:8px"><label style="font-size:.7rem">Nom entreprise *</label><input type="text" id="signupCompany" placeholder="Transport Dupont SARL" style="padding:8px 12px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0">
+          <div class="auth-field" style="margin-bottom:8px"><label style="font-size:.7rem">SIRET *</label><input type="text" id="signupSiret" placeholder="123 456 789" maxlength="17" style="padding:8px 12px"></div>
+          <div class="auth-field" style="margin-bottom:8px"><label style="font-size:.7rem">N° TVA</label><input type="text" id="signupTva" placeholder="FR12345678" style="padding:8px 12px"></div>
         </div>
-        <div class="auth-field"><label>Adresse *</label><input type="text" id="signupAddress" placeholder="12 rue des Transporteurs"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="auth-field"><label>Code postal *</label><input type="text" id="signupPostal" placeholder="75001" maxlength="5"></div>
-          <div class="auth-field"><label>Ville *</label><input type="text" id="signupCity" placeholder="Paris"></div>
+        <div class="auth-field" style="margin-bottom:8px"><label style="font-size:.7rem">Adresse *</label><input type="text" id="signupAddress" placeholder="12 rue des Transporteurs" style="padding:8px 12px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="auth-field" style="margin-bottom:8px"><label style="font-size:.7rem">Code postal *</label><input type="text" id="signupPostal" placeholder="75001" maxlength="5" style="padding:8px 12px"></div>
+          <div class="auth-field" style="margin-bottom:8px"><label style="font-size:.7rem">Ville *</label><input type="text" id="signupCity" placeholder="Paris" style="padding:8px 12px"></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="auth-field"><label>Téléphone</label><input type="text" id="signupPhone" placeholder="06 12 34 56 78"></div>
-          <div class="auth-field"><label>Email facturation</label><input type="email" id="signupBillingEmail" placeholder="compta@entreprise.fr"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div class="auth-field" style="margin-bottom:8px"><label style="font-size:.7rem">Téléphone</label><input type="text" id="signupPhone" placeholder="06 12 34 56 78" style="padding:8px 12px"></div>
+          <div class="auth-field" style="margin-bottom:8px"><label style="font-size:.7rem">Email facturation</label><input type="email" id="signupBillingEmail" placeholder="compta@..." style="padding:8px 12px"></div>
         </div>
-        <div style="height:1px;background:var(--border);margin:12px 0"></div>
-        <div class="auth-field"><label>Email de connexion *</label><input type="email" id="signupEmail" placeholder="vous@email.com"></div>
-        <div class="auth-field"><label>Mot de passe *</label><input type="password" id="signupPass" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')doSignup()"></div>
+        <div style="height:1px;background:var(--border);margin:8px 0"></div>
+        <div class="auth-field" style="margin-bottom:8px"><label style="font-size:.7rem">Email connexion *</label><input type="email" id="signupEmail" placeholder="vous@email.com" style="padding:8px 12px"></div>
+        <div class="auth-field" style="margin-bottom:10px"><label style="font-size:.7rem">Mot de passe *</label><input type="password" id="signupPass" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')doSignup()" style="padding:8px 12px"></div>
         <button class="auth-btn" id="signupBtn" onclick="doSignup()">Créer mon compte →</button>
         <div class="auth-err" id="signupErr"></div>
       </div>
