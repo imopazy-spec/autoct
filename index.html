@@ -6,6 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="AutoCT">
 <meta name="theme-color" content="#1A1C1E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AutoCT">
+<link rel="manifest" href="/manifest.json">
 <title>AutoCT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
@@ -435,6 +439,15 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 <body>
 
 <!-- TOP NAV -->
+<!-- ══ PAGE PROFIL ══ -->
+<div class="page" id="page-profile" style="padding-top:0"><main>
+  <div class="page-hero" style="margin-top:8px">
+    <div class="page-hero-label">Mon compte</div>
+    <h1>Profil</h1>
+  </div>
+  <div id="profileContent"></div>
+</main></div>
+
 <!-- ══ PAGE ABONNEMENT ══ -->
 <div class="page" id="page-plans" style="padding-top:0"><main>
   <div class="page-hero" style="margin-top:8px">
@@ -531,6 +544,7 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
     <button class="drawer-nav-item" id="dnav-finances" onclick="switchTab('finances',this);closeDrawer()"><span class="nav-icon">💰</span>Finances</button>
     <button class="drawer-nav-item" id="dnav-employees" onclick="switchTab('employees',this);closeDrawer()"><span class="nav-icon">👷</span>Employés</button>
     <div class="drawer-sep"></div>
+    <button class="drawer-nav-item" id="dnav-profile" onclick="switchTab('profile',this);closeDrawer()"><span class="nav-icon">👤</span>Mon profil</button>
     <button class="drawer-nav-item" id="dnav-plans" onclick="switchTab('plans',this);closeDrawer()"><span class="nav-icon">💳</span>Abonnement</button>
     <div class="drawer-sep"></div>
     <button class="drawer-nav-item" id="dnav-history" onclick="switchTab('history',this);closeDrawer()"><span class="nav-icon">📋</span>Historique CT</button>
@@ -1581,6 +1595,7 @@ function switchTab(name,el){
   if(name==='employees')renderEmployees();
   if(name==='settings')renderSettingsMembers();
   if(name==='plans')renderPlans();
+  if(name==='profile')renderProfile();
 }
 
 // ════════════════════════════════════════
@@ -1595,6 +1610,11 @@ function formatPlaque(input){
 }
 let _editingVehicleId = null;
 function openAddModal(){
+  // Vérifier limite plan gratuit
+  if(!isPro() && !_editingVehicleId && vehicles.length >= 2){
+    showUpgradeModal('Vous avez atteint la limite de 2 véhicules du plan Gratuit.');
+    return;
+  }
   _editingVehicleId = null;
   document.getElementById('addModalTitle').textContent = 'Nouveau véhicule';
   document.getElementById('addModalSub').textContent = 'Ajoutez un véhicule à surveiller.';
@@ -2125,6 +2145,11 @@ async function deleteHistoryFromSupabase(id){
   try{await _rest('DELETE','history?id=eq.'+id);}catch(e){}
 }
 
+function showUpgradeModal(msg){
+  document.getElementById('upgradeMsg').textContent = msg||'Passez à Pro pour débloquer cette fonctionnalité.';
+  document.getElementById('upgradeModal').classList.add('open');
+}
+
 // ════════════════════════════════════════
 // SUBSCRIPTION
 // ════════════════════════════════════════
@@ -2518,6 +2543,70 @@ async function subscribePlan(plan){
     toast('Erreur connexion','');
     console.error(e);
   }
+}
+
+function renderProfile(){
+  const el=document.getElementById('profileContent');
+  if(!el||!currentUser)return;
+  const plan=currentUser._plan||'gratuit';
+  const planLabels={gratuit:'Gratuit',pro:'Pro ✨',entreprise:'Entreprise 🏢'};
+  const planColors={gratuit:'var(--ink3)',pro:'var(--accent)',entreprise:'var(--blue)'};
+  const displayName=currentUser.user_metadata?.full_name||currentUser.email.split('@')[0];
+
+  el.innerHTML=`
+    <!-- Avatar -->
+    <div style="display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px">
+      <div style="width:56px;height:56px;border-radius:14px;background:var(--accent-dim);display:flex;align-items:center;justify-content:center;font-size:1.6rem;border:2px solid var(--accent)">
+        ${currentUser.user_metadata?.avatar_url?`<img src="${currentUser.user_metadata.avatar_url}" style="width:100%;height:100%;border-radius:12px;object-fit:cover">`:'👤'}
+      </div>
+      <div style="flex:1">
+        <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink)">${displayName}</div>
+        <div style="font-size:.82rem;color:var(--ink3);margin-top:2px">${currentUser.email}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${planColors[plan]};background:rgba(0,0,0,.3);padding:4px 10px;border-radius:6px;border:1px solid ${planColors[plan]}">${planLabels[plan]}</div>
+      </div>
+    </div>
+
+    <!-- Infos compte -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px">
+      <div style="font-family:var(--font-display);font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink2);margin-bottom:16px">Informations</div>
+      <div style="display:grid;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:.85rem;color:var(--ink2)">Email</span>
+          <span style="font-size:.85rem;font-weight:500;color:var(--ink)">${currentUser.email}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:.85rem;color:var(--ink2)">Plan</span>
+          <span style="font-size:.85rem;font-weight:600;color:${planColors[plan]}">${planLabels[plan]}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:.85rem;color:var(--ink2)">Véhicules</span>
+          <span style="font-size:.85rem;font-weight:500;color:var(--ink)">${vehicles.length} ${!isPro()?'/ 2':''}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0">
+          <span style="font-size:.85rem;color:var(--ink2)">Espace actif</span>
+          <span style="font-size:.85rem;font-weight:500;color:var(--ink)">${currentWorkspace?currentWorkspace.name:'Personnel'}</span>
+        </div>
+      </div>
+    </div>
+
+    ${!isPro()?`
+    <!-- Upgrade banner -->
+    <div style="background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--radius);padding:20px;margin-bottom:16px;text-align:center">
+      <div style="font-size:1.4rem;margin-bottom:8px">🚀</div>
+      <div style="font-family:var(--font-display);font-size:1rem;font-weight:700;text-transform:uppercase;color:var(--accent);margin-bottom:6px">Passez à Pro</div>
+      <div style="font-size:.82rem;color:var(--ink2);margin-bottom:16px">Véhicules illimités, rappels email, et plus encore.</div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="switchTab('plans',null)">Voir les offres → 4,99€/mois</button>
+    </div>`:''}
+
+    <!-- Actions -->
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn" style="width:100%;justify-content:center;background:var(--surface);border:1px solid var(--border)" onclick="showUserMenu()">
+        🚪 Se déconnecter
+      </button>
+    </div>
+  `;
 }
 
 function renderPlans(){
