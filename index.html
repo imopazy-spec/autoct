@@ -468,67 +468,33 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   <div id="currentPlanBanner" style="display:none;margin-bottom:20px"></div>
   <div style="display:flex;flex-direction:column;gap:16px" id="plansList">
 
-    <!-- Gratuit -->
-    <div class="plan-card">
-      <div class="plan-header">
-        <div>
-          <div class="plan-name">Gratuit</div>
-          <div class="plan-price">0€<span class="plan-period">/mois</span></div>
-        </div>
-        <div class="plan-badge" style="background:var(--surface2);color:var(--ink2)">Actuel</div>
-      </div>
-      <div class="plan-features">
-        <div class="plan-feat">✅ 2 véhicules maximum</div>
-        <div class="plan-feat">✅ Historique CT</div>
-        <div class="plan-feat muted">❌ Rappels email</div>
-        <div class="plan-feat muted">❌ Espaces de travail</div>
-        <div class="plan-feat muted">❌ Gestion employés</div>
-        <div class="plan-feat muted">❌ Module finances</div>
-      </div>
-    </div>
-
-    <!-- Pro -->
+    <!-- Plan unique Entreprise -->
     <div class="plan-card featured">
       <div class="plan-header">
         <div>
-          <div class="plan-name">Pro</div>
-          <div class="plan-price">4,99€<span class="plan-period">/mois</span></div>
-        </div>
-        <div class="plan-badge" style="background:var(--accent);color:#fff">Populaire</div>
-      </div>
-      <div class="plan-features">
-        <div class="plan-feat">✅ Véhicules illimités</div>
-        <div class="plan-feat">✅ Historique CT</div>
-        <div class="plan-feat">✅ Rappels email automatiques</div>
-        <div class="plan-feat muted">❌ Espaces de travail</div>
-        <div class="plan-feat muted">❌ Gestion employés</div>
-        <div class="plan-feat muted">❌ Module finances</div>
-      </div>
-      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:16px" onclick="subscribePlan('pro')">
-        Choisir Pro →
-      </button>
-    </div>
-
-    <!-- Entreprise -->
-    <div class="plan-card">
-      <div class="plan-header">
-        <div>
           <div class="plan-name">Entreprise</div>
-          <div class="plan-price">200€<span class="plan-period">/mois</span></div>
+          <div class="plan-price">200€<span class="plan-period"> TTC/mois</span></div>
         </div>
-        <div class="plan-badge" style="background:var(--blue-dim);color:var(--blue)">Flotte</div>
+        <div class="plan-badge" style="background:var(--accent);color:#fff">Tout inclus</div>
+      </div>
+      <div style="background:var(--accent-dim);border:1px solid rgba(249,115,22,0.2);border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:.82rem;color:var(--accent);font-weight:600">
+        🎁 1 mois gratuit — Aucune carte bancaire requise pour l'essai
       </div>
       <div class="plan-features">
         <div class="plan-feat">✅ Véhicules illimités</div>
+        <div class="plan-feat">✅ Historique CT complet</div>
         <div class="plan-feat">✅ Rappels email automatiques</div>
-        <div class="plan-feat">✅ Espaces de travail multi-users</div>
-        <div class="plan-feat">✅ Gestion employés (permis, FCO...)</div>
+        <div class="plan-feat">✅ Espaces de travail multi-utilisateurs</div>
+        <div class="plan-feat">✅ Gestion employés (permis, FCO, carte conducteur)</div>
         <div class="plan-feat">✅ Module finances & rentabilité</div>
         <div class="plan-feat">✅ Tableau de bord entreprise</div>
+        <div class="plan-feat">✅ Export PDF professionnel</div>
+        <div class="plan-feat">✅ Support prioritaire</div>
       </div>
-      <button class="btn" style="width:100%;justify-content:center;margin-top:16px;background:var(--blue-dim);color:var(--blue);border:1px solid rgba(59,130,246,0.3)" onclick="subscribePlan('entreprise')">
-        Choisir Entreprise →
+      <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:20px;padding:14px;font-size:1rem" onclick="subscribePlan('entreprise')">
+        Démarrer l'essai gratuit →
       </button>
+      <div style="text-align:center;font-size:.75rem;color:var(--ink3);margin-top:10px">Sans engagement · Résiliable à tout moment</div>
     </div>
 
   </div>
@@ -961,8 +927,8 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
   <h2 class="modal-title">Passez à Pro</h2>
   <p class="modal-sub" id="upgradeMsg" style="margin-bottom:24px">Débloquez toutes les fonctionnalités.</p>
   <div style="background:var(--accent-dim);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:16px;margin-bottom:24px">
-    <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:800;color:var(--accent)">4,99€<span style="font-size:.9rem;font-weight:400;color:var(--ink3)">/mois</span></div>
-    <div style="font-size:.82rem;color:var(--ink2);margin-top:4px">Véhicules illimités · Rappels email · Sans engagement</div>
+    <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:800;color:var(--accent)">200€<span style="font-size:.9rem;font-weight:400;color:var(--ink3)"> TTC/mois</span></div>
+    <div style="font-size:.82rem;color:var(--ink2);margin-top:4px">🎁 1 mois gratuit · Tout inclus · Sans engagement</div>
   </div>
   <div class="modal-actions" style="flex-direction:column;gap:10px">
     <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="closeModal('upgradeModal');switchTab('plans',null)">Voir les offres →</button>
@@ -2276,8 +2242,8 @@ function getPlanLabel(){
   return plans[currentUser?._plan||'gratuit']||'Gratuit';
 }
 
-function isPro(){return currentUser&&(currentUser._plan==='pro'||currentUser._plan==='entreprise');}
-function isEntreprise(){return currentUser&&currentUser._plan==='entreprise';}
+function isPro(){return true;} // Tout le monde a accès complet
+function isEntreprise(){return true;}
 
 // ════════════════════════════════════════
 // ONBOARDING
@@ -3539,9 +3505,9 @@ function renderWorkspacePicker(){
   if(dwsPicker){
     if(currentUser){
       dwsPicker.style.display='block';
-      dwsIcon.textContent=currentWorkspace?'🏢':'👤';
+      dwsIcon.textContent='🏢';
       const roleLabel=currentWorkspace&&currentWorkspace._myRole?` · ${getRoleLabel(currentWorkspace._myRole)}`:'';
-      dwsName.textContent=currentWorkspace?currentWorkspace.name+''+roleLabel:'Personnel';
+      dwsName.textContent=currentWorkspace?currentWorkspace.name+''+roleLabel:'Mon entreprise';
     } else {
       dwsPicker.style.display='none';
     }
@@ -3554,8 +3520,8 @@ function renderWorkspacePicker(){
     document.getElementById('workspaceIcon').textContent='🏢';
     document.getElementById('workspaceName').textContent=currentWorkspace.name;
   }else{
-    document.getElementById('workspaceIcon').textContent='👤';
-    document.getElementById('workspaceName').textContent='Personnel';
+    document.getElementById('workspaceIcon').textContent='🏢';
+    document.getElementById('workspaceName').textContent='Mon entreprise';
   }
 }
 
@@ -3564,14 +3530,6 @@ function openWorkspaceModal(){
   // Espace personnel
   const isPersonal=!currentWorkspace;
   list.innerHTML=`
-    <div class="ws-item ${isPersonal?'active':''}" onclick="switchWorkspace(null)">
-      <div class="ws-icon">👤</div>
-      <div class="ws-info">
-        <div class="ws-name">Personnel</div>
-        <div class="ws-role">Mes véhicules personnels</div>
-      </div>
-      ${isPersonal?'<span style="color:var(--accent)">✓</span>':''}
-    </div>
     ${workspaces.map(w=>{
       const active=currentWorkspace&&currentWorkspace.id===w.id;
       const isOwner=w.owner_id===currentUser.id;
