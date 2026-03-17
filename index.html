@@ -920,6 +920,30 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
 </div></div>
 
 <!-- ══ MODAL VÉHICULE ══ -->
+<!-- TRIAL MODAL -->
+<div class="modal-overlay" id="trialModal"><div class="modal" style="text-align:center">
+  <span class="modal-handle"></span>
+  <div style="font-size:2.5rem;margin-bottom:12px">🎉</div>
+  <h2 class="modal-title">Bienvenue sur AutoCT !</h2>
+  <p class="modal-sub" style="margin-bottom:20px">Démarrez votre <strong style="color:var(--accent)">mois gratuit</strong> maintenant.<br>Aucune carte bancaire requise.</p>
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px;text-align:left">
+    <div style="font-size:.82rem;color:var(--ink2);line-height:1.8">
+      ✅ Accès complet pendant 30 jours<br>
+      ✅ Véhicules, employés, finances illimités<br>
+      ✅ Rappels email automatiques<br>
+      💳 Puis <strong style="color:var(--ink)">200€ TTC/mois</strong> — résiliable à tout moment
+    </div>
+  </div>
+  <div class="modal-actions" style="flex-direction:column;gap:10px">
+    <button class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;font-size:1rem" onclick="startTrial()">
+      Démarrer mon essai gratuit →
+    </button>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center" onclick="closeModal('trialModal')">
+      Plus tard
+    </button>
+  </div>
+</div></div>
+
 <!-- UPGRADE MODAL -->
 <div class="modal-overlay" id="upgradeModal"><div class="modal" style="text-align:center">
   <span class="modal-handle"></span>
@@ -2255,6 +2279,20 @@ function startEnterpriseSignup(){
   // Montrer un message
   const err=document.getElementById('signupErr');
   if(err){err.style.color='var(--accent)';err.textContent='✨ Créez votre compte pour accéder au plan Entreprise';}
+}
+
+function showTrialModal(){
+  // Afficher seulement si pas encore abonné
+  if(currentUser && currentUser._plan && currentUser._plan !== 'gratuit') return;
+  // Afficher seulement une fois par session
+  if(sessionStorage.getItem('trial_shown')) return;
+  sessionStorage.setItem('trial_shown','1');
+  document.getElementById('trialModal').classList.add('open');
+}
+
+async function startTrial(){
+  closeModal('trialModal');
+  await subscribePlan('entreprise');
 }
 
 function showUpgradeModal(msg){
