@@ -1072,11 +1072,27 @@ input[type=range]{width:100px;accent-color:var(--accent);cursor:pointer}
         <div class="auth-err" id="loginErr"></div>
       </div>
       <div id="authSignup" style="display:none">
-        <div class="auth-title">Creer un compte</div>
-        <div class="auth-sub">Gratuit, sans engagement.</div>
-        <div class="auth-field"><label>Email</label><input type="email" id="signupEmail" placeholder="vous@email.com"></div>
-        <div class="auth-field"><label>Mot de passe</label><input type="password" id="signupPass" placeholder="Min. 8 caracteres" onkeydown="if(event.key==='Enter')doSignup()"></div>
-        <button class="auth-btn" id="signupBtn" onclick="doSignup()">Creer mon compte</button>
+        <div class="auth-title">Créer un compte</div>
+        <div class="auth-sub">Informations de votre entreprise pour la facturation.</div>
+        
+        <div class="auth-field"><label>Nom de l'entreprise *</label><input type="text" id="signupCompany" placeholder="Transport Dupont SARL"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="auth-field"><label>SIRET *</label><input type="text" id="signupSiret" placeholder="123 456 789 00012" maxlength="17"></div>
+          <div class="auth-field"><label>N° TVA</label><input type="text" id="signupTva" placeholder="FR12345678901"></div>
+        </div>
+        <div class="auth-field"><label>Adresse *</label><input type="text" id="signupAddress" placeholder="12 rue des Transporteurs"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="auth-field"><label>Code postal *</label><input type="text" id="signupPostal" placeholder="75001" maxlength="5"></div>
+          <div class="auth-field"><label>Ville *</label><input type="text" id="signupCity" placeholder="Paris"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="auth-field"><label>Téléphone</label><input type="text" id="signupPhone" placeholder="06 12 34 56 78"></div>
+          <div class="auth-field"><label>Email facturation</label><input type="email" id="signupBillingEmail" placeholder="compta@entreprise.fr"></div>
+        </div>
+        <div style="height:1px;background:var(--border);margin:12px 0"></div>
+        <div class="auth-field"><label>Email de connexion *</label><input type="email" id="signupEmail" placeholder="vous@email.com"></div>
+        <div class="auth-field"><label>Mot de passe *</label><input type="password" id="signupPass" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')doSignup()"></div>
+        <button class="auth-btn" id="signupBtn" onclick="doSignup()">Créer mon compte →</button>
         <div class="auth-err" id="signupErr"></div>
       </div>
     </div>
@@ -2041,26 +2057,54 @@ async function doLogin(){
 }
 
 async function doSignup(){
+  const company=document.getElementById('signupCompany')?.value.trim()||'';
+  const siret=document.getElementById('signupSiret')?.value.trim()||'';
+  const address=document.getElementById('signupAddress')?.value.trim()||'';
+  const postal=document.getElementById('signupPostal')?.value.trim()||'';
+  const city=document.getElementById('signupCity')?.value.trim()||'';
   const email=document.getElementById('signupEmail').value.trim();
   const pass=document.getElementById('signupPass').value;
   const btn=document.getElementById('signupBtn');
   const err=document.getElementById('signupErr');
-  if(!email||!pass){err.textContent='Remplissez tous les champs.';return;}
-  if(pass.length<8){err.textContent='Mot de passe minimum 8 caracteres.';return;}
-  btn.disabled=true;btn.textContent='Creation...';err.textContent='';
+
+  if(!company||!siret||!address||!postal||!city){
+    err.style.color='var(--urgent)';
+    err.textContent='Remplissez tous les champs obligatoires (*).';
+    return;
+  }
+  if(!email||!pass){err.style.color='var(--urgent)';err.textContent='Email et mot de passe requis.';return;}
+  if(pass.length<8){err.style.color='var(--urgent)';err.textContent='Mot de passe minimum 8 caractères.';return;}
+
+  btn.disabled=true;btn.textContent='Création...';err.textContent='';
   try{
     const data=await _authPost('signup',{email,password:pass});
     if(data.access_token){
       _saveSession(data);
+      // Sauvegarder le profil entreprise
+      try{
+        await _rest('POST','profiles',{
+          id:data.user.id,
+          type:'entreprise',
+          company_name:company,
+          siret:siret,
+          tva:document.getElementById('signupTva')?.value.trim()||'',
+          address:address,
+          postal_code:postal,
+          city:city,
+          phone:document.getElementById('signupPhone')?.value.trim()||'',
+          billing_email:document.getElementById('signupBillingEmail')?.value.trim()||email
+        });
+      }catch(e){console.error('profile save:',e);}
       await onLogin(data.user);
     }else{
       err.style.color='var(--accent)';
-      err.textContent='Compte cree ! Verifiez votre email pour confirmer.';
-      btn.disabled=false;btn.textContent='Creer mon compte';
+      err.textContent='Compte créé ! Vérifiez votre email pour confirmer.';
+      btn.disabled=false;btn.textContent='Créer mon compte →';
     }
   }catch(e){
+    err.style.color='var(--urgent)';
     err.textContent=e.message;
-    btn.disabled=false;btn.textContent='Creer mon compte';
+    btn.disabled=false;btn.textContent='Créer mon compte →';
   }
 }
 
@@ -2084,8 +2128,7 @@ async function onLogin(user){
   renderWorkspacePicker();
   // Charger le plan
   await loadSubscription();
-  // Vérifier si onboarding nécessaire
-  await checkOnboarding();
+  // Onboarding intégré dans l'inscription
   // Vérifier intention pro
   const intent = localStorage.getItem('ct_intent');
   if(intent){
