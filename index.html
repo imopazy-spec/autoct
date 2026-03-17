@@ -1611,8 +1611,8 @@ function formatPlaque(input){
 let _editingVehicleId = null;
 function openAddModal(){
   // Vérifier limite plan gratuit
-  if(!isPro() && !_editingVehicleId && vehicles.length >= 2){
-    showUpgradeModal('Vous avez atteint la limite de 2 véhicules du plan Gratuit.');
+  if(!isPro() && vehicles.length >= 2){
+    showUpgradeModal('Vous avez atteint la limite de 2 véhicules du plan Gratuit. Passez à Pro pour en ajouter plus !');
     return;
   }
   _editingVehicleId = null;
