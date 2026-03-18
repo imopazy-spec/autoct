@@ -196,8 +196,12 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 
 
 /* ── AUTH SCREEN ── */
-#authScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px}
-.auth-box{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:32px 28px;max-height:90vh;overflow-y:auto}
+#authScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:stretch;overflow:hidden}
+.auth-left{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 24px;overflow-y:auto;background:var(--bg)}
+.auth-right{width:420px;background:linear-gradient(135deg,#1A1C1E,#111315);border-left:1px solid var(--border);display:none;flex-direction:column;justify-content:center;padding:48px 40px;position:relative;overflow:hidden}
+@media(min-width:900px){.auth-right{display:flex}}
+.auth-right::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(249,115,22,0.12),transparent 70%);pointer-events:none}
+.auth-box{width:100%;max-width:420px;background:transparent}
 .auth-screen-inner{display:flex;gap:24px;width:100%;max-width:900px;align-items:flex-start}
 .auth-pro-card{flex:1;background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(249,115,22,0.02));border:1px solid rgba(249,115,22,0.3);border-radius:20px;padding:32px 28px;display:none}
 @media(min-width:768px){.auth-box{flex:1}.auth-pro-card{display:block}}
@@ -225,6 +229,15 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 .auth-btn:hover{opacity:.85}
 .auth-btn:disabled{opacity:.5;cursor:not-allowed}
 .auth-err{font-size:.8rem;color:var(--urgent);margin-top:10px;text-align:center;min-height:18px}
+/* AUTH STEPPER */
+.auth-step{display:flex;flex-direction:column;align-items:center;gap:4px;flex:0 0 auto}
+.auth-step-num{width:28px;height:28px;border-radius:50%;background:var(--surface2);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--ink3);transition:all .3s}
+.auth-step.active .auth-step-num{background:var(--accent);border-color:var(--accent);color:#fff}
+.auth-step.done .auth-step-num{background:var(--ok);border-color:var(--ok);color:#fff}
+.auth-step-label{font-size:.65rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.auth-step.active .auth-step-label{color:var(--accent)}
+.auth-step-line{flex:1;height:2px;background:var(--border);margin:0 6px;margin-bottom:16px;transition:background .3s}
+.auth-step-line.done{background:var(--accent)}
 /* ONBOARDING */
 #onboardingScreen{position:fixed;inset:0;background:var(--bg);z-index:500;display:none;align-items:center;justify-content:center;padding:24px}
 #onboardingScreen.open{display:flex}
@@ -2046,6 +2059,39 @@ function startProSignup(){
   document.getElementById('signupEmail').focus();
 }
 
+function goToStep2(){
+  const email=document.getElementById('signupEmail').value.trim();
+  const pass=document.getElementById('signupPass').value;
+  const err=document.getElementById('signupErr');
+  if(!email){err.textContent='Email requis.';return;}
+  if(!pass||pass.length<8){err.textContent='Mot de passe minimum 8 caractères.';return;}
+  err.textContent='';
+  document.getElementById('signupStep1').style.display='none';
+  document.getElementById('signupStep2').style.display='block';
+  // Stepper
+  document.getElementById('step1dot').classList.add('done');
+  document.getElementById('step2dot').classList.add('active');
+  document.getElementById('stepline1').classList.add('done');
+  // Cacher Google et tabs
+  document.getElementById('googleBtn').style.display='none';
+  document.getElementById('authDivider').style.display='none';
+  document.getElementById('authTabsBar').style.display='none';
+  document.getElementById('signupStepper').style.display='block';
+}
+
+function backToStep1(){
+  document.getElementById('signupStep1').style.display='block';
+  document.getElementById('signupStep2').style.display='none';
+  document.getElementById('step1dot').classList.remove('done');
+  document.getElementById('step1dot').classList.add('active');
+  document.getElementById('step2dot').classList.remove('active');
+  document.getElementById('stepline1').classList.remove('done');
+  document.getElementById('googleBtn').style.display='flex';
+  document.getElementById('authDivider').style.display='flex';
+  document.getElementById('authTabsBar').style.display='flex';
+  document.getElementById('signupStepper').style.display='none';
+}
+
 function switchAuthTab(tab){
   document.getElementById('tabLogin').classList.toggle('active',tab==='login');
   document.getElementById('tabSignup').classList.toggle('active',tab==='signup');
@@ -2091,15 +2137,14 @@ async function doSignup(){
   const btn=document.getElementById('signupBtn');
   const err=document.getElementById('signupErr');
 
+  const err2=document.getElementById('signupErr2')||err;
   if(!company||!siret||!address||!postal||!city){
-    err.style.color='var(--urgent)';
-    err.textContent='Remplissez tous les champs obligatoires (*).';
+    err2.style.color='var(--urgent)';
+    err2.textContent='Remplissez tous les champs obligatoires (*)';
     return;
   }
-  if(!email||!pass){err.style.color='var(--urgent)';err.textContent='Email et mot de passe requis.';return;}
-  if(pass.length<8){err.style.color='var(--urgent)';err.textContent='Mot de passe minimum 8 caractères.';return;}
 
-  btn.disabled=true;btn.textContent='Création...';err.textContent='';
+  btn.disabled=true;btn.textContent='Création...';err2.textContent='';
   try{
     const data=await _authPost('signup',{email,password:pass});
     if(data.access_token){
@@ -2142,13 +2187,15 @@ async function doSignup(){
 
       await onLogin(data.user);
     }else{
-      err.style.color='var(--accent)';
-      err.textContent='Compte créé ! Vérifiez votre email pour confirmer.';
+      const e2=document.getElementById('signupErr2')||document.getElementById('signupErr');
+      e2.style.color='var(--accent)';
+      e2.textContent='Compte créé ! Vérifiez votre email pour confirmer.';
       btn.disabled=false;btn.textContent='Créer mon compte →';
     }
   }catch(e){
-    err.style.color='var(--urgent)';
-    err.textContent=e.message;
+    const e3=document.getElementById('signupErr2')||document.getElementById('signupErr');
+    e3.style.color='var(--urgent)';
+    e3.textContent=e.message;
     btn.disabled=false;btn.textContent='Créer mon compte →';
   }
 }
