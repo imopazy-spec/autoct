@@ -2119,6 +2119,27 @@ async function doSignup(){
           billing_email:document.getElementById('signupBillingEmail')?.value.trim()||email
         });
       }catch(e){console.error('profile save:',e);}
+
+      // Créer automatiquement l'espace de travail entreprise
+      try{
+        const inviteCode=Math.random().toString(36).substring(2,10).toUpperCase();
+        const ws=await _rest('POST','workspaces',{
+          name:company,
+          owner_id:data.user.id,
+          invite_code:inviteCode
+        });
+        if(ws&&ws[0]){
+          // Ajouter comme owner
+          await _rest('POST','workspace_members',{
+            workspace_id:ws[0].id,
+            user_id:data.user.id,
+            role:'owner'
+          });
+          // Sauvegarder pour auto-sélection
+          localStorage.setItem('ct_ws', ws[0].id);
+        }
+      }catch(e){console.error('workspace create:',e);}
+
       await onLogin(data.user);
     }else{
       err.style.color='var(--accent)';
