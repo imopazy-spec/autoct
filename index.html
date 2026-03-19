@@ -197,10 +197,9 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 
 /* ── AUTH SCREEN ── */
 #authScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:stretch;overflow:hidden}
-.auth-left{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 24px;overflow-y:auto;background:var(--bg)}
-.auth-right{width:420px;background:linear-gradient(135deg,#1A1C1E,#111315);border-left:1px solid var(--border);display:none;flex-direction:column;justify-content:center;padding:48px 40px;position:relative;overflow:hidden}
+.auth-left{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:40px 24px}
+.auth-right{width:400px;background:#111315;border-left:1px solid var(--border);display:none;flex-direction:column;justify-content:center;padding:48px 40px;overflow:hidden;flex-shrink:0}
 @media(min-width:900px){.auth-right{display:flex}}
-.auth-right::before{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(249,115,22,0.12),transparent 70%);pointer-events:none}
 .auth-box{width:100%;max-width:420px;background:transparent}
 .auth-screen-inner{display:flex;gap:24px;width:100%;max-width:900px;align-items:flex-start}
 .auth-pro-card{flex:1;background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(249,115,22,0.02));border:1px solid rgba(249,115,22,0.3);border-radius:20px;padding:32px 28px;display:none}
