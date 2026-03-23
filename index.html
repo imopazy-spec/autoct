@@ -196,11 +196,16 @@ main{max-width:700px;margin:0 auto;padding:24px 16px}
 
 
 /* ── AUTH SCREEN ── */
-#authScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:stretch}
-.auth-left{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bg);padding:40px 24px;display:flex;flex-direction:column;align-items:center}
-.auth-right{width:400px;background:#111315;border-left:1px solid var(--border);display:none;flex-direction:column;justify-content:center;padding:48px 40px;overflow-y:auto;flex-shrink:0;position:sticky;top:0;height:100vh}
-@media(min-width:900px){.auth-right{display:flex}}
+#authScreen{position:fixed;inset:0;background:var(--bg);z-index:9999;overflow-y:auto;display:flex;justify-content:center;padding:40px 24px}
+.auth-left{display:none}
+.auth-right{display:none}
 .auth-box{width:100%;max-width:420px}
+@media(min-width:900px){
+  #authScreen{padding:0;overflow:hidden;display:flex}
+  .auth-left{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 24px;overflow-y:auto;background:var(--bg)}
+  .auth-right{width:400px;background:#111315;border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;padding:48px 40px;flex-shrink:0}
+  .auth-box{width:100%;max-width:420px}
+}
 .auth-screen-inner{display:flex;gap:24px;width:100%;max-width:900px;align-items:flex-start}
 .auth-pro-card{flex:1;background:linear-gradient(135deg,rgba(249,115,22,0.08),rgba(249,115,22,0.02));border:1px solid rgba(249,115,22,0.3);border-radius:20px;padding:32px 28px;display:none}
 @media(min-width:768px){.auth-box{flex:1}.auth-pro-card{display:block}}
@@ -2076,6 +2081,7 @@ function goToStep2(){
   document.getElementById('authDivider').style.display='none';
   document.getElementById('authTabsBar').style.display='none';
   document.getElementById('signupStepper').style.display='block';
+  document.getElementById('step2Actions').style.display='flex';
 }
 
 function backToStep1(){
@@ -2089,6 +2095,7 @@ function backToStep1(){
   document.getElementById('authDivider').style.display='flex';
   document.getElementById('authTabsBar').style.display='flex';
   document.getElementById('signupStepper').style.display='none';
+  document.getElementById('step2Actions').style.display='none';
 }
 
 function switchAuthTab(tab){
